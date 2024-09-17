@@ -21,10 +21,8 @@ const techStack = [
 export default function TechStack() {
   return (
     <div className="py-16 overflow-hidden">
-      <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
-          Tech Stack
-        </h2>
+      <div className="container mx-auto">
+        <h2 className="text-3xl font-bold mb-8  text-gray-800">I Use...</h2>
         <div className="flex overflow-x-hidden">
           <div className="flex animate-scroll">
             {[...techStack, ...techStack].map((tech, index) => (
