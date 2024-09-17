@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Ghost, Mail, Github, Linkedin } from "lucide-react";
+import { Ghost, Mail, Github, Linkedin, Download } from "lucide-react";
 import TechStack from "../tech-stack/tech-stack";
 import Header from "../header/header";
+// Removed the import of resume from a non-existent path
 
 export default function Profile() {
   return (
@@ -38,6 +39,9 @@ export default function Profile() {
           </Link>
           <Link href="https://www.linkedin.com/in/shanlefan/" target="_blank">
             <Linkedin size={30} />
+          </Link>
+          <Link href="/Shan-Le-Fan-Andrea-Resume.pdf" download target="_blank">
+            <Download size={30} />
           </Link>
         </div>
       </div>
