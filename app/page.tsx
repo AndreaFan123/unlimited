@@ -1,7 +1,16 @@
+import Profile from "@/components/profile/profile";
+import Projects from "@/components/projects/projects";
+
 export default function Home() {
   return (
-    <div className=" max-w-full items-center p-4 h-full gap-5 md:flex-row md:justify-between md:max-w-[700px] mx-auto lg:max-w-[900px] xl:max-w-[1200px] 2xl:max-w-[1400px]">
-      <main>Hello World</main>
+    <div className="container mx-auto px-5 py-16">
+      <main className="h-screen flex  w-full flex-col lg:flex-row items-start  justify-start">
+        {/* Profile component*/}
+        <Profile />
+        <section className="w-full lg:w-[70%]">
+          <Projects />
+        </section>
+      </main>
     </div>
   );
 }
