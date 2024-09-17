@@ -1,36 +1,72 @@
+import Link from "next/link";
+import Image from "next/image";
+import meetToday from "@/public/meet.today.png";
+import senryo from "@/public/senryo02.png";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 const projects = [
   {
-    name: "Project 1",
-    description: "Description 1",
+    name: "meet.today",
+    description: "Digital Business Card platform",
     link: "https://example.com",
+    src: meetToday,
   },
   {
-    name: "Project 2",
-    description: "Description 2",
-    link: "https://example.com",
+    name: "senryo",
+    description: "Food Delivery Platform",
+    link: "https://order.sen-ryo.com.hk/tc",
+    src: senryo,
   },
   {
-    name: "Project 3",
-    description: "Description 3",
+    name: "meet.today",
+    description: "Digital Business Card platform",
     link: "https://example.com",
+    src: meetToday,
+  },
+  {
+    name: "senryo",
+    description: "Food Delivery Platform",
+    link: "https://order.sen-ryo.com.hk/tc",
+    src: senryo,
   },
 ];
 
 export default function Projects() {
   return (
-    <section>
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
+    <div className="border-b-[1px] border-gray-400 border-dashed pb-16 ">
+      <h2 className="text-3xl font-bold md:pl-9 mb-8 text-gray-800">
         Projects
       </h2>
-      <div>
-        {projects.map((project) => (
-          <div key={project.name}>
-            <h3>{project.name}</h3>
-            <p>{project.description}</p>
-            <a href={project.link}>{project.link}</a>
-          </div>
+      <div className="flex flex-wrap lg:w-fit  gap-7 md:pl-9">
+        {projects.map((project, index) => (
+          <Card
+            className="w-full lg:w-[300px] h-auto"
+            key={`${project.name}-${index}`}
+          >
+            <Link href={project.link} target="_blank">
+              <CardHeader>
+                <Image
+                  src={project.src}
+                  alt={project.name}
+                  width={300}
+                  height={0}
+                  className="w-full h-auto"
+                />
+              </CardHeader>
+              <CardContent>
+                <CardTitle>{project.name}</CardTitle>
+                <CardDescription>{project.description}</CardDescription>
+              </CardContent>
+            </Link>
+          </Card>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
