@@ -5,9 +5,9 @@ import Header from "../header/header";
 
 export default function Profile() {
   return (
-    <section className="lg:sticky lg:px-4 lg:top-0 lg:h-screen flex flex-col gap-5 text-gray-600 w-full lg:w-[30%]">
+    <section className="lg:sticky  lg:px-4 lg:top-0 lg:h-screen flex flex-col gap-5 text-gray-600 w-full lg:w-[30%]">
       <Header />
-      <div className="pt-7 lg:sticky lg:top-[35px]">
+      <div className="pt-7">
         <div className="flex items-start gap-2">
           <Ghost width={50} height={50} />
           <div className="text-gray-800 font-semibold">

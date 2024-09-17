@@ -21,7 +21,7 @@ const techStack = [
 export default function TechStack() {
   return (
     <div className="py-16 overflow-hidden">
-      <div className="container mx-auto">
+      <div className="container mx-auto ">
         <h2 className="text-3xl font-bold mb-8  text-gray-800">I Use...</h2>
         <div className="flex overflow-x-hidden">
           <div className="flex animate-scroll">
