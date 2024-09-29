@@ -14,14 +14,16 @@ const projects = [
   {
     name: "meet.today",
     description: "Digital Business Card platform",
-    link: "https://example.com",
+    link: "/",
     src: meetToday,
+    status: "WIP",
   },
   {
     name: "senryo",
     description: "Food Delivery Platform",
     link: "https://order.sen-ryo.com.hk/tc",
     src: senryo,
+    status: "Done",
   },
 ];
 
@@ -48,7 +50,18 @@ export default function Projects() {
                 />
               </CardHeader>
               <CardContent>
-                <CardTitle>{project.name}</CardTitle>
+                <div className="flex justify-between items-center">
+                  <CardTitle>{project.name}</CardTitle>
+                  <span
+                    className={`text-gray-700 text-xs ${
+                      project.status === "Done"
+                        ? "bg-green-200 px-3 py-1 rounded-full"
+                        : "bg-orange-200 px-3 py-1 rounded-full"
+                    }`}
+                  >
+                    {project.status}
+                  </span>
+                </div>
                 <CardDescription>{project.description}</CardDescription>
               </CardContent>
             </Link>
@@ -58,8 +71,3 @@ export default function Projects() {
     </div>
   );
 }
-
-/**
- *  <div className="py-16 overflow-hidden">
-      <div className="container mx-auto ">
- */
