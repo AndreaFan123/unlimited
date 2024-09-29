@@ -39,7 +39,15 @@ export default function Projects() {
             className="w-full lg:w-[300px] h-auto"
             key={`${project.name}-${index}`}
           >
-            <Link href={project.link} target="_blank">
+            <Link
+              href={project.link}
+              target="_blank"
+              className={`${
+                project.status === "Done"
+                  ? "cursor-pointer"
+                  : "cursor-not-allowed"
+              }`}
+            >
               <CardHeader>
                 <Image
                   src={project.src}
