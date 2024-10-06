@@ -8,7 +8,7 @@ export default function Home() {
       <main className="h-screen flex  w-full flex-col lg:flex-row items-start  justify-start">
         <Profile />
         <div className="w-full xl:min-h-screen lg:border-l-[1px] lg:border-gray-400 lg:border-dashed">
-          <section className="w-full lg:h-[90%] lg:overflow-scroll lg:ml-[16px]">
+          <section className="w-full lg:h-[90%] lg:ml-8">
             <Projects />
           </section>
           <section>

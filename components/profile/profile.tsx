@@ -19,7 +19,7 @@ export default function Profile() {
         <article className="text-base py-9 leading-relaxed font-light flex flex-col gap-3">
           <p>
             Self-disciplined, curiosity-driven frontend engineer with a
-            marketing background, proficient in Next.js, React, TailwindCSS,
+            marketing background, and a passion for Next.js, React, TailwindCSS,
             JavaScript, TypeScript, HTML, and CSS.
           </p>
           <p>
