@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import meetToday from "@/public/meet.today.png";
 import senryo from "@/public/senryo02.png";
+import ROUTES from "@/constants";
 import {
   Card,
   CardContent,
@@ -14,16 +15,16 @@ const projects = [
   {
     name: "meet.today",
     description: "Digital Business Card platform",
-    link: "/",
+    link: ROUTES.MEETUTODAY,
     src: meetToday,
-    status: "WIP",
+    status: true,
   },
   {
     name: "senryo",
     description: "Food Delivery Platform",
-    link: "https://order.sen-ryo.com.hk/tc",
+    link: ROUTES.SENRYO,
     src: senryo,
-    status: "Done",
+    status: true,
   },
 ];
 
@@ -39,18 +40,16 @@ export default function Projects() {
                 href={project.link}
                 target="_blank"
                 className={`inline-block w-[300px] ${
-                  project.status === "Done"
-                    ? "cursor-pointer"
-                    : "cursor-not-allowed"
+                  project.status ? "cursor-pointer" : "cursor-not-allowed"
                 }`}
               >
                 <CardHeader>
                   <Image
                     src={project.src}
                     alt={project.name}
-                    width={0}
-                    height={0}
-                    className="w-full h-auto"
+                    width={1394}
+                    height={1024}
+                    className="w-full h-auto object-contain self-center"
                   />
                 </CardHeader>
                 <CardContent>
@@ -58,12 +57,12 @@ export default function Projects() {
                     <CardTitle>{project.name}</CardTitle>
                     <span
                       className={`text-gray-700 text-xs ${
-                        project.status === "Done"
+                        project.status
                           ? "bg-green-200 px-3 py-1 rounded-full"
                           : "bg-orange-200 px-3 py-1 rounded-full"
                       }`}
                     >
-                      {project.status}
+                      {project.status ? "Done" : "WIP"}
                     </span>
                   </div>
                   <CardDescription>{project.description}</CardDescription>
