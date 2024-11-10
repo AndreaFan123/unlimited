@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import meetToday from "@/public/meet.today.png";
-import senryo from "@/public/senryo02.png";
-import ROUTES from "@/constants";
+import meetToday from "@/public/assets/meet.today.png";
+import senryo from "@/public/assets/senryo02.png";
+import ROUTES from "@/constant/routes";
 import {
   Card,
   CardContent,
