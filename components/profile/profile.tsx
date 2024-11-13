@@ -30,21 +30,21 @@ export default function Profile() {
           </p>
         </article>
         <div className="flex gap-6">
-          <Link href={ROUTES.GITHUB} target="_blank" className="icon-hover">
+          <Link href={ROUTES.GITHUB} target="_blank" className="hoverEffect">
             <Github size={30} />
           </Link>
-          <Link href={ROUTES.LINKEDIN} target="_blank" className="icon-hover">
+          <Link href={ROUTES.LINKEDIN} target="_blank" className="hoverEffect">
             <Linkedin size={30} />
           </Link>
           <Link
             href={ROUTES.RESUME}
             download
             target="_blank"
-            className="icon-hover"
+            className="hoverEffect"
           >
             <Download size={30} />
           </Link>
-          <Link href={ROUTES.BLOG} target="_blank" className="icon-hover">
+          <Link href={ROUTES.BLOG} target="_blank" className="hoverEffect">
             <Rss size={30} />
           </Link>
         </div>

@@ -1,5 +1,13 @@
+import { Metadata } from "next";
 import Footer from "@/components/footer/footer";
 import Header from "@/components/header/header";
+
+export const metadata: Metadata = {
+  title: "Blog | Unlimited",
+  description:
+    "Rambling about web development, management, and other random stuff in my life 🚀",
+};
+
 export default function BlogLayout({
   children,
 }: Readonly<{
@@ -8,7 +16,9 @@ export default function BlogLayout({
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <main className="w-full mx-auto my-10 px-4 sm:max-w-full md:max-w-[800px]">
+        {children}
+      </main>
       <Footer />
     </>
   );
