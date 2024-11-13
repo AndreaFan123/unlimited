@@ -59,6 +59,7 @@ const config: Config = {
     },
     animation: {
       scroll: "scroll 30s linear infinite",
+      bounce: "bounce 1s infinite",
     },
     keyframes: {
       scroll: {
@@ -69,8 +70,18 @@ const config: Config = {
           transform: "translateX(-50%)",
         },
       },
+      bounce: {
+        "0%, 100%": {
+          transform: "translateX(-25%)",
+          animationTimingFunction: "cubic-bezier(0.8, 0, 1, 1)",
+        },
+        "50%": {
+          transform: "translateX(0)",
+          animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
+        },
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
 export default config;
