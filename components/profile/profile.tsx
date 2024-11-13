@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Ghost, Github, Linkedin, Download } from "lucide-react";
+import { Ghost, Github, Linkedin, Download, Rss } from "lucide-react";
 import TechStack from "../tech-stack/tech-stack";
 import Header from "../header/header";
-import ROUTES from "@/constants";
+import ROUTES from "@/constants/routes";
 
 export default function Profile() {
   return (
@@ -30,14 +30,22 @@ export default function Profile() {
           </p>
         </article>
         <div className="flex gap-6">
-          <Link href={ROUTES.GITHUB} target="_blank">
+          <Link href={ROUTES.GITHUB} target="_blank" className="icon-hover">
             <Github size={30} />
           </Link>
-          <Link href={ROUTES.LINKEDIN} target="_blank">
+          <Link href={ROUTES.LINKEDIN} target="_blank" className="icon-hover">
             <Linkedin size={30} />
           </Link>
-          <Link href={ROUTES.RESUME} download target="_blank">
+          <Link
+            href={ROUTES.RESUME}
+            download
+            target="_blank"
+            className="icon-hover"
+          >
             <Download size={30} />
+          </Link>
+          <Link href={ROUTES.BLOG} target="_blank" className="icon-hover">
+            <Rss size={30} />
           </Link>
         </div>
       </div>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import meetToday from "@/public/meet.today.png";
 import senryo from "@/public/senryo02.png";
-import ROUTES from "@/constants";
+import ROUTES from "@/constants/routes";
 import {
   Card,
   CardContent,

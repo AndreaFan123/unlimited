@@ -4,6 +4,7 @@ const ROUTES = {
   RESUME: "/Shan-Le-Fan-Andrea-Resume.pdf",
   SENRYO: "https://order.sen-ryo.com.hk/en",
   MEETUTODAY: "https://meetu.today/en",
+  BLOG: "/blog",
 };
 
 export default ROUTES;
