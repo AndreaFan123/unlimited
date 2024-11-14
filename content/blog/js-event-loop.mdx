@@ -53,12 +53,7 @@ Essentially, the Event Loop continuously checks if the call stack is empty, then
 
 Let's take a diagram to understand how the Event Loop works and how it handles the macrotasks.
 
-<Image
-  src="/static/event-loop/macro.png"
-  alt="macro task"
-  width={1000}
-  height={1000}
-/>
+<Image src="/static/macro.png" alt="macro task" width={1000} height={1000} />
 
 1. JavaScript runtime starts reading the code, and create a global execution context, and push it to the call stack, in this stage, think of **main()** is a function that is being executed.
 
@@ -66,7 +61,7 @@ Let's take a diagram to understand how the Event Loop works and how it handles t
 3. The second line of code is a **setTimeout()**, it will be pushed to the call stack as well, but then it will be moved to the Web APIs, and registered a timer.
 
 <Image
-  src="/static/event-loop/register-timer.png"
+  src="/static/register-timer.png"
   alt="register timer"
   width={1000}
   height={1000}
@@ -78,17 +73,12 @@ Let's take a diagram to understand how the Event Loop works and how it handles t
 
 This is a diagram to show how the Event Loop works and how it handles the microtasks.
 
-<Image
-  src="/static/event-loop/micro.png"
-  alt="micro task"
-  width={1000}
-  height={1000}
-/>
+<Image src="/static/micro.png" alt="micro task" width={1000} height={1000} />
 
 When there're microtasks and macrotasks, the Event Loop will always handle the microtasks first, then it will handle the macrotasks.
 
 <Image
-  src="/static/event-loop/micro-macro.png"
+  src="/static/micro-macro.png"
   alt="micro and macro"
   width={1000}
   height={1000}
