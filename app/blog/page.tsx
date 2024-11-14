@@ -1,5 +1,5 @@
 import { posts } from "#site/content";
-import Post from "@/components/post-list/post";
+import Post from "@/components/post-list/Post";
 import QueryPagination from "@/components/pagination/query-pagination";
 import { sortPosts } from "@/lib/utils";
 
