@@ -1,6 +1,9 @@
 import { posts } from "#site/content";
 import { notFound } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { ArrowLeft } from "lucide-react";
+import ROUTES from "@/constants/routes";
+import Link from "next/link";
 import MdxContent from "@/components/mdx/MdxComponent";
 
 import "@/styles/mdx.css";
@@ -39,6 +42,14 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       </div>
       <Separator />
       <MdxContent code={post.body} />
+      <Link
+        className="hover:text-orange-500 transition-all duration-300"
+        href={ROUTES.BLOG}
+      >
+        <div className="flex items-center gap-2">
+          <ArrowLeft className="w-4 h-4" /> <span>Back to Blog</span>
+        </div>
+      </Link>
     </article>
   );
 }
