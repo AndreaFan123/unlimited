@@ -6,6 +6,7 @@ const ROUTES = {
   SENRYO: "https://order.sen-ryo.com.hk/en",
   MEETUTODAY: "https://meetu.today/en",
   BLOG: "/blog",
+  BLOG_SLUG: "/blog/[slug]",
 };
 
 export default ROUTES;

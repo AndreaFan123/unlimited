@@ -1,54 +1,43 @@
-import Link from "next/link";
-import { Ghost, Github, Linkedin, Download, Rss } from "lucide-react";
 import TechStack from "../tech-stack/tech-stack";
+import SOCIALS from "@/constants/socials";
 import Header from "../header/header";
-import ROUTES from "@/constants/routes";
+import SocialLink from "./socialLink";
+import PersonInfo from "./person-info";
+import PostContainer from "./post-container";
+import { posts } from "#site/content";
+import { sortPosts } from "@/lib/utils";
 
 export default function Profile() {
+  const sortedPosts = sortPosts(posts.filter((post) => post.published));
+  const latestPosts = sortedPosts.slice(0, 2);
   return (
     <section className="lg:sticky  lg:px-4 lg:top-0 lg:h-screen flex flex-col gap-5 text-gray-600 w-full lg:w-[30%]">
       <Header />
       <div className="pt-7">
-        <div className="flex items-start gap-2">
-          <Ghost width={50} height={50} />
-          <div className="text-gray-800 font-semibold">
-            <h5>Shan Le Fan(Andrea)</h5>
-            <span>Frontend Developer && Marketer</span>
-          </div>
-        </div>
-        <article className="text-base py-9 leading-relaxed font-light flex flex-col gap-3">
-          <p>
-            Self-disciplined, curiosity-driven frontend engineer with a
-            marketing background, and a passion for Next.js, React, TailwindCSS,
-            JavaScript, TypeScript, HTML, and CSS.
-          </p>
-          <p>
-            Highly adept at independent and collaborative projects, with strong
-            focus on website development and user experience. Passionate about
-            applying technical skills in volunteer projects for community
-            impact.
-          </p>
-        </article>
+        <PersonInfo
+          name="Shan Le Fan(Andrea)"
+          title="Frontend Developer && Marketer"
+          content_1="Self-disciplined, curiosity-driven frontend engineer with a marketing background, and a passion for Next.js, React, TailwindCSS, JavaScript, TypeScript, HTML, and CSS."
+          content_2="Highly adept at independent and collaborative projects, with strong focus on website development and user experience. Passionate about applying technical skills in volunteer projects for community impact."
+        />
         <div className="flex gap-6">
-          <Link href={ROUTES.GITHUB} target="_blank" className="hoverEffect">
-            <Github size={30} />
-          </Link>
-          <Link href={ROUTES.LINKEDIN} target="_blank" className="hoverEffect">
-            <Linkedin size={30} />
-          </Link>
-          <Link
-            href={ROUTES.RESUME}
-            download
-            target="_blank"
-            className="hoverEffect"
-          >
-            <Download size={30} />
-          </Link>
-          <Link href={ROUTES.BLOG} target="_blank" className="hoverEffect">
-            <Rss size={30} />
-          </Link>
+          {SOCIALS.map((socialItem) => (
+            <SocialLink
+              key={socialItem.name}
+              icon={socialItem.icon}
+              url={socialItem.url}
+              target={socialItem.target}
+            />
+          ))}
         </div>
       </div>
+
+      <ul className="py-7 flex flex-col gap-3">
+        <h2 className="text-3xl font-bold text-gray-700">Latest Posts</h2>
+        {latestPosts.map((post) => (
+          <PostContainer key={post.slug} post={post} />
+        ))}
+      </ul>
       <TechStack />
     </section>
   );

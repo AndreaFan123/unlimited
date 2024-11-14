@@ -2,6 +2,9 @@ import { posts } from "#site/content";
 import { notFound } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import MdxContent from "@/components/mdx/MdxComponent";
+
+import "@/styles/mdx.css";
+
 type PostPageProps = {
   params: {
     slug: string[];
