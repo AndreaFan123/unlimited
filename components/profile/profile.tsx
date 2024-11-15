@@ -13,7 +13,7 @@ export default function Profile() {
   return (
     <section className="lg:sticky  lg:px-4 lg:top-0 lg:h-screen flex flex-col gap-5 text-gray-600 w-full lg:w-[30%]">
       <Header />
-      <div className="pt-7">
+      <div className="mt-7 px-4 sm:px-0">
         <PersonInfo
           name="Shan Le Fan(Andrea)"
           title="Frontend Developer && Marketer"
@@ -27,17 +27,19 @@ export default function Profile() {
               icon={socialItem.icon}
               url={socialItem.url}
               target={socialItem.target}
+              ariaLabel={socialItem.ariaLabel}
             />
           ))}
         </div>
       </div>
-
-      <ul className="py-7 flex flex-col gap-3">
+      <div className="flex flex-col mt-7 px-4 sm:px-0">
         <h2 className="text-3xl font-bold text-gray-700">Latest Posts</h2>
-        {latestPosts.map((post) => (
-          <PostContainer key={post.slug} post={post} />
-        ))}
-      </ul>
+        <ul className="py-4 flex flex-col gap-3">
+          {latestPosts.map((post) => (
+            <PostContainer key={post.slug} post={post} />
+          ))}
+        </ul>
+      </div>
       <TechStack />
     </section>
   );
