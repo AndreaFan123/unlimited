@@ -2,17 +2,10 @@ import {
   RiReactjsFill,
   RiNextjsFill,
   RiTailwindCssFill,
-  RiVuejsFill,
   RiCss3Fill,
   RiHtml5Fill,
 } from "react-icons/ri";
-import {
-  BiLogoTypescript,
-  BiLogoJavascript,
-  BiLogoFlask,
-  BiLogoPython,
-  BiLogoDjango,
-} from "react-icons/bi";
+import { BiLogoTypescript, BiLogoJavascript } from "react-icons/bi";
 
 const techStack = [
   { name: "Next.js", logo: RiNextjsFill },
@@ -22,17 +15,15 @@ const techStack = [
   { name: "JavaScript", logo: BiLogoJavascript },
   { name: "TypeScript", logo: BiLogoTypescript },
   { name: "TailwindCSS", logo: RiTailwindCssFill },
-  { name: "Vue", logo: RiVuejsFill },
-  { name: "Python", logo: BiLogoPython },
-  { name: "Flask", logo: BiLogoFlask },
-  { name: "Django", logo: BiLogoDjango },
 ];
 
 export default function TechStack() {
   return (
-    <div className="py-7 overflow-hidden">
+    <div className="py-7 overflow-hidden px-4 sm:px-0">
       <div className="container mx-auto ">
-        <h2 className="text-3xl font-bold text-gray-700 mb-4">I Use...</h2>
+        <h2 className="text-3xl font-bold text-gray-700 mb-5">
+          I am focusing on...
+        </h2>
         <div className="flex overflow-x-hidden">
           <div className="flex animate-scroll ">
             {[...techStack, ...techStack].map((tech, index) => (

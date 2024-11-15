@@ -30,9 +30,9 @@ const projects = [
 
 export default function Projects() {
   return (
-    <div className="w-full mt-8">
+    <div className="w-full mt-8 px-4 sm:px-0">
       <h2 className="text-3xl font-bold mb-8 text-gray-800">Projects</h2>
-      <div className="border-b-[1px] pt-4 border-gray-400 border-dashed pb-16 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
+      <div className="border-b-[1px] pt-4 border-gray-400 border-dashed pb-10 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
         <div className="flex overflow-x-auto lg:w-fit gap-7">
           {projects.map((project, index) => (
             <Card key={`${project.name}-${index}`}>
