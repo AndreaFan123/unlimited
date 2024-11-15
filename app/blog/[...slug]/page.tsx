@@ -2,6 +2,8 @@ import { posts } from "#site/content";
 import { notFound } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { Calendar } from "lucide-react";
 import ROUTES from "@/constants/routes";
 import Link from "next/link";
 import MdxContent from "@/components/mdx/MdxComponent";
@@ -30,15 +32,20 @@ export const generateStaticParams = async (): Promise<
 
 export default async function BlogPostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
-
   if (!post || !post.published) {
     notFound();
+    return;
   }
+  const formattedDate = formatDate(post.date);
   return (
     <article className="flex w-full flex-col gap-4 items-start prose">
       <div className="pb-5">
         <h1>{post.title}</h1>
         {post.description && <p>{post.description}</p>}
+        <span className="flex items-center gap-2 text-sm text-gray-500">
+          <Calendar className="w-4 h-4" color="#4b5563" />
+          {formattedDate}
+        </span>
       </div>
       <Separator />
       <MdxContent code={post.body} />
