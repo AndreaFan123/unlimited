@@ -11,7 +11,7 @@ export default function Profile() {
   const sortedPosts = sortPosts(posts.filter((post) => post.published));
   const latestPosts = sortedPosts.slice(0, 2);
   return (
-    <section className="lg:sticky  lg:px-4 lg:top-0 lg:h-screen flex flex-col gap-5 text-gray-600 w-full lg:w-[30%]">
+    <section className="lg:sticky lg:px-4 lg:top-0 lg:min-h-screen flex flex-col gap-5 text-gray-600 w-full lg:w-[30%]">
       <Header />
       <div className="mt-7 px-4 sm:px-0">
         <PersonInfo
