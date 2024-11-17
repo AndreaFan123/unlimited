@@ -1,7 +1,9 @@
+/* eslint-disable import/no-anonymous-default-export */
 
+import { NextConfig } from "next";
+import { build } from "velite";
 
-/** @type {import('next').NextConfig} */
-export default {
+const nextConfig: NextConfig = {
   // othor next config here...
   webpack: (config) => {
     config.plugins.push(new VeliteWebpackPlugin());
@@ -11,7 +13,16 @@ export default {
 
 class VeliteWebpackPlugin {
   static started = false;
-  apply(/** @type {import('webpack').Compiler} */ compiler) {
+  apply(
+    /** @type {import('webpack').Compiler} */ compiler: {
+      hooks: {
+        beforeCompile: {
+          tapPromise: (arg0: string, arg1: () => Promise<void>) => void;
+        };
+      };
+      options: { mode: string };
+    }
+  ) {
     // executed three times in nextjs
     // twice for the server (nodejs / edge runtime) and once for the client
     compiler.hooks.beforeCompile.tapPromise("VeliteWebpackPlugin", async () => {
@@ -22,3 +33,5 @@ class VeliteWebpackPlugin {
     });
   }
 }
+
+export default nextConfig;
