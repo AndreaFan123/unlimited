@@ -6,7 +6,6 @@ export type MetadataType = {
   keywords: string[];
 };
 
-// Common keywords for En and Tc
 const commonKeywordsEn = [
   "Andrea Fan",
   "Portfolio",
@@ -15,7 +14,6 @@ const commonKeywordsEn = [
   "Taiwan",
 ];
 
-// Landing page metadata
 export const landingPageContent: MetadataType = {
   title: "Unlimited | Andrea Fan's Portfolio",
   description:
