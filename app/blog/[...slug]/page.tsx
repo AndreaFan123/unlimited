@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 import { Calendar } from "lucide-react";
 import ROUTES from "@/constants/routes";
 import Link from "next/link";
-import MdxContent from "@/components/mdx/mdxComponent";
+import MdxContent from "@/components/mdx/MdxComponent";
 
 import "@/styles/mdx.css";
 import { generatePageMetadata } from "@/config/metadata";

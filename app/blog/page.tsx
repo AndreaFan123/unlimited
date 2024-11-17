@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { blogPageContent, generatePageMetadata } from "@/config/metadata";
 import { posts } from "#site/content";
-import Post from "@/components/post-list/post";
-import QueryPagination from "@/components/pagination/query-pagination";
+import Post from "@/components/post-list/Post";
+import QueryPagination from "@/components/pagination/QueryPagination";
 import { sortPosts } from "@/lib/utils";
 
 type BlogPageProps = {

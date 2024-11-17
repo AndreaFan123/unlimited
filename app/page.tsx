@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Profile from "@/components/profile/profile";
-import Projects from "@/components/projects/projects";
-import WorkExperience from "@/components/work-experience/work-experience";
+import Profile from "@/components/profile/Profile";
+import Projects from "@/components/projects/Projects";
+import WorkExperience from "@/components/work-experience/WorkExperience";
 import { landingPageContent, generatePageMetadata } from "@/config/metadata";
 
 export const metadata: Metadata = generatePageMetadata(landingPageContent);
