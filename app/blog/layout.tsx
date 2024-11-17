@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import Footer from "@/components/footer/Footer";
-import Header from "@/components/header/Header";
+import Footer from "@/components/normal-components/Footer";
+import Header from "@/components/normal-components/Header";
 
 export const metadata: Metadata = {
   title: "Blog | Unlimited",

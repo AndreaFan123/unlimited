@@ -1,6 +1,6 @@
 import TechStack from "../tech-stack/TechStack";
 import SOCIALS from "@/constants/socials";
-import Header from "../header/Header";
+import Header from "../normal-components/Header";
 import SocialLink from "./SocialLink";
 import PersonInfo from "./PersonInfo";
 import PostContainer from "./PostContainer";
