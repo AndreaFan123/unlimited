@@ -1,7 +1,7 @@
 import TechStack from "@/components/tech-stack/TechStack";
 import SOCIALS from "@/constants/socials";
 import Header from "@/components/normal-components/Header";
-import SocialLink from "@/components/profile/SocialLink";
+import ExternalLink from "@/components/profile/ExternalLink";
 import PersonInfo from "@/components/profile/PersonInfo";
 import PostContainer from "@/components/profile/PostContainer";
 import { posts } from "#site/content";
@@ -22,7 +22,7 @@ export default function ProfileContainer() {
         />
         <div className="flex gap-6">
           {SOCIALS.map((socialItem) => (
-            <SocialLink
+            <ExternalLink
               key={socialItem.name}
               icon={socialItem.icon}
               url={socialItem.url}

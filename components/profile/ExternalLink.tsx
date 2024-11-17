@@ -1,18 +1,18 @@
 import Link from "next/link";
 
-type SocialLinkProps = {
+type ExternalLinkProps = {
   icon: JSX.Element;
   url: string;
   target: string;
   ariaLabel: string;
 };
 
-export default function SocialLink({
+export default function ExternalLink({
   icon,
   url,
   target,
   ariaLabel,
-}: SocialLinkProps) {
+}: ExternalLinkProps) {
   return (
     <Link
       href={url}
