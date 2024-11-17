@@ -7,7 +7,7 @@ import PostContainer from "./PostContainer";
 import { posts } from "#site/content";
 import { sortPosts } from "@/lib/utils";
 
-export default function Profile() {
+export default function ProfileContainer() {
   const sortedPosts = sortPosts(posts.filter((post) => post.published));
   const latestPosts = sortedPosts.slice(0, 2);
   return (

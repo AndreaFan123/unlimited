@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function Projects() {
+export default function ProjectContainer() {
   return (
     <div className="w-full mt-8 px-4 sm:px-0">
       <h2 className="text-3xl font-bold mb-8 text-gray-800">Projects</h2>
