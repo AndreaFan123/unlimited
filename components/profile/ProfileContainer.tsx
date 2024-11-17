@@ -1,9 +1,9 @@
-import TechStack from "../tech-stack/TechStack";
+import TechStack from "@/components/tech-stack/TechStack";
 import SOCIALS from "@/constants/socials";
-import Header from "../normal-components/Header";
-import SocialLink from "./SocialLink";
-import PersonInfo from "./PersonInfo";
-import PostContainer from "./PostContainer";
+import Header from "@/components/normal-components/Header";
+import SocialLink from "@/components/profile/SocialLink";
+import PersonInfo from "@/components/profile/PersonInfo";
+import PostContainer from "@/components/profile/PostContainer";
 import { posts } from "#site/content";
 import { sortPosts } from "@/lib/utils";
 
