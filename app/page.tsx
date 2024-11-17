@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import Profile from "@/components/profile/profile";
 import Projects from "@/components/projects/projects";
 import WorkExperience from "@/components/work-experience/work-experience";
+import { landingPageContent, generatePageMetadata } from "@/config/metadata";
+
+export const metadata: Metadata = generatePageMetadata(landingPageContent);
 
 export default function Home() {
   return (

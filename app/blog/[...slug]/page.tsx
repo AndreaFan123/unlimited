@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+import { singleBlogPageContent } from "@/config/metadata";
 import { posts } from "#site/content";
 import { notFound } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
@@ -9,12 +11,20 @@ import Link from "next/link";
 import MdxContent from "@/components/mdx/mdxComponent";
 
 import "@/styles/mdx.css";
+import { generatePageMetadata } from "@/config/metadata";
 
 type PostPageProps = {
   params: {
     slug: string[];
   };
 };
+
+export async function generateMetadata({
+  params,
+}: PostPageProps): Promise<Metadata> {
+  const post = await getPostFromParams(params);
+  return generatePageMetadata(singleBlogPageContent, post?.title);
+}
 
 const getPostFromParams = async (params: PostPageProps["params"]) => {
   const slug = params?.slug?.join("/");
@@ -34,8 +44,8 @@ export default async function BlogPostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
   if (!post || !post.published) {
     notFound();
-    return;
   }
+
   const formattedDate = formatDate(post.date);
   return (
     <article className="flex w-full flex-col gap-4 items-start prose">

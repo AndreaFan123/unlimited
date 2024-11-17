@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+import { blogPageContent, generatePageMetadata } from "@/config/metadata";
 import { posts } from "#site/content";
 import Post from "@/components/post-list/post";
 import QueryPagination from "@/components/pagination/query-pagination";
@@ -8,6 +10,8 @@ type BlogPageProps = {
     page?: string;
   };
 };
+
+export const metadata: Metadata = generatePageMetadata(blogPageContent);
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const postsPerPage = 3;
