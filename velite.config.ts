@@ -27,8 +27,8 @@ export default defineConfig({
   root: "content",
   output: {
     data: ".velite",
-    assets: "public/images",
-    base: "/images/",
+    assets: "public/static",
+    base: "/static/",
     name: "[name]-[hash:6].[ext]",
     clean: false,
   },
