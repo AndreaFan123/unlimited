@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import projectList from "@/constants/project-list";
-import TechTag from "./tech-tag";
+import TechTag from "./TechTag";
 import {
   Card,
   CardContent,
