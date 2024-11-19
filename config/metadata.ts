@@ -44,11 +44,12 @@ export const singleBlogPageContent: MetadataType = {
 
 export function generatePageMetadata(
   content: MetadataType,
-  blogTitle?: string
+  blogTitle?: string,
+  blogDescription?: string
 ): Metadata {
   return {
     title: blogTitle ? `${blogTitle} | ${content.title}` : content.title,
-    description: content.description,
+    description: blogDescription ?? content.description,
     keywords: content.keywords,
   };
 }
