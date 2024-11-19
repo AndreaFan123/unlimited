@@ -23,7 +23,11 @@ export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
   const post = await getPostFromParams(params);
-  return generatePageMetadata(singleBlogPageContent, post?.title);
+  return generatePageMetadata(
+    singleBlogPageContent,
+    post?.title,
+    post?.description
+  );
 }
 
 const getPostFromParams = async (params: PostPageProps["params"]) => {
@@ -63,8 +67,8 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         className="hover:text-orange-500 transition-all duration-300"
         href={ROUTES.BLOG}
       >
-        <div className="flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> <span>Back to Blog</span>
+        <div className="flex mt-9 items-center gap-2">
+          <ArrowLeft className="w-4 h-4" /> <span>Back to Blog 🏃🏽‍♀️</span>
         </div>
       </Link>
     </article>
