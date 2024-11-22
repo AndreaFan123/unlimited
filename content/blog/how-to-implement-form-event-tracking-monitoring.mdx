@@ -1,6 +1,174 @@
 ---
 title: "How to implement form event tracking and monitoring?"
 description: Let's get our hands dirty and implement form event tracking and monitoring
-date: 2024-11-20
-published: false
+date: 2024-11-22
+published: true
 ---
+
+In the last article - [Event tracking and monitoring](/blog/event-tracking-and-monitoring), I cover the basic use cases for event tracking and monitoring.
+
+In this article, let's get our hands dirty and implement form event tracking and monitoring.
+
+## HTML Form
+
+Let's start with a simple HTML form.
+
+```html
+<form
+  id="registrationForm"
+  name="registrationForm"
+  action="/submit"
+  method="post"
+  novalidate
+  aria-label="form-title"
+>
+  <h1 id="form-title" tabindex="-1">Registration</h1>
+  <div
+    id="error-summary"
+    class="error-summary visually-hidden"
+    role="alert"
+    aria-live="polite"
+  >
+  </div>
+  <div>
+    <label for="name">
+      Name
+      <span class="required" aria-hidden="true">*</span>
+      <span class="visually-hidden">required</span>
+    </label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      required
+      aria-required="true"
+      aria-describedby="name-hint name-error"
+    />
+    <span id="name-hint" class="hint">Enter your first and last name</span>
+    <span id="name-error" class="error" role="alert"></span>
+  </div>
+  <div class="form-group">
+    <label for="email" class="label">
+      Email Address
+      <span class="required" aria-hidden="true">*</span>
+      <span class="visually-hidden">required</span>
+    </label>
+    <input 
+      type="email" 
+      id="email" 
+      name="email" 
+      required
+      aria-required="true"
+      aria-describedby="email-hint email-error"
+      autocomplete="email">
+    <span id="email-hint" class="hint">We'll never share your email</span>
+    <span id="email-error" class="error" role="alert"></span>
+  </div>
+  <button
+    id="submit-button"
+    type="submit"
+    aria-describedby="submit-hint">
+    Register
+  </button>
+  <span id="submit-hint" class="visually-hidden">
+    Submitting this form will create your account
+  </span>
+</form>
+```
+
+Above is a simple registration form with name, email and submit button.
+
+
+## Identify what events we want to track
+
+From marketing perspective, a registration form is a conversion funnel, I'd like to track how many users visit the form, how many of them interact with the form, and how many of them successfully submit the form, so basically I want to track the following events:
+
+- Web visit
+- Focus on the form / interact with the form
+- Click submit button
+- Submit form successfully
+
+## Implement event tracking
+
+Now that we have a basic event trakcing plan, let's implement it.
+
+### Web visit
+
+```html
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    try {
+      trackEvent('registration_form_visit', {
+        eventType: "page_view",
+        eventCategory: "registration_form",
+        eventAction: "visit",
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+        sessionId: getSessionId(),
+      });
+    } catch (error) {
+      console.error('Error tracking web visit', error);
+    }
+  });
+</script>
+```
+
+session id is a unique identifier for a user's session, with this we can track how many users visit the form and how many users interact with the form.
+
+### Focus on the form / interact with the form
+
+Next, we want to track when a user focuses on the form or interacts with the form, we can use `focus` and `input` event to track this.
+
+```html
+<script>
+  const inputFields = document.querySelectorAll('input');
+  inputFields.forEach(input => {
+    input.addEventListener('focus', () => {
+      trackEvent('registration_form_focus', {
+        eventType: 'interaction',
+        eventCategory: 'registration_form',
+        eventAction: 'focus',
+        field: input.name,
+        sessionId: getSessionId(),
+      });
+    });
+  });
+</script>
+```
+
+### Click submit button and Submit form successfully
+
+Click button is not equals to submit form successfully, so let's track the click event first, and then if the form is valid, then we can track the submit event.
+
+```html
+<script>
+  const handleSubmit = () => {
+    const form = document.querySelector('#registrationForm');
+    if (!form.checkValidity()) {
+      console.error('Form is invalid');
+      return;
+    }
+    trackEvent('registration_form_submit_success', {
+      eventType: 'registration_form_conversion',
+      sessionId: getSessionId(),
+      timestamp: new Date().toISOString(),
+      formData: new FormData(form),
+    });
+  }
+
+  const submitButton = document.querySelector('#submit-button');
+  submitButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    trackEvent('registration_form_click', {
+      eventType: 'interaction',
+      eventCategory: 'registration_form',
+      eventAction: 'click',
+      sessionId: getSessionId(),
+      timestamp: new Date().toISOString(),
+    });
+    handleSubmit();
+  });
+  
+</script>
+```
+
