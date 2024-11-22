@@ -11,7 +11,7 @@ const workExperience = [
     position: "Senior Marketing",
     duration: "2021-10-01 ~ 2022-12-01",
     description:
-      "Responsible for TW/HK/MO market, including market strategy, competitor analysis, and product positioning.",
+      "Responsible for TW/HK/MO market, including marketing strategy, online and offline campaigns, competitor analysis, market research.",
   },
   {
     company: "exe",
