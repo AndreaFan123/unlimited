@@ -27,31 +27,51 @@ const components = {
     />
   ),
   h2: ({ children }: { children: React.ReactNode }) => (
-    <h2 className="mt-5 m-0 font-black">{children}</h2>
+    <h2 className="mt-5 m-0 font-black text-gray-700 dark:text-gray-300">
+      {children}
+    </h2>
   ),
   h3: ({ children }: { children: React.ReactNode }) => (
-    <h3 className="mt-5 mb-0 font-bold">{children}</h3>
+    <h3 className="mt-5 mb-0 font-bold text-gray-700 dark:text-gray-300">
+      {children}
+    </h3>
   ),
   h4: ({ children }: { children: React.ReactNode }) => (
-    <h4 className="mt-4 mb-0 font-bold">{children}</h4>
+    <h4 className="mt-4 mb-0 font-bold text-gray-700 dark:text-gray-300">
+      {children}
+    </h4>
+  ),
+  h5: ({ children }: { children: React.ReactNode }) => (
+    <h5 className="mt-4 mb-0 font-bold text-gray-700 dark:text-gray-300">
+      {children}
+    </h5>
   ),
   p: ({ children }: { children: React.ReactNode }) => (
-    <p className="my-0">{children}</p>
+    <p className="my-0 text-gray-700 dark:text-gray-300">{children}</p>
   ),
   figure: ({ children }: { children: React.ReactNode }) => (
-    <figure className="my-0 w-full">{children}</figure>
+    <figure className="my-0 w-full text-gray-700 dark:text-gray-300">
+      {children}
+    </figure>
   ),
   ul: ({ children }: { children: React.ReactNode }) => (
-    <ul className="mt-0 w-full">{children}</ul>
+    <ul className="mt-0 w-full text-gray-700 dark:text-gray-300">{children}</ul>
   ),
   li: ({ children }: { children: React.ReactNode }) => (
-    <li className="mt-0 w-full">{children}</li>
+    <li className="mt-0 w-full text-gray-700 dark:text-gray-300">{children}</li>
   ),
   blockquote: ({ children }: { children: React.ReactNode }) => (
-    <blockquote className="border-[#5350a6]">{children}</blockquote>
+    <blockquote className="border-[#5350a6] text-gray-700 dark:text-gray-300">
+      {children}
+    </blockquote>
   ),
   strong: ({ children }: { children: React.ReactNode }) => (
     <strong className="rounded bg-[#c3c2ed] px-1">{children}</strong>
+  ),
+  a: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href} className="text-gray-700 dark:text-gray-300">
+      {children}
+    </a>
   ),
 };
 

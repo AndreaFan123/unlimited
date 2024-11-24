@@ -30,7 +30,9 @@ const workExperience = [
 export default function WorkExperience() {
   return (
     <div className="mt-[20px] md:pl-9 mb-8 px-4 sm:px-0">
-      <h2 className="text-2xl mb-[20px] font-bold">Work Experience</h2>
+      <h2 className="text-2xl mb-[20px] font-bold text-gray-700 dark:text-gray-300">
+        Work Experience
+      </h2>
       <div>
         {workExperience
           .sort(
@@ -44,28 +46,26 @@ export default function WorkExperience() {
               className="mb-4 flex flex-col sm:flex-row sm:justify-between w-full"
             >
               <div className="flex sm:w-[70%]">
-                <div className="w-[30px] mt-[7px] h-[30px] bg-gray-800 flex items-center justify-center">
-                  <span className="text-white text-sm font-semibold">
+                <div className="w-[30px] mt-[7px] h-[30px] bg-gray-800 dark:bg-gray-300 flex items-center justify-center">
+                  <span className="text-white dark:text-gray-700 text-sm font-semibold">
                     {index + 1}
                   </span>
                 </div>
                 <div className="ml-4 w-full">
-                  <div className="flex items-center justify-between gap-7">
+                  <div className="mb-2">
                     <h3 className="text-lg font-semibold">
-                      {experience.company}
+                      {experience.company} | {experience.position}
                     </h3>
                   </div>
-                  <p className="text-md font-semibold text-gray-600">
-                    {experience.position}
-                  </p>
-
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     {experience.description}
                   </p>
                 </div>
               </div>
               <div className="hidden sm:inline-block sm:w-[30%] sm:text-right">
-                <p className="text-xs text-gray-600">{experience.duration}</p>
+                <p className="text-xs text-gray-700 dark:text-gray-300">
+                  {experience.duration}
+                </p>
               </div>
             </div>
           ))}

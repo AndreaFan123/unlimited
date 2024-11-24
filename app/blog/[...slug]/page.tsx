@@ -54,10 +54,12 @@ export default async function BlogPostPage({ params }: PostPageProps) {
   return (
     <article className="flex w-full flex-col gap-4 items-start prose">
       <div className="pb-5">
-        <h1>{post.title}</h1>
-        {post.description && <p>{post.description}</p>}
-        <span className="flex items-center gap-2 text-sm text-gray-500">
-          <Calendar className="w-4 h-4" color="#4b5563" />
+        <h1 className="text-gray-700 dark:text-gray-300">{post.title}</h1>
+        {post.description && (
+          <p className="text-gray-700 dark:text-gray-300">{post.description}</p>
+        )}
+        <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-300">
+          <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-300" />
           {formattedDate}
         </span>
       </div>
@@ -67,7 +69,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         className="hover:text-orange-500 transition-all duration-300"
         href={ROUTES.BLOG}
       >
-        <div className="flex mt-9 items-center gap-2">
+        <div className="flex mt-9 items-center gap-2 text-gray-700 dark:text-gray-300">
           <ArrowLeft className="w-4 h-4" /> <span>Back to Blog 🏃🏽‍♀️</span>
         </div>
       </Link>

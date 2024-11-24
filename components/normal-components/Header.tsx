@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
+import { ModeToggle } from "../theme-toggle";
 
 export default function Header() {
   return (
@@ -7,10 +8,11 @@ export default function Header() {
       <nav className="flex justify-between items-center h-full">
         <Link
           href={ROUTES.HOME}
-          className="font-extrabold text-gray-700 text-2xl"
+          className="font-extrabold text-gray-700 dark:text-gray-300 text-2xl"
         >
           Unlimited
         </Link>
+        <ModeToggle />
       </nav>
     </header>
   );

@@ -16,8 +16,12 @@ export default function PersonInfo({
   return (
     <>
       <div className="flex items-start gap-2">
-        <Ghost width={50} height={50} />
-        <div className="text-gray-800 font-semibold">
+        <Ghost
+          width={50}
+          height={50}
+          className="text-gray-700 dark:text-gray-300"
+        />
+        <div className="text-gray-700 dark:text-gray-300 font-semibold">
           <h5>{name}</h5>
           <span>{title}</span>
         </div>
