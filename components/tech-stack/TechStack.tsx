@@ -21,14 +21,14 @@ export default function TechStack() {
   return (
     <div className="py-7 overflow-hidden px-4 sm:px-0">
       <div className="container mx-auto ">
-        <h2 className="text-3xl font-bold text-gray-700 mb-5">
+        <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-5">
           I am focusing on...
         </h2>
         <div className="flex overflow-x-hidden">
           <div className="flex animate-scroll ">
             {[...techStack, ...techStack].map((tech, index) => (
               <div key={index} className="flex flex-col items-center mx-4">
-                <tech.logo className="w-16 h-16 mb-2" color="#374151" />
+                <tech.logo className="w-16 h-16 mb-2 text-gray-700 dark:text-gray-300" />
               </div>
             ))}
           </div>

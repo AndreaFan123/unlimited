@@ -13,8 +13,10 @@ import {
 export default function ProjectContainer() {
   return (
     <div className="w-full mt-8 px-4 sm:px-0">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800">Projects</h2>
-      <div className="border-b-[1px] pt-4 border-gray-400 border-dashed pb-10 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
+      <h2 className="text-3xl font-bold mb-8 text-gray-700 dark:text-gray-300">
+        Projects
+      </h2>
+      <div className="border-b-[1px] pt-4 border-gray-400 dark:border-white border-dashed pb-10 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
         <div className="flex overflow-x-auto lg:w-fit gap-4">
           {projectList.map((project, index) => (
             <Card key={`${project.name}-${index}`}>
@@ -47,7 +49,9 @@ export default function ProjectContainer() {
                       {project.status ? "Done" : "WIP"}
                     </span>
                   </div>
-                  <CardDescription>{project.description}</CardDescription>
+                  <CardDescription className="text-gray-700 dark:text-gray-300">
+                    {project.description}
+                  </CardDescription>
                   <TechTag tech={project.tech} />
                 </CardContent>
               </Link>

@@ -25,14 +25,18 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   return (
     <>
       <section className="flex flex-col gap-4 pb-10">
-        <h1 className="text-4xl font-extrabold text-gray-700">Blog</h1>
+        <h1 className="text-4xl font-extrabold text-gray-700 dark:text-gray-300">
+          Blog
+        </h1>
         <p>
           Rambling about web development, management, and other random stuff in
           my life 🚀
         </p>
       </section>
       <section className="flex flex-col gap-4 my-4">
-        <h2 className="text-2xl font-bold text-gray-700">Featured</h2>
+        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+          Featured
+        </h2>
         {displayPosts?.length > 0 ? (
           <ul className="flex flex-col gap-10">
             {displayPosts.map((post) => (
