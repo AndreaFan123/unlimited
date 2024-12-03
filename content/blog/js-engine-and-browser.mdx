@@ -1,0 +1,17 @@
+---
+title: "The relationship between JavaScript engine and browser"
+description: Who is in charge of running JavaScript code in the browser?
+date: 2024-12-02
+published: false
+---
+
+In articles [Browser rendering pipeline part 1](/blog/browser-rendering-pipeline-part-1) and [Browser rendering pipeline part 2](/blog/browser-rendering-pipeline-part-2), we have reviewed the browser rendering pipeline, and know that the browser will parse the HTML, CSS and JavaScript code to render the page, but who is in charge of running all of these code?
+
+## Review the browser workflow
+
+Now that the browser has downloaded HTML and CSS, it will parse the HTML to build the DOM tree, and parse the CSS to build the CSSOM tree, then combine them to build the render tree, but who is exactly in charge of running it?
+
+There're two engines behind the scene:
+
+- JavaScript engine
+- Rendering engine
