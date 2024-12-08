@@ -2,6 +2,7 @@
 title: "Event tracking and monitoring"
 description: Basic concepts of event tracking and monitoring
 date: 2024-11-19
+tags: ["JavaScript", "JS", "Practical", "monitoring", "event tracking"]
 published: true
 ---
 
@@ -36,14 +37,14 @@ Normally, there're 3 types of monitoring:
 
 This function is used to track general events, such as clicks, scrolls, form submissions, etc, and a "POST" request will be sent to the server to record the event.
 
-In this function, I want to get the element that triggers the event, 
+In this function, I want to get the element that triggers the event,
 
 ```ts
 // Here to define the type of the event
-type EventType = 'click' | 'scroll' | 'formSubmission'
+type EventType = "click" | "scroll" | "formSubmission";
 
 // Here to define the type of the button
-type ButtonType = 'cta' | 'close' | 'submit'
+type ButtonType = "cta" | "close" | "submit";
 
 // Here to define the details of the event
 interface EventDetails {
@@ -57,16 +58,16 @@ interface EventDetails {
     campaignId?: string;
     pageType?: string;
     url?: string;
-    position?: number;  
+    position?: number;
   };
 }
 const trackEvent = (eventType: EventType, details: EventDetails) => {
   // "POST" request to the server to record the event, something like this:
-  fetch('/api/trackEvent', {
-    method: 'POST',
-    body: JSON.stringify({ eventType, details })
-  })
-}
+  fetch("/api/trackEvent", {
+    method: "POST",
+    body: JSON.stringify({ eventType, details }),
+  });
+};
 ```
 
 Let's say I want to track a "CTA" button, this data can be used to analyze the user behavior, and optimize the marketing campaign or website design.
@@ -81,7 +82,7 @@ Let's say I want to track a "CTA" button, this data can be used to analyze the u
 document.addEventListener("DOMContentLoaded", () => {
   // or you can declare a const variable to get the element
   // const ctaButton = document.getElementById("ctaButton");
-  // Since id is unique, so we don't have to declare a const variable 
+  // Since id is unique, so we don't have to declare a const variable
   ctaButton.addEventListener("click", () => {
     trackEvent("click", {
       element: ctaButton,
@@ -113,31 +114,36 @@ window.addEventListener("load", () => {
   trackEvent("page_load", {
     duration: pageLoad,
     timeStamp: Date.now(),
-  })
-})
+  });
+});
 ```
 
 ### API request monitoring
+
 For API monitoring, there're two stages that we can monitor:
+
 1. Before the request is sent.
 2. After the request is received.
 
 ```ts
-const apiPerformance = (url:string) => {
+const apiPerformance = (url: string) => {
   const startTime = performance.now();
-  fetch(url).then((res) => res.json()).then((data) => {
-    const duration  = performance.now() - startTime;
-    trackEvent("api_request", {
-      endpoint:url,
-      duration,
-      timeStamp: Date.now(),
-    })
-  })
-}
-apiPerformance("https://www.example.com/api/data")
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      const duration = performance.now() - startTime;
+      trackEvent("api_request", {
+        endpoint: url,
+        duration,
+        timeStamp: Date.now(),
+      });
+    });
+};
+apiPerformance("https://www.example.com/api/data");
 ```
 
 ### JavaScript error monitoring
+
 If we want to monitor the JavaScript errors, we can use the `window.onerror` event, when this event is triggered, execute the tracking function, for example:
 
 ```html
@@ -148,7 +154,7 @@ If we want to monitor the JavaScript errors, we can use the `window.onerror` eve
         trackEvent("js_error", {
           message,
           source,
-          lineno, 
+          lineno,
           colno,
           timeStamp: Date.now(),
         });
@@ -162,4 +168,3 @@ If we want to monitor the JavaScript errors, we can use the `window.onerror` eve
 We can check the error in the console, it should show an object like this:
 
 <Image src="/static/js-error.png" alt="js error" width={1000} height={1000} />
-

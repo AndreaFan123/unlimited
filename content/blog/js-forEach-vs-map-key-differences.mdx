@@ -2,6 +2,7 @@
 title: "JavaScript forEach vs map, key differences?"
 description: forEach vs map, key differences
 date: 2024-12-01
+tags: ["JavaScript", "JS", "Fundamentals", "JS methods"]
 published: true
 ---
 
@@ -28,11 +29,16 @@ In this article, I'd like to review these two methods, **forEach** and **map**, 
 **forEach()** is not chainable, while **map()** is chainable, for example:
 
 ```ts
-// forEach is not chainable  
-[1, 2, 3].forEach(num => num * 2).filter(num => num > 2) // undefined
+// forEach is not chainable
+[1, 2, 3]
+  .forEach((num) => num * 2)
+  .filter((num) => num > 2) // undefined
 
-// map is chainable
-[1, 2, 3].map(num => num * 2).filter(num => num > 2) // [4, 6]
+  [
+    // map is chainable
+    (1, 2, 3)
+  ].map((num) => num * 2)
+  .filter((num) => num > 2); // [4, 6]
 ```
 
 ## React use cases, why map() is preferred?
@@ -44,14 +50,14 @@ We often use **map()** in React to transform an array of data into a list of JSX
 
 ```tsx
 // Not recommended
-const animals = ['dog', 'cat', 'bird'];
+const animals = ["dog", "cat", "bird"];
 for (let i = 0; i < animals.length; i++) {
-  return <li key={animals[i]}>{animals[i]}</li>
+  return <li key={animals[i]}>{animals[i]}</li>;
 }
 
 // Recommended
 // index as key is not recommended, but it's ok for this example, use id if possible
-const animals = ['dog', 'cat', 'bird'];
+const animals = ["dog", "cat", "bird"];
 const animalList = animals.map((animal, index) => (
   <li key={index}>{animal}</li>
 ));
@@ -62,6 +68,8 @@ const animalList = animals.map((animal, index) => (
 4. Using map() is more flexible, because it can be used with other array methods, e.g. filter(), reduce(), etc.
 
 ```tsx
-const animals = ['dog', 'cat', 'bird'];
-const filteredAnimals = animals.map(animal => animal.toUpperCase()).filter(animal => animal !== 'dog');
+const animals = ["dog", "cat", "bird"];
+const filteredAnimals = animals
+  .map((animal) => animal.toUpperCase())
+  .filter((animal) => animal !== "dog");
 ```
