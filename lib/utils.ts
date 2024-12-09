@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Post } from "#site/content";
+import { slug } from "github-slugger";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,5 +32,20 @@ export function getAllTags(posts: Array<Post>) {
         tags[tag] = (tags[tag] ?? 0) + 1;
       });
     }
+  });
+  return tags;
+}
+
+export function sortTagByCount(tags: Record<string, number>) {
+  return Object.keys(tags).sort((a, b) => tags[b] - tags[a]);
+}
+
+export function getPostByTagSlug(posts: Array<Post>, tag: string) {
+  return posts.filter((post) => {
+    if (!post.tags) {
+      return false;
+    }
+    const slugFieldTags = post.tags.map((tag) => slug(tag));
+    return slugFieldTags.includes(tag);
   });
 }

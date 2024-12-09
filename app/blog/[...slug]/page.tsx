@@ -9,9 +9,10 @@ import { Calendar } from "lucide-react";
 import ROUTES from "@/constants/routes";
 import Link from "next/link";
 import MdxContent from "@/components/mdx/MdxComponent";
+import { generatePageMetadata } from "@/config/metadata";
+import { getAllTags, sortTagByCount } from "@/lib/utils";
 
 import "@/styles/mdx.css";
-import { generatePageMetadata } from "@/config/metadata";
 
 type PostPageProps = {
   params: {
@@ -62,6 +63,17 @@ export default async function BlogPostPage({ params }: PostPageProps) {
           <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-300" />
           {formattedDate}
         </span>
+        <div className="flex gap-2 mt-6">
+          {post.tags?.map((tag, index) => (
+            <span
+              className="bg-[#5350a6] rounded-full text-white py-1 px-2 text-sm"
+              key={`${tag}-${index}`}
+            >
+              {" "}
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
       <Separator />
       <MdxContent code={post.body} />
