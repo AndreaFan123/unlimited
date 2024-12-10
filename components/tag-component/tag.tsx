@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { slug } from "github-slugger";
+import ROUTES from "@/constants/routes";
 import { badgeVariants } from "../ui/badge";
 
-interface TagProps {
+type TagProps = {
   tag: string;
   current?: boolean;
   count?: number;
-}
+};
 
 export default function Tag({ tag, current, count }: TagProps) {
   return (
@@ -15,7 +16,7 @@ export default function Tag({ tag, current, count }: TagProps) {
         variant: current ? "default" : "secondary",
         className: "no-underline rounded-md",
       })}
-      href={`/blog/tags/${slug(tag)}`}
+      href={`${ROUTES.TAG_SLUG}${slug(tag)}`}
     >
       {tag} {count ? `(${count})` : null}
     </Link>

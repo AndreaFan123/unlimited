@@ -2,7 +2,7 @@ const workExperience = [
   {
     company: "Ringus-solution",
     position: "Frontend Engineer",
-    duration: "2022-11-01 ~ Present",
+    duration: "2022-11-01 ~ 2024-12-03",
     description:
       "Developed web applications using React.js, Next.js, TailwindCSS, TypeScript and other frontend technologies.",
   },

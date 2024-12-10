@@ -42,6 +42,12 @@ export const singleBlogPageContent: MetadataType = {
   keywords: commonKeywordsEn,
 };
 
+export const tagPageContent: MetadataType = {
+  title: "Blog Tag",
+  description: "Blog posts about a specific tag.",
+  keywords: commonKeywordsEn,
+};
+
 export function generatePageMetadata(
   content: MetadataType,
   blogTitle?: string,
