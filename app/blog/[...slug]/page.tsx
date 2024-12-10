@@ -6,11 +6,12 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { Calendar } from "lucide-react";
+import { generatePageMetadata } from "@/config/metadata";
+import { slug } from "github-slugger";
+import { Badge } from "@/components/ui/badge";
 import ROUTES from "@/constants/routes";
 import Link from "next/link";
 import MdxContent from "@/components/mdx/MdxComponent";
-import { generatePageMetadata } from "@/config/metadata";
-import { getAllTags, sortTagByCount } from "@/lib/utils";
 
 import "@/styles/mdx.css";
 
@@ -65,13 +66,15 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         </span>
         <div className="flex gap-2 mt-6">
           {post.tags?.map((tag, index) => (
-            <span
-              className="bg-[#5350a6] rounded-full text-white py-1 px-2 text-sm"
-              key={`${tag}-${index}`}
-            >
-              {" "}
-              {tag}
-            </span>
+            <Badge key={`${tag}-${index}`} variant="secondary">
+              <Link
+                className="text-gray-600 dark:text-gray-300 no-underline"
+                href={`/blog/tags/${slug(tag)}`}
+              >
+                {" "}
+                {tag}
+              </Link>
+            </Badge>
           ))}
         </div>
       </div>

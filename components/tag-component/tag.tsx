@@ -15,7 +15,7 @@ export default function Tag({ tag, current, count }: TagProps) {
         variant: current ? "default" : "secondary",
         className: "no-underline rounded-md",
       })}
-      href={`/tags/${slug(tag)}`}
+      href={`/blog/tags/${slug(tag)}`}
     >
       {tag} {count ? `(${count})` : null}
     </Link>

@@ -1,3 +1,3 @@
-export default function TagPage() {
-  return <div>Tag</div>;
+export default function TagPage({ params }: { params: { tag: string } }) {
+  return <div>{params.tag}</div>;
 }

@@ -66,12 +66,15 @@ const components = {
     </blockquote>
   ),
   strong: ({ children }: { children: React.ReactNode }) => (
-    <strong className="rounded bg-[#c3c2ed] px-1">{children}</strong>
+    <strong className="rounded bg-[#c3c2ed] px-1 ">{children}</strong>
   ),
   a: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href} className="text-gray-700 dark:text-gray-300">
       {children}
     </a>
+  ),
+  code: ({ children }: { children: React.ReactNode; href: string }) => (
+    <code className="text-gray-700 dark:text-gray-300">{children}</code>
   ),
 };
 
