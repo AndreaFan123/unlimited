@@ -7,6 +7,7 @@ type PostListProps = {
   title: string;
   description?: string;
   date: string;
+  href?: string;
 };
 
 export default function Post({
@@ -14,13 +15,14 @@ export default function Post({
   title,
   description,
   date,
+  href,
 }: PostListProps) {
   const formatTime = formatDate(date);
   return (
     <li className="flex justify-between gap-2 w-full font-mono py-3">
       <div className="flex flex-col w-full md:w-[70%]">
         <Link
-          href={slug}
+          href={href ? href : slug}
           className="text-xl font-semibold pb-2 text-[#5350a6] dark:text-[#a19efc] hover:text-orange-500 transition-all duration-300"
         >
           {title}
