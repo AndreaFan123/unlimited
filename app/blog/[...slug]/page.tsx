@@ -69,7 +69,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
             <Badge key={`${tag}-${index}`} variant="secondary">
               <Link
                 className="text-gray-600 dark:text-gray-300 no-underline"
-                href={`/blog/tags/${slug(tag)}`}
+                href={`${ROUTES.TAG_SLUG}${slug(tag)}`}
               >
                 {" "}
                 {tag}

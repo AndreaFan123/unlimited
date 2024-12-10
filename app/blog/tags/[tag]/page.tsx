@@ -1,7 +1,28 @@
 import { posts } from "#site/content";
 import Post from "@/components/post-list/Post";
+import { generatePageMetadata } from "@/config/metadata";
+import { tagPageContent } from "@/config/metadata";
+import { Metadata } from "next";
 
-export default function TagPage({ params }: { params: { tag: string } }) {
+type TagPageProps = {
+  params: {
+    tag: string;
+  };
+};
+
+export async function generateMetadata({
+  params,
+}: TagPageProps): Promise<Metadata> {
+  const postTag = await getTagsFromParams(params);
+  return generatePageMetadata(tagPageContent, postTag.toUpperCase());
+}
+
+const getTagsFromParams = async (params: TagPageProps["params"]) => {
+  const tags = params.tag.toLowerCase();
+  return tags;
+};
+
+export default function TagPage({ params }: TagPageProps) {
   const tag = params.tag.toLowerCase();
   const filteredPosts = posts.filter((post) => post?.tags?.includes(tag));
 

@@ -42,7 +42,7 @@ export default function Post({
         </p>
 
         <Link
-          href={slug}
+          href={href ? href : slug}
           className="flex items-center bg-[#5350a6] text-white w-fit px-2 py-1 gap-2 mt-4 hover:text-orange-300 transition-all duration-300"
         >
           Read more

@@ -7,6 +7,7 @@ const ROUTES = {
   MEETUTODAY: "https://meetu.today/en",
   BLOG: "/blog",
   BLOG_SLUG: "/blog/[slug]",
+  TAG_SLUG: "/blog/tags/",
 };
 
 export default ROUTES;

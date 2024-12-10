@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
+
 type PostContainerProps = {
   slug: string;
   title: string;
