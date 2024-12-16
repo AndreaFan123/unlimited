@@ -3,9 +3,90 @@ title: "Functional Programming Part 1 - Concept"
 description: Learn how to use FP to refactor code.
 date: 2024-12-15
 tags: ["javascript", "fp", "functional programming", "reading note"]
-published: false
+published: true
 ---
 
 These are my reading notes from the book [Simplicity: Taming Complex Software with Functional programming](https://www.amazon.com/Grokking-Simplicity-software-functional-thinking/dp/1617296201).
 
-## What is Functional Programming
+## Programming paradigms
+
+There are two major programming paradigms:
+
+- Object-Oriented Programming (OOP)
+- Functional Programming (FP).
+
+### Characteristics
+
+- Object-Oriented Programming focuses on modeling software as a collection of objects.
+- Functional Programming treats computation as the evaluation of mathematical functions."
+
+### "Classic" definition of FP
+
+- It emphasizes the use of mathematical functions and aims to avoid side effects.
+- It relies on pure functions, which produce no side effects
+
+Now, let's talk about a bit of these two:
+
+#### Side effects
+
+Side effects refer to any behavior a function performs beyond simply returning a value.
+
+#### Pure functions
+
+A pure function always produces the same output when given the same input, and we called this "Mathematical functions".
+
+## In reality
+
+In the real world, side effects are essential - they're the main reason we use software. After all, we want our programs to interact with the outside world, whether by displaying output, saving files, or sending network requests. Therefore, while functional programming emphasizes minimizing side effects, it doesn't eliminate them entirely - it just manages them more carefully.
+
+## Actions, Calculations and Data
+
+When learning Functional Programming, we need to learn how to distinguish between three core concepts:
+
+- **Actions**: represent operations that involve side effects, such as input/output operations, network requests, or database interactions. These are the parts of our program that interact with the outside world.
+- **Calculations**: pure functions that transform data without side effects. They consistently produce the same output for the same input, making them predictable and easy to test.
+- **Data**: consists of immutable data structures that contain information but no behaviors. Unlike objects in Object-Oriented Programming, data structures in FP are passive containers of information, without attached methods or operations.
+
+Let's have some examples:
+
+```ts
+// Can you identify which one is action, calculation and data?
+
+type WeatherStation = {
+    id: string
+    location: {
+        latitude: number
+        longitude: number
+    }
+    lastReading: number
+    status: 'active' | 'offline'
+}
+
+calculateAverageTemperature(num);
+saveUserProfile(id:string, name:string, email:string)
+filterActiveStations(stations:WeatherStation[])
+fetchLatestReadings()
+convertToFahrenheit(celsiusTemp:number)
+logUserActivity(id:string, action:string)
+```
+
+```ts
+// Actions
+saveUserProfile(id:string, name:string, email:string)
+logUserActivity(id:string, action:string)
+
+// Calculations
+calculateAverageTemperature(num);
+filterActiveStations(stations:WeatherStation[])
+fetchLatestReadings()
+convertToFahrenheit(celsiusTemp:number)
+
+// Data
+WeatherStation
+```
+
+### Explanation
+
+#### Actions
+
+Actions will be influenced by the **time**, **number of execution time** or both. So when we said `logUserActivity(id:string, action:string)` and `saveUserProfile(id:string, name:string, email:string)`
