@@ -1,0 +1,45 @@
+---
+title: "Functional Programming Part 2 - FP Concept in Real World"
+description: Learn how to use FP to refactor code.
+date: 2024-12-20
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+---
+
+In last article [Functional Programming Part 1 - Concept](/blog/functional-programming-part-1-concept), we've talked about the basic concept of Functional Programming. Let's review it quickly:
+
+When we talk about Functional Programming, there're several key concepts we need to understand:
+
+1. Side effects: in short, side effects refer to any behavior a function performs beyond returning a value, it's influenced
+   by time or number of execution or both, such as input/output operations, network requests, or database interactions.
+2. Pure functions: a pure function always produces the same output when given the same input, and we called this "Mathematical functions".
+
+In Chapter 2, author introduces the 2 key methods to apply FP in real world:
+
+1. identify actions, calculations, and data.
+2. First class functions.
+
+## Glance of stratified design
+
+**Stratified design** is a software design "principle" that focused on creating **strata** or
+levels of abstraction where each layer builds upon the previous one, key points:
+
+1. Each layer uses operations and abstractions form the layers below it.
+2. Each layer has a clear and consistent level of abstraction.
+3. Changes in one layer ideally should not require changes in other layers.
+4. Functions in the same layer should operate at similar abstraction levels.
+
+Author uses the example of a pizza restaurant to illustrate the concept of stratified design.
+
+<Image
+  src="/static/stratified-design.png"
+  alt="register timer"
+  width={1000}
+  height={1000}
+/>
+
+- Business Layer: the highest layer, it's responsible for the business logic.
+- Domain Layer: the middle layer, it's responsible for the domain logic, for example, the pizza receipt.
+- Tech stack: the lowest layer, it's responsible for basic data types and structures.
+
+And the red arrows show the each layer depends on the layer below it.
