@@ -19,11 +19,14 @@ export default function ProjectContainer() {
       <div className="border-b-[1px] pt-4 border-gray-400 dark:border-white border-dashed pb-10 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
         <div className="flex overflow-x-auto lg:w-fit gap-4">
           {projectList.map((project, index) => (
-            <Card key={`${project.name}-${index}`}>
+            <Card
+              key={`${project.name}-${index}`}
+              className="focus:outline-none focus:ring focus:ring-[#7772ff] m-5"
+            >
               <Link
                 href={project.link}
                 target="_blank"
-                className={`inline-block w-[250px] ${
+                className={`inline-block h-full w-[250px] ${
                   project.status ? "cursor-pointer" : "cursor-not-allowed"
                 } `}
               >
