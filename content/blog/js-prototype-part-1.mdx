@@ -2,7 +2,7 @@
 title: "JavaScript Prototype part 1"
 description: What is JavaScript Prototype?
 date: 2024-12-22
-tags: ["javascript"]
+tags: ["javascript", "prototype"]
 published: true
 ---
 
@@ -37,7 +37,7 @@ Under the hood, JS will do something like this, same goes for number, boolean, e
 
 ```js
 let str = "hello";
-let strObj = new String(str);
+let strObj = new String(str); // boxing, but will be removed by the garbage collector after the method call
 console.log(strObj.toUpperCase()); // HELLO
 
 // same for number
@@ -55,16 +55,58 @@ Objects are mutable, and they are **passed by reference**, objects in JavaScript
 3. object
 4. Date
 
-#### Constructor Function
+## Prototype property and prototype chain
 
-A constructor function is a special function that will create an object via the `new` keyword, and the convention is to start the function name with a capital letter, for example:
+In JavaScript, when we create a function, it will automatically have a prototype property, this prototype property is an object, and it has a constructor property that points back to the function itself.
+We can add properties and methods to the prototype object, and all instances created by the constructor function will inherit these properties and methods.
 
 ```js
-function Person(name, age) {
+function Person(name) {
   this.name = name;
-  this.age = age;
 }
 
-// person1 is an instance of Person
-const person1 = new Person("Alice", 25);
+console.log(Person.prototype);
+// { constructor: [Function: Person] }
+
+Person.prototype.sayHello = function () {
+  console.log(`Hello, my name is ${this.name}`);
+};
+
+let person1 = new Person("Alice");
+let person2 = new Person("Bob");
+
+person1.sayHello(); // Hello, my name is Alice
+person2.sayHello(); // Hello, my name is Bob
 ```
+
+In the above example, we created a constructor function `Person`, and added a method `sayHello`, then we created two instances `person1` and `person2`, and called the `sayHello` method on them.
+
+`person1` and `person2` has name property, even though they don't have the `sayHello` method, they can still call it, because they inherit the `sayHello` from the Person.prototype.
+
+When we try to use a property or method on an object, JavaScript will first look for it on the object itself, if it can't find it, it will look for it on the prototype object, and keep looking up the chain until it finds it or reach the end of the chain,
+this is called **prototype chain**.
+
+```css
+null
+   ↑
+Object.prototype
+   ├─ toString()
+   ↑
+Person.prototype
+   ├─ sayHello()
+   ↑
+[[Prototype]]
+   ├─ name: "Alice"  (person1)
+   └─ name: "Bob"    (person2)
+```
+
+## Summary
+
+- JavaScript has two types of data types, primitive types and objects.
+- Primitive types are immutable and passed by value, objects are mutable and passed by reference.
+- When we try to use a method on a primitive type, JavaScript under the hood will wrap it with an object and call the method on the object.
+- When we create a function, it will automatically have a prototype property, and we can add properties and methods to the prototype object.
+- All instances created by the constructor function will inherit the properties and methods from the prototype object.
+- When we try to use a property or method on an object, JavaScript will first look for it on the object itself, if it can't find it, it will look for it on the prototype object, and keep looking up the chain until it finds it or reach the end of the chain, this is called prototype chain.
+
+Next, we will talk about more about prototype chain, and some other topics that confuse me when I first learned JavaScript prototype. 🥲
