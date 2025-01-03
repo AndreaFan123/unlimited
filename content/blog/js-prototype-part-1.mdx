@@ -1,0 +1,70 @@
+---
+title: "JavaScript Prototype part 1"
+description: What is JavaScript Prototype?
+date: 2024-12-22
+tags: ["javascript"]
+published: true
+---
+
+In [last article](/blog/js-prototype-introduction-programming-paradigms), we talked about the programming paradigms, and a bit about JavaScript is a multi-paradigm programming language, and how it supports multiple paradigms.
+Today, let's dive deeper into JavaScript Prototype.
+
+## What is Prototype in JavaScript?
+
+Before we jump into JavaScript prototype, you may heard of that all data types in JavaScript are objects,but there're a significant difference between primitive types and objects.
+
+### Primitive types
+
+Primitive types are immutable, and they are **passed by value**, the primitive types in JavaScript are:
+
+1. number
+2. string
+3. boolean
+4. null
+5. undefined
+6. symbol
+7. bigint
+
+but why we can use methods like `toUpperCase()` on a string, or `toFixed()` on a number? This is because javascript will automatically wrap the primitive type with an object when you call a method on it, this is called **boxing**.
+For example:
+
+```js
+let str = "hello";
+console.log(str.toUpperCase()); // HELLO
+```
+
+Under the hood, JS will do something like this, same goes for number, boolean, etc.
+
+```js
+let str = "hello";
+let strObj = new String(str);
+console.log(strObj.toUpperCase()); // HELLO
+
+// same for number
+let num = 123;
+let numObj = new Number(num);
+console.log(numObj.toFixed(2)); // 123.00
+```
+
+### Objects types
+
+Objects are mutable, and they are **passed by reference**, objects in JavaScript are:
+
+1. function
+2. array
+3. object
+4. Date
+
+#### Constructor Function
+
+A constructor function is a special function that will create an object via the `new` keyword, and the convention is to start the function name with a capital letter, for example:
+
+```js
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+// person1 is an instance of Person
+const person1 = new Person("Alice", 25);
+```
