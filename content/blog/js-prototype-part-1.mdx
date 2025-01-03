@@ -1,0 +1,112 @@
+---
+title: "JavaScript Prototype part 1"
+description: What is JavaScript Prototype?
+date: 2024-12-22
+tags: ["javascript", "prototype"]
+published: true
+---
+
+In [last article](/blog/js-prototype-introduction-programming-paradigms), we talked about the programming paradigms, and a bit about JavaScript is a multi-paradigm programming language, and how it supports multiple paradigms.
+Today, let's dive deeper into JavaScript Prototype.
+
+## What is Prototype in JavaScript?
+
+Before we jump into JavaScript prototype, you may heard of that all data types in JavaScript are objects,but there're a significant difference between primitive types and objects.
+
+### Primitive types
+
+Primitive types are immutable, and they are **passed by value**, the primitive types in JavaScript are:
+
+1. number
+2. string
+3. boolean
+4. null
+5. undefined
+6. symbol
+7. bigint
+
+but why we can use methods like `toUpperCase()` on a string, or `toFixed()` on a number? This is because javascript will automatically wrap the primitive type with an object when you call a method on it, this is called **boxing**.
+For example:
+
+```js
+let str = "hello";
+console.log(str.toUpperCase()); // HELLO
+```
+
+Under the hood, JS will do something like this, same goes for number, boolean, etc.
+
+```js
+let str = "hello";
+let strObj = new String(str); // boxing, but will be removed by the garbage collector after the method call
+console.log(strObj.toUpperCase()); // HELLO
+
+// same for number
+let num = 123;
+let numObj = new Number(num);
+console.log(numObj.toFixed(2)); // 123.00
+```
+
+### Objects types
+
+Objects are mutable, and they are **passed by reference**, objects in JavaScript are:
+
+1. function
+2. array
+3. object
+4. Date
+
+## Prototype property and prototype chain
+
+In JavaScript, when we create a function, it will automatically have a prototype property, this prototype property is an object, and it has a constructor property that points back to the function itself.
+We can add properties and methods to the prototype object, and all instances created by the constructor function will inherit these properties and methods.
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+console.log(Person.prototype);
+// { constructor: [Function: Person] }
+
+Person.prototype.sayHello = function () {
+  console.log(`Hello, my name is ${this.name}`);
+};
+
+let person1 = new Person("Alice");
+let person2 = new Person("Bob");
+
+person1.sayHello(); // Hello, my name is Alice
+person2.sayHello(); // Hello, my name is Bob
+```
+
+In the above example, we created a constructor function `Person`, and added a method `sayHello`, then we created two instances `person1` and `person2`, and called the `sayHello` method on them.
+
+`person1` and `person2` has name property, even though they don't have the `sayHello` method, they can still call it, because they inherit the `sayHello` from the Person.prototype.
+
+When we try to use a property or method on an object, JavaScript will first look for it on the object itself, if it can't find it, it will look for it on the prototype object, and keep looking up the chain until it finds it or reach the end of the chain,
+this is called **prototype chain**.
+
+```css
+null
+   ↑
+Object.prototype
+   ├─ toString()
+   ↑
+Person.prototype
+   ├─ sayHello()
+   ↑
+[[Prototype]]
+   ├─ name: "Alice"  (person1)
+   └─ name: "Bob"    (person2)
+```
+
+## Summary
+
+- JavaScript has two types of data types, primitive types and objects.
+- Primitive types are immutable and passed by value, objects are mutable and passed by reference.
+- When we try to use a method on a primitive type, JavaScript under the hood will wrap it with an object and call the method on the object.
+- When we create a function, it will automatically have a prototype property, and we can add properties and methods to the prototype object.
+- All instances created by the constructor function will inherit the properties and methods from the prototype object.
+- When we try to use a property or method on an object, JavaScript will first look for it on the object itself, if it can't find it, it will look for it on the prototype object, and keep looking up the chain until it finds it or reach the end of the chain, this is called prototype chain.
+
+Next, we will talk about more about prototype chain, and some other topics that confuse me when I first learned JavaScript prototype. 🥲
