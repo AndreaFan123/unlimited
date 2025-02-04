@@ -1,0 +1,51 @@
+---
+title: "JavaScript Prototype part 2"
+description: Dive into JavaScript Prototype chain
+date: 2025-1-1
+tags: ["javascript", "prototype"]
+published: false
+---
+
+In [last article](/blog/js-prototype-part-1), we talked about the basic of JavaScript Prototype, and how it works, today, let's dive deeper into JavaScript Prototype chain.
+
+## Prototype chain
+
+Like we've mentioned before, JavaScript is a prototype-based language, although it has a **class** syntax, but it's just a syntax sugar, under the hood,
+it still uses prototype
+
+In JavaScript, it uses **objects** to implement inheritance, each of objects has a link to a object called **prototype**, and this prototype object also has a prototype object and it goes to the end of the chain which is `null`.
+
+### Possible to mutate members of the prototype chain or swap the prototype object?
+
+Yes, it's possible, let's see example below:
+
+```typescript
+function Cat() {}
+Cat.prototype.sound = function () {
+  return "Meow";
+};
+
+const oldCat = new Cat();
+
+// 替換整個原型
+Cat.prototype = {
+  sound: function () {
+    return "woof";
+  },
+  run: function () {
+    return "running";
+  },
+};
+
+const newCat = new Cat();
+
+console.log(oldCat.sound()); // Meow
+console.log(newCat.sound()); // woof
+console.log(oldCat.run); // undefined
+console.log(newCat.run()); // running
+```
+
+Let's break down the code above:
+
+- Declared a `Cat` function (constructor) and added a `sound` method to its prototype.
+-
