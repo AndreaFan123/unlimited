@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { slug } from "github-slugger";
 import ROUTES from "@/src/constants/routes";
 import { badgeVariants } from "../ui/badge";
+import { Link } from "@/src/i18n/navigation";
 
 type TagProps = {
   tag: string;

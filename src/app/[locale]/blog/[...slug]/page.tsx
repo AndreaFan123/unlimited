@@ -10,10 +10,11 @@ import { generatePageMetadata } from "@/src/config/metadata";
 import { slug } from "github-slugger";
 import { Badge } from "@/src/app/[locale]/components/ui/badge";
 import ROUTES from "@/src/constants/routes";
-import Link from "next/link";
+
 import MdxContent from "@/src/app/[locale]/components/mdx/MdxComponent";
 
 import "@/styles/mdx.css";
+import { Link } from "@/src/i18n/navigation";
 
 type PostPageProps = {
   params: {

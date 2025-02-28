@@ -6,6 +6,7 @@ import {
   RiHtml5Fill,
 } from "react-icons/ri";
 import { BiLogoTypescript, BiLogoJavascript } from "react-icons/bi";
+import { useTranslations } from "next-intl";
 
 const techStack = [
   { name: "Next.js", logo: RiNextjsFill },
@@ -18,11 +19,12 @@ const techStack = [
 ];
 
 export default function TechStack() {
+  const t = useTranslations("techStack");
   return (
     <div className="py-7 overflow-hidden px-4 sm:px-0">
       <div className="container mx-auto ">
         <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-5">
-          I am focusing on...
+          {t("title")}
         </h2>
         <div className="flex overflow-x-hidden">
           <div className="flex animate-scroll ">

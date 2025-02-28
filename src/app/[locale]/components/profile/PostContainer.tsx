@@ -1,5 +1,5 @@
-import Link from "next/link";
 import ROUTES from "@/src/constants/routes";
+import { Link } from "@/src/i18n/navigation";
 
 type PostContainerProps = {
   slug: string;

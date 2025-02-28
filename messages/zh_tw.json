@@ -9,5 +9,56 @@
   },
   "techStack": {
     "title": "我目前專注於..."
+  },
+  "projects": {
+    "title": "專案",
+    "digitalCard": "數位名片平台",
+    "senryo": "日本壽司外送平台",
+    "unlimitedBlog": "個人作品集和部落格"
+  },
+  "socials": {
+    "linkedin": "前往 Linkedin",
+    "github": "前往 Github",
+    "resume": "下載履歷",
+    "blog": "前往部落格"
+  },
+  "workExperience": {
+    "workExperience": "工作經驗",
+    "ringus": {
+      "company": "Ringus-solution",
+      "title": "前端工程師",
+      "duration": "2022-11-01 ~ 2024-12-03",
+      "description": "使用 React.js、Next.js、TailwindCSS、TypeScript 和其他前端技術開發網頁應用程式。"
+    },
+    "codapayment": {
+      "company": "Codapayment",
+      "title": "資深行銷",
+      "duration": "2021-10-01 ~ 2022-12-01",
+      "description": "負責台灣/香港市場，包括行銷策略、線上和線下活動、競爭對手分析、市場研究。"
+    },
+    "elex": {
+      "company": "exe",
+      "title": "社群經理",
+      "duration": "2020-05-01 ~ 2021-09-27",
+      "description": "建立中文社群，舉辦線上和線下活動。"
+    },
+    "wargaming": {
+      "company": "Wargaming.net",
+      "title": "銷售優化（團隊主管）",
+      "duration": "2018-12-01 ~ 2020-03-01",
+      "description": "優化銷售流程，提高銷售效率。"
+    }
+  },
+  "notFound": {
+    "returnHome": "返回首頁"
+  },
+  "blog": {
+    "blog": "部落格",
+    "description": "關於網頁開發、管理和生活中其他雜七雜八的事情",
+    "feature": "精選",
+    "workingOnIt": "我正在努力中"
+  },
+  "footer": {
+    "allRightsReserved": "保留所有權利"
   }
 }

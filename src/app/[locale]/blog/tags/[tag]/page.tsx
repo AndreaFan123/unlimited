@@ -1,8 +1,10 @@
-import { posts } from "#site/content";
 import Post from "@/src/app/[locale]/components/post-list/Post";
+
+import { posts } from "#site/content";
 import { generatePageMetadata } from "@/src/config/metadata";
 import { tagPageContent } from "@/src/config/metadata";
 import { Metadata } from "next";
+import { useTranslations } from "next-intl";
 
 type TagPageProps = {
   params: {
@@ -23,13 +25,14 @@ const getTagsFromParams = async (params: TagPageProps["params"]) => {
 };
 
 export default function TagPage({ params }: TagPageProps) {
+  const t = useTranslations("tag");
   const tag = params.tag.toLowerCase();
   const filteredPosts = posts.filter((post) => post?.tags?.includes(tag));
 
   return (
     <section className="flex flex-col gap-4 my-4">
       <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">
-        ✨{params.tag.toUpperCase()}✨ related posts
+        ✨{params.tag.toUpperCase()}✨ {t("relatedPosts")}
       </h2>
       {filteredPosts?.length > 0 ? (
         <ul className="flex flex-col gap-10">
@@ -38,7 +41,7 @@ export default function TagPage({ params }: TagPageProps) {
           ))}
         </ul>
       ) : (
-        <p>I am working on it 🚧</p>
+        <p>{t("workingOnIt")} 🚧</p>
       )}
     </section>
   );

@@ -1,7 +1,9 @@
-import Link from "next/link";
+import { Link } from "@/src/i18n/navigation";
 import ROUTES from "@/src/constants/routes";
+import { useTranslations } from "next-intl";
 
 export default function NotFound() {
+  const t = useTranslations("notFound");
   return (
     <main className="bg-background w-full max-w-full min-h-screen flex flex-col justify-center items-center">
       <h2 className="text-[9rem] md:text-[25rem] relative">
@@ -13,7 +15,7 @@ export default function NotFound() {
 
       <p>Could not find requested resource</p>
       <Link href={ROUTES.HOME} className="font-bold underline">
-        Return Home
+        {t("returnHome")}
       </Link>
     </main>
   );

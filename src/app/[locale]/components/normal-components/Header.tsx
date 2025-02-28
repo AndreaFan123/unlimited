@@ -1,6 +1,6 @@
-import Link from "next/link";
 import ROUTES from "@/src/constants/routes";
 import { ModeToggle } from "../theme-toggle";
+import { Link } from "@/src/i18n/navigation";
 
 export default function Header() {
   return (

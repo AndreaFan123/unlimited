@@ -1,37 +1,37 @@
-const workExperience = [
-  {
-    company: "Ringus-solution",
-    position: "Frontend Engineer",
-    duration: "2022-11-01 ~ 2024-12-03",
-    description:
-      "Developed web applications using React.js, Next.js, TailwindCSS, TypeScript and other frontend technologies.",
-  },
-  {
-    company: "CondaPayment",
-    position: "Senior Marketing",
-    duration: "2021-10-01 ~ 2022-12-01",
-    description:
-      "Responsible for TW/HK/MO market, including marketing strategy, online and offline campaigns, competitor analysis, market research.",
-  },
-  {
-    company: "exe",
-    position: "Community Manager",
-    duration: "2020-05-01 ~ 2021-09-27",
-    description: "Built Mandarin community, hosted online and offline events.",
-  },
-  {
-    company: "Wargaming.net",
-    position: "Sales Optimization (Team Lead)",
-    duration: "2018-12-01 ~ 2020-03-01",
-    description: "Optimized sales process and increased sales efficiency.",
-  },
-];
+import { useTranslations } from "next-intl";
 
 export default function WorkExperience() {
+  const t = useTranslations("workExperience");
+  const workExperience = [
+    {
+      company: t("ringus.company"),
+      position: t("ringus.title"),
+      duration: t("ringus.duration"),
+      description: t("ringus.description"),
+    },
+    {
+      company: t("codapayment.company"),
+      position: t("codapayment.title"),
+      duration: t("codapayment.duration"),
+      description: t("codapayment.description"),
+    },
+    {
+      company: t("elex.company"),
+      position: t("elex.title"),
+      duration: t("elex.duration"),
+      description: t("elex.description"),
+    },
+    {
+      company: t("wargaming.company"),
+      position: t("wargaming.title"),
+      duration: t("wargaming.duration"),
+      description: t("wargaming.description"),
+    },
+  ];
   return (
     <div className="mt-[20px] md:pl-9 mb-8 px-4 sm:px-0">
       <h2 className="text-2xl mb-[20px] font-bold text-gray-700 dark:text-gray-300">
-        Work Experience
+        {t("workExperience")}
       </h2>
       <div>
         {workExperience

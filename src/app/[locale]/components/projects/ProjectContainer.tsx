@@ -1,6 +1,7 @@
-import Link from "next/link";
 import Image from "next/image";
-import projectList from "@/src/constants/project-list";
+import meetToday from "@/public/meet-today.png";
+import senryo from "@/public/senryo.png";
+import unlimited from "@/public/unlimited.png";
 import TechTag from "./TechTag";
 import {
   Card,
@@ -9,12 +10,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/app/[locale]/components/ui/card";
+import { Link } from "@/src/i18n/navigation";
+import { useTranslations } from "next-intl";
+import ROUTES from "@/src/constants/routes";
 
 export default function ProjectContainer() {
+  const t = useTranslations("projects");
+
+  const projectList = [
+    {
+      name: "meet.today",
+      description: t("digitalCard"),
+      link: ROUTES.MEETUTODAY,
+      src: meetToday,
+      status: true,
+      tech: ["Next.js", "TailwindCSS", "TypeScript", "i18n"],
+    },
+    {
+      name: "senryo",
+      description: t("senryo"),
+      link: ROUTES.SENRYO,
+      src: senryo,
+      status: true,
+      tech: ["Next.js", "TailwindCSS", "TypeScript", "i18n"],
+    },
+    {
+      name: "Unlimited",
+      description: t("unlimitedBlog"),
+      link: "",
+      src: unlimited,
+      status: true,
+      tech: ["Next.js", "TailwindCSS", "TypeScript", "MDX", "Shadcn/UI"],
+    },
+  ];
   return (
     <div className="w-full mt-8 px-4 sm:px-0">
       <h2 className="text-3xl font-bold mb-8 text-gray-700 dark:text-gray-300">
-        Projects
+        {t("title")}
       </h2>
       <div className="border-b-[1px] pt-4 border-gray-400 dark:border-white border-dashed pb-10 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
         <div className="flex overflow-x-auto lg:w-fit gap-4">
