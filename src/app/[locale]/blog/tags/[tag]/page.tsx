@@ -1,4 +1,4 @@
-import Post from "@/src/app/[locale]/components/post-list/Post";
+import Post from "@/src/components/post-list/Post";
 
 import { posts } from "#site/content";
 import { generatePageMetadata } from "@/src/config/metadata";

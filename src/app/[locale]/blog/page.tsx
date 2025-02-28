@@ -1,5 +1,5 @@
-import Post from "@/src/app/[locale]/components/post-list/Post";
-import QueryPagination from "@/src/app/[locale]/components/pagination/QueryPagination";
+import Post from "@/src/components/post-list/Post";
+import QueryPagination from "@/src/components/pagination/QueryPagination";
 import { Metadata } from "next";
 import { blogPageContent, generatePageMetadata } from "@/src/config/metadata";
 import { posts } from "#site/content";

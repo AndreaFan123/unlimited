@@ -2,18 +2,17 @@ import { Metadata } from "next";
 import { singleBlogPageContent } from "@/src/config/metadata";
 import { posts } from "#site/content";
 import { notFound } from "next/navigation";
-import { Separator } from "@/src/app/[locale]/components/ui/separator";
+import { Separator } from "@/src/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
 import { formatDate } from "@/src/lib/utils";
 import { Calendar } from "lucide-react";
 import { generatePageMetadata } from "@/src/config/metadata";
 import { slug } from "github-slugger";
-import { Badge } from "@/src/app/[locale]/components/ui/badge";
+import { Badge } from "@/src/components/ui/badge";
 import ROUTES from "@/src/constants/routes";
 
-import MdxContent from "@/src/app/[locale]/components/mdx/MdxComponent";
-
-import "@/styles/mdx.css";
+import MdxContent from "@/src/components/mdx/MdxComponent";
+import "@/src/styles/mdx.css";
 import { Link } from "@/src/i18n/navigation";
 
 type PostPageProps = {

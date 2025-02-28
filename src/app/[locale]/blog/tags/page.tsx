@@ -1,7 +1,7 @@
 import { getAllTags, sortTagByCount } from "@/src/lib/utils";
 import { Metadata } from "next";
 import { posts } from "#site/content";
-import Tag from "@/src/app/[locale]/components/tag-component/tag";
+import Tag from "@/src/components/tag-component/tag";
 
 export const metadata: Metadata = {
   title: "Tags",

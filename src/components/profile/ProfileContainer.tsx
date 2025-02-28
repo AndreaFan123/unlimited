@@ -1,8 +1,8 @@
-import TechStack from "@/src/app/[locale]/components/tech-stack/TechStack";
-import Header from "@/src/app/[locale]/components/normal-components/Header";
-import ExternalLink from "@/src/app/[locale]/components/profile/ExternalLink";
-import PersonInfo from "@/src/app/[locale]/components/profile/PersonInfo";
-import PostContainer from "@/src/app/[locale]/components/profile/PostContainer";
+import TechStack from "@/src/components/tech-stack/TechStack";
+import Header from "@/src/components/normal-components/Header";
+import ExternalLink from "@/src/components/profile/ExternalLink";
+import PersonInfo from "@/src/components/profile/PersonInfo";
+import PostContainer from "@/src/components/profile/PostContainer";
 
 import { Github, Linkedin, Download, Rss } from "lucide-react";
 import { posts } from "#site/content";
@@ -18,7 +18,7 @@ export default function ProfileContainer({ lang }: { lang: Locales }) {
   const sortedPosts = sortPosts(
     posts.filter((post) => post.published && post.language === lang)
   );
-  console.log("sortedPosts", sortedPosts);
+
   const latestPosts = sortedPosts.slice(0, 2);
 
   const SOCIALS = [
@@ -53,7 +53,7 @@ export default function ProfileContainer({ lang }: { lang: Locales }) {
   ];
   return (
     <section className="lg:sticky lg:px-4 lg:top-0 lg:min-h-screen flex flex-col gap-5 text-gray-700 dark:text-gray-300 w-full lg:w-[30%]">
-      <Header />
+      <Header lang={lang} />
       <div className="mt-7 px-4 sm:px-0">
         <PersonInfo
           name={tProfile("name")}

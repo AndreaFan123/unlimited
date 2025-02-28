@@ -9,7 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/src/app/[locale]/components/ui/card";
+} from "@/src/components/ui/card";
 import { Link } from "@/src/i18n/navigation";
 import { useTranslations } from "next-intl";
 import ROUTES from "@/src/constants/routes";

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import ProfileContainer from "@/src/app/[locale]/components/profile/ProfileContainer";
-import ProjectContainer from "@/src/app/[locale]/components/projects/ProjectContainer";
-import WorkExperience from "@/src/app/[locale]/components/work-experience/WorkExperience";
+import ProfileContainer from "../../components/profile/ProfileContainer";
+import ProjectContainer from "../../components/projects/ProjectContainer";
+import WorkExperience from "../../components/work-experience/WorkExperience";
 import {
   landingPageContent,
   generatePageMetadata,

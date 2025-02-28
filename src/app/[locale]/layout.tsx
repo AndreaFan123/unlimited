@@ -1,7 +1,7 @@
 import { Inter, Noto_Sans_TC } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { ThemeProvider } from "@/src/app/[locale]/components/theme-provider";
+import { ThemeProvider } from "@/src/components/theme-provider";
 import "./globals.css";
 import { Locales } from "@/src/i18n/request";
 
