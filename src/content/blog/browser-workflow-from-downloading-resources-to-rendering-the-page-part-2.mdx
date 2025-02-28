@@ -1,0 +1,150 @@
+---
+title: "Browser workflow from downloading resources to rendering the page part 2"
+description: After getting the IP address, what happens next?
+date: 2024-11-15
+tags: ["web", "browser"]
+published: true
+language: "en"
+---
+
+## Review the previous part
+
+If you haven't read the [previous part](/blog/browser-workflow-from-downloading-resources-to-rendering-the-page-part-1), I recommend you to do so first, but let's review the main steps:
+
+When a user enters a URL in the browser, the browser will go through the following steps:
+
+1. Check browser DNS cache, if there's no result, go to step 2.
+2. Check OS DNS cache, if there's no result, go to step 3.
+3. Query ISP DNS server, it will go through (recursively) root DNS server, TLD DNS server and Authoritative DNS server to get the IP address of the domain name, then update cache.
+4. Return the IP address to the browser.
+
+## Before requesting resources
+
+Typically, browsers will need 3 types of resources for a page:
+
+- HTML
+- CSS
+- JavaScript
+
+but there're two important steps that happen before requesting resources, let's break them down:
+
+1. Establish a TCP connection
+2. HTTPS Check
+
+### Establish connection and send request
+
+TCP is a short called **Transmission Control Protocol**, it's a connection-oriented protocol, which means it needs to establish a connection before sending data, and it ensures the data is delivered reliably and in order, during this step, the browser will:
+
+- Three-way handshake
+- HTTPS check
+
+Once the connection is established and no error occurs, the browser will send a request to the server.
+
+#### What is the three-way handshake?
+
+Three-way handshake is a process that establishes a connection between a client and a server. It involves three messages:
+
+#### 👋🏽 First handshake
+
+- Client to server
+- Send SYN packet
+- Tell the server "I want to connect to you"
+
+#### 👋🏽 Second handshake
+
+- Server to client
+- Send SYN-ACK packet
+- Tell the client "OK, I received your SYN packet, I'm ready to connect to you"
+
+#### 👋🏽 Third handshake
+
+- Client to server
+- Send ACK packet
+- Tell the server "I received it too, we can start sending data now"
+
+```json
+Client                             Server
+   |                               |
+   |        SYN (seq=x)           |
+   |------------------------------>|
+   |                               |
+   |    SYN+ACK (seq=y, ack=x+1)  |
+   |<------------------------------|
+   |                               |
+   |        ACK (ack=y+1)         |
+   |------------------------------>|
+   |                               |
+```
+
+There're potential problems that may occur during the three-way handshake, but we'll talk about them in the future.
+
+#### HTTP/HTTPS check
+
+#### When the connection is HTTP:
+
+- Get IP address.
+- TCP Connection (Three-way handshake).
+- Send HTTP request directly.
+- Receive response.
+- Close or keep the connection.
+
+#### When the connection is HTTPS:
+
+- Get IP address.
+- TCP Connection (Three-way handshake).
+- TLS (Transport Layer Security) handshake (short version):
+  - 👋🏽 Negotiate encryption algorithms.
+  - 👋🏽 Exchange certificates.
+  - 👋🏽 Generate shared secret key.
+- Send HTTP request through the encrypted connection.
+- Receive encrypted response.
+- Close or keep the connection.
+
+## Finally, requesting resources
+
+### HTML file
+
+Once the connection is established, first resource that browser will request is the HTML file, which is the structure of the page, after receiving the HTML file, it will parse the HTML and build the **DOM tree**.
+
+### CSS file
+
+We know that there're two ways of writing CSS:
+
+- Inline
+- External
+
+```html
+<!-- internal CSS -->
+<style>
+  .class {
+    color: red;
+  }
+</style>
+
+<!-- external CSS -->
+<link rel="stylesheet" href="styles.css" />
+```
+
+Although HTML and CSS are different resources, when the browser parses the HTML, and encounters any inline CSS or external CSS, it will request the CSS file, but this doesn't block the browser from parsing HTML, they are parsed in parallel.
+
+After receiving the CSS file, the browser will parse the CSS file, and build the **CSSOM tree**.
+
+Here is the flow look like:
+
+```json
+Parse HTML ─────────────────────────────────────► Complete DOM
+     │
+     └── Encounter CSS ─── Download CSS ─── Parse CSS ──► Complete CSSOM
+```
+
+### JavaScript file
+
+When encountering a JavaScript file, the browser will stop parsing HTML, it will download the JavaScript file, and execute the JavaScript code.
+
+## Summary
+
+In this article, we reviewd that after receiving IP address, browser will go through three-way handshake to establish a connection, then check if the connection is HTTP or HTTPS, if it's HTTP, it will send a request directly, if it's HTTPS, it will go through TLS handshake, then send a request.
+
+After that, browser will request the HTML file, then the CSS file, and finally the JavaScript file.
+
+In the next article, I'd like to talk more about the process of rendering the page in detail.

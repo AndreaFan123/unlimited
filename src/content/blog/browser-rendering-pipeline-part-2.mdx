@@ -1,0 +1,113 @@
+---
+title: "Browser rendering pipeline part 2 (Focus on rendering engine)"
+description: After parsing the HTML and CSS, what happens next?
+date: 2024-12-03
+tags: ["web", "browser"]
+published: true
+language: "en"
+---
+
+## Review the previous part
+
+In article [Browser rendering pipeline part 1](/blog/browser-rendering-pipeline-part-1), we have reviewed the browser rendering pipeline, and know that the browser will parse the HTML and CSS and create the DOM tree and CSSOM tree, the main role behind this is the **Rendering engine**.
+
+## Different types of rendering engines
+
+Different browsers use different rendering engines, here are some of them:
+
+- IE: Trident
+- Firefox: Gecko
+- Safari: WebKit
+- Chrome and Opera: Blink (based on WebKit)
+
+## The main flow
+
+After getting contents of the requested document from networking layer, the basic flow of the rendering engine is as follows:
+
+### Parsing phase
+
+In this stage, the rendering engine will parse the HTML and CSS, and create the DOM tree and CSSOM tree.
+
+Also the JavaScript engine will execute the script, every script will be executed in the single thread, and push into the callstack one by one, the order of the execution is based on LIFO (Last In First Out), if there's a DOM event or timer event triggered, it will be pushed into event queue, just remember that the priority of the execution on the callstack are always higher than the event queue, you can refer to [JavaScript event loop](/blog/js-event-loop) for more details.
+
+### Render phase
+
+In this stage, both DOM tree and CSSOM tree will be combined to create the render tree, then the browser will layout the render tree and painting, finally compose the final image and display it on the screen, let's dive into each stage.
+
+#### Layout tree
+
+In this stage, the browser will do several things:
+
+1. Calculate the position and size of each node.
+2. Handle box model, positioning and floating.
+3. Then create the layout tree.
+
+#### Paint stage
+
+In this stage, the browser will:
+
+1. convert layout to actual pixels.
+2. Handle the order of the painting, such as the z-index.
+3. Handle color, border or shadow, etc.
+4. Draw the content on the screen.
+
+#### Compositing stage
+
+In this stage, the browser will combine the different layers into a single image, and display it on the screen.
+
+## Reflow and repaint
+
+Some operations will trigger the reflow or repaint, let's review them:
+
+### Reflow
+
+Reflow is the process of recalculating the layout of the elements, it will be triggered when the element's size or position is changed, let's say we add new elements, change the style of the element, or resize the window, etc, much expensive operation, we should avoid it as much as possible.
+
+```js
+element.style.width = "100px";
+element.style.height = "100px";
+element.style.left = "100px";
+```
+
+Above code demonstrates a simple reflow, because we change the style of the element multiple times, the better way to do this is to use `element.cssText` to change the style of the element, like this:
+
+```js
+// Batches changes
+element.cssText = "width: 100px; height: 100px; left: 100px;";
+```
+
+> 🧐 ummm...does RWD trigger reflow?
+
+#### Responsive design
+
+Media queries during the initial load apply styles statically, so they do not cause additional reflow, but when the window is resized, the browser will need to recalculate the layout of the elements, so it will trigger reflow, let's see an example:
+
+```html
+<style>
+  @media (min-width: 768px) {
+      .container {
+          width: 750px;
+      }
+  }
+  @media (min-width: 1200px) {
+      .container {
+          width: 1170px;
+  }
+</style>
+```
+
+Just remember if the CSS value changes the layout, such as `width`, `height`, `left`, `top`, `margin`, `padding`, etc, it will trigger reflow, if it only changes the visual properties, such as `color`, `border`, `shadow`, etc, it will trigger repaint.
+
+#### Repaint
+
+Triggered when only the visual properties change, such as color, border or shadow, etc, this requires re-executing the paint and compositing phases, less expensive than reflow.
+
+## Summary
+
+1. In the network layer, the browser will get the contents of the requested document.
+2. In the parsing phase, the browser will parse the HTML and CSS, and create the DOM tree and CSSOM tree.
+3. In the render phase, the browser will layout the render tree and paint, finally compose the final image and display it on the screen.
+4. Some operations will trigger the reflow or repaint, we should avoid them as much as possible.
+5. CSS value changes that affect layout will trigger reflow.
+6. CSS value changes that do not affect layout will trigger repaint.
+7. Reflow is more expensive than repaint.

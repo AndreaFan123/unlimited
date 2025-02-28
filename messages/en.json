@@ -1,0 +1,13 @@
+{
+  "logo": "Unlimited",
+  "profile": {
+    "name": "Shan Le Fan (Andrea)",
+    "title": "Frontend Developer && Marketer",
+    "content1": "Self-disciplined, curiosity-driven frontend engineer with a marketing background, and a passion for Next.js, React, TailwindCSS, JavaScript, TypeScript, HTML, and CSS.",
+    "content2": "Highly adept at independent and collaborative projects, with strong focus on website development and user experience. Passionate about applying technical skills in volunteer projects for community impact.",
+    "latestPosts": "Latest Posts"
+  },
+  "techStack": {
+    "title": "TI am focusing on..."
+  }
+}

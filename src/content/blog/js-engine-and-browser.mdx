@@ -1,0 +1,67 @@
+---
+title: "JavaScript engine and browser"
+description: Who is in charge of running JavaScript code in the browser?
+date: 2024-12-05
+tags: ["javascript", "web", "browser"]
+published: true
+language: "en"
+---
+
+In articles [Browser rendering pipeline part 1](/blog/browser-rendering-pipeline-part-1) and [Browser rendering pipeline part 2](/blog/browser-rendering-pipeline-part-2), we have reviewed the browser rendering pipeline, and know that the browser will parse the HTML, CSS and JavaScript code to render the page, now let's talk about the JavaScript engine.
+
+## Higher level programming languages
+
+JavaScript is a higher level programming language, it's designed to be easy to understand and use, but the computer can't understand it, the only thing
+that the computer can understand is binary code, which is a sequence of 0 and 1 (CPU can only understand 0 and 1).
+
+JS engine is help to translate JavaScript code to binary code in order to run it on the computer.
+
+> Is there a low level programming language?
+>
+> Yes, there are some low level programming languages, such as C, C++, Rust, etc.
+
+## Common JS engines
+
+- V8 (Chrome, Edge)
+- SpiderMonkey (Firefox)
+- JavaScriptCore (Safari)
+- Chakra (Edge)
+
+## The relationship between browser and JS engine
+
+Take webkit as an example, webkit is made up of two parts:
+
+- WebCore: Rendering engine, responsible for parsing HTML and CSS, and building the DOM tree and CSSOM tree.
+- JavaScriptCore: JavaScript engine, responsible for parsing and executing JavaScript code.
+
+## Main flow
+
+When the browser receives the JS code, the JS engine will do the following steps:
+
+### Parsing phase
+
+- Parser: Converts JavaScript code into Abstract Syntax Tree (AST), then AST will be sent to the compiler.
+
+### Execution phase
+
+- Interpreter: Transforms AST into bytecode and executes it.
+- Compiler: Compiles frequently used code into machine code for better performance.
+- Profiler: Monitors code execution and optimizes hot paths.
+
+## Browser Architecture
+
+<Image
+  src="/static/browser.png"
+  alt="browser architecture"
+  width={1000}
+  height={1000}
+/>
+
+## Summary
+
+- Two main components: JS engine and rendering engine.
+- JS engine: Parsing phase, execution phase.
+- Rendering engine: Parsing phase, execution phase.
+- When the browser receives the JS code, the JS engine will do the following steps:
+  - Parsing phase: Converts JavaScript code into Abstract Syntax Tree (AST), then AST will be sent to the compiler.
+  - Execution phase: Interpreter: Transforms AST into bytecode and executes it.

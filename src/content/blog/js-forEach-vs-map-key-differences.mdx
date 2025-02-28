@@ -1,0 +1,76 @@
+---
+title: "JavaScript forEach vs map, key differences?"
+description: forEach vs map, key differences
+date: 2024-12-01
+tags: ["javascript", "fundamentals"]
+published: true
+language: "en"
+---
+
+As a programmer, we deal with different sorts of data structures, and one of the most common data structures is an array, or in other programming languages, a list.
+
+If you've been programming in JS for a while, you've probably come across different methods to loop through an array.
+
+In this article, I'd like to review these two methods, **forEach** and **map**, and see how they are different from each other.
+
+## Key differences
+
+### Purpose
+
+1. **forEach()** is used to execute **side effects** for each element in an array, meaning it's used for actions like logging, updating DOM, storing values, etc.
+2. **map()** is used to create a new array based on the original array, but with each element transformed, e.g. multiplying each element by 2.
+
+### Return value
+
+1. forEach() returns undefined.
+2. map() returns a new array.
+
+### Chainability
+
+**forEach()** is not chainable, while **map()** is chainable, for example:
+
+```ts
+// forEach is not chainable
+[1, 2, 3]
+  .forEach((num) => num * 2)
+  .filter((num) => num > 2) // undefined
+
+  [
+    // map is chainable
+    (1, 2, 3)
+  ].map((num) => num * 2)
+  .filter((num) => num > 2); // [4, 6]
+```
+
+## React use cases, why map() is preferred?
+
+We often use **map()** in React to transform an array of data into a list of JSX elements, the main reason is that **map()** returns a new array, each element can be JSX elements, this fits the concept of **componentization** and **declarative rendering**.
+
+1. The return value can be using rendering directly.
+2. Cleaner and more declarative, because when we use map(), we know that we want to **convert** each value from an array into a JSX element, and we don't need to manage the array or index manually.
+
+```tsx
+// Not recommended
+const animals = ["dog", "cat", "bird"];
+for (let i = 0; i < animals.length; i++) {
+  return <li key={animals[i]}>{animals[i]}</li>;
+}
+
+// Recommended
+// index as key is not recommended, but it's ok for this example, use id if possible
+const animals = ["dog", "cat", "bird"];
+const animalList = animals.map((animal, index) => (
+  <li key={index}>{animal}</li>
+));
+```
+
+3. React is single data source, it means that the data is stored in the state, and the state is the single source of truth, using map() can maintain the data consistency because it returns a new array, and it's easier to track and update.
+
+4. Using map() is more flexible, because it can be used with other array methods, e.g. filter(), reduce(), etc.
+
+```tsx
+const animals = ["dog", "cat", "bird"];
+const filteredAnimals = animals
+  .map((animal) => animal.toUpperCase())
+  .filter((animal) => animal !== "dog");
+```
