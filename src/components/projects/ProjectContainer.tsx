@@ -42,18 +42,34 @@ export default function ProjectContainer() {
       status: true,
       tech: ["Next.js", "TailwindCSS", "TypeScript", "MDX", "Shadcn/UI"],
     },
+    {
+      name: "senryo",
+      description: t("senryo"),
+      link: ROUTES.SENRYO,
+      src: senryo,
+      status: true,
+      tech: ["Next.js", "TailwindCSS", "TypeScript", "i18n"],
+    },
+    {
+      name: "Unlimited",
+      description: t("unlimitedBlog"),
+      link: "",
+      src: unlimited,
+      status: true,
+      tech: ["Next.js", "TailwindCSS", "TypeScript", "MDX", "Shadcn/UI"],
+    },
   ];
   return (
-    <div className="w-full mt-8 px-4 sm:px-0">
-      <h2 className="text-3xl font-bold mb-8 text-gray-700 dark:text-gray-300">
+    <div className="w-full mt-5 px-4 sm:px-0">
+      <h2 className="text-3xl font-bold mb-2 text-gray-700 dark:text-gray-300">
         {t("title")}
       </h2>
-      <div className="border-b-[1px] pt-4 border-gray-400 dark:border-white border-dashed pb-10 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
-        <div className="flex overflow-x-auto lg:w-fit gap-4">
+      <div className="border-b-[1px] pt-4 border-gray-400 dark:border-white border-dashed pb-5 w-full max-w-full lg:max-w-screen-lg overflow-x-auto">
+        <div className="flex overflow-x-auto lg:w-fit gap-2">
           {projectList.map((project, index) => (
             <Card
               key={`${project.name}-${index}`}
-              className="focus:outline-none focus:ring focus:ring-[#7772ff] m-5"
+              className="focus:outline-none focus:ring focus:ring-[#7772ff] m-5 dark:bg-gray-800 hover:transform hover:scale-105 transition-transform"
             >
               <Link
                 href={project.link}

@@ -1,0 +1,188 @@
+---
+title: "JavaScript 原型介紹 - 程式設計法"
+description: 什麼是 JavaScript 原型？
+date: 2024-12-20
+tags: ["javascript"]
+published: true
+language: "zh_tw"
+---
+
+今天，我想複習 JS 中最重要的概念之一，也就是原型（prototype），讓我們先從基礎開始。
+
+## 什麼是所謂的程式設計法？
+
+想像一個工具箱，有錘子、螺絲起子、鋸子等。每個工具都有其特定用途，我們可以用不同的工具解決不同的問題，有時你需要結合它們來解決複雜的問題，這個概念類似於程式設計法。
+
+程式設計法是程式設計的基本方法或風格，它定義了思考和解決問題的方式。
+
+以下是一些常見的程式設計法及其特性：
+
+### 命令式程式設計（Imperative Programming:
+
+- 通過執行陳述式來改變程式的狀態。
+- 專注於如何使用明確的指令來執行任務，如迴圈、條件等。
+- 例如：C、Java。
+
+### 宣告式程式設計（Declarative Programming）：
+
+- 描述要做什麼，而不是如何做。
+- 專注於結果。
+- 例如：SQL、HTML。
+
+### 函式程式設計（Functional Programming）：
+
+- 函式是主要的建構區塊。
+- 避免更改狀態和可變數據。
+- 例如：Haskell。
+
+### 物件導向程式設計（Object-Oriented Programming）：
+
+- 將程式碼組織成物件。
+- 封裝數據和行為。
+- 例如：Java、Python。
+
+## JavaScript 身兼多職
+
+JavaScript 是一種**多範式**程式語言，它支援物件導向程式設計概念，將函式視為**一等公民(First-class citizen)**，可以用命令式風格或宣告式風格來使用。
+
+假設我們想從陣列中過濾出偶數，將每個數字乘以 2，然後將它們相加。
+
+### 命令式風格
+
+```js
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+function imperativeApproach(arr: number[]) {
+  let result = 0;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] % 2 === 0) {
+      result += arr[i] * 2;
+    }
+  }
+  return result;
+}
+
+console.log(imperativeApproach(numbers));
+```
+
+### 宣告式風格
+
+```js
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+function declarativeApproach(arr: number[]) {
+  return arr
+    .filter((num) => num % 2 === 0)
+    .map((num) => num * 2)
+    .reduce(acc, (curr) => acc + curr, 0);
+}
+
+console.log(declarativeApproach(numbers));
+```
+
+### 函式式風格
+
+```js
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+const isEven = (num: number) => num % 2 === 0;
+const multiplyByTwo = (num: number) => num * 2;
+const sum = (acc: number, curr: number) => acc + curr;
+
+function functionalApproach(arr: number[]) {
+  return arr.filter(isEven).map(multiplyByTwo).reduce(sum, 0);
+}
+
+console.log(functionalApproach(numbers));
+```
+
+### 物件導向風格
+
+```js
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+class NumberProcessor {
+  constructor(private numbers: number[]) {}
+
+  isEven(num: number) {
+    return num % 2 === 0;
+  }
+
+  multiplyByTwo(num: number) {
+    return num * 2;
+  }
+
+  sum(acc: number, curr: number) {
+    return acc + curr;
+  }
+
+  process() {
+    return this.numbers.filter(this.isEven).map(this.multiplyByTwo).reduce(this.sum, 0);
+  }
+}
+
+const processor = new NumberProcessor(numbers);
+```
+
+## JavaScript 中的原型
+
+在物件導向程式設計中，有兩種創建物件的方式：基於**類（class-based**）和基於**原型（prototype-based）**。
+
+### 基於類的物件導向程式設計
+
+這是較傳統，較直觀的方式，可以想像成一個藍圖，你可以從藍圖中創建多個實例。
+
+```js
+class Enemy() {
+  constructor(name) {
+    this.name = name;
+  }
+
+  attack() {
+    console.log(`${this.name} is attacking!`);
+  }
+
+  defend() {
+    console.log(`${this.name} is defending!`);
+  }
+}
+
+const enemy1 = new Enemy("Goblin");
+const enemy2 = new Enemy("Orc");
+
+enemy1.attack(); // Goblin is attacking!
+enemy2.defend(); // Orc is defending!
+```
+
+### 基於原型的物件導向程式設計
+
+這種方式更靈活，它允許你在沒有藍圖的情況下創建物件，只需克隆一個現有物件。
+
+```js
+const enemy = {
+  attack() {
+    console.log(`${this.name} is attacking!`);
+  },
+
+  defend() {
+    console.log(`${this.name} is defending!`);
+  },
+};
+
+const enemy1 = Object.create(enemy);
+enemy1.name = "Goblin";
+enemy1.attack(); // Goblin is attacking!
+
+const enemy2 = Object.create(enemy);
+enemy2.name = "Orc";
+enemy2.defend(); // Orc is defending!
+```
+
+## 結論
+
+在這篇文章中，我們回顧了程式語言範式，以及 JavaScript 如何支援多種範式，並學習了基於類的物件導向程式設計和基於原型的物件導向程式設計之間的差異。
+
+- JavaScript 是一種多範式程式語言。
+- JavaScript 是一種基於原型的物件導向程式語言。
+- 程式設計範式定義了思考和解決問題的方式。
+- 有四種常見的程式設計範式：命令式、宣告式、函式和物件導向。

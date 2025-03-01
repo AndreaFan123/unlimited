@@ -29,7 +29,7 @@ export default function WorkExperience() {
     },
   ];
   return (
-    <div className="mt-[20px] md:pl-9 mb-8 px-4 sm:px-0">
+    <div className="mt-[20px] md:pl-7 mb-8 px-4 sm:px-0">
       <h2 className="text-2xl mb-[20px] font-bold text-gray-700 dark:text-gray-300">
         {t("workExperience")}
       </h2>
@@ -51,21 +51,19 @@ export default function WorkExperience() {
                     {index + 1}
                   </span>
                 </div>
-                <div className="ml-4 w-full">
-                  <div className="mb-2">
-                    <h3 className="text-lg font-semibold">
+                <div className="ml-4">
+                  <div className="mb-2 relative">
+                    <h3 className="text-lg font-semibold ">
                       {experience.company} | {experience.position}
                     </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">
+                      {experience.duration}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <p className="text-base text-gray-700 dark:text-gray-300">
                     {experience.description}
                   </p>
                 </div>
-              </div>
-              <div className="hidden sm:inline-block sm:w-[30%] sm:text-right">
-                <p className="text-xs text-gray-700 dark:text-gray-300">
-                  {experience.duration}
-                </p>
               </div>
             </div>
           ))}

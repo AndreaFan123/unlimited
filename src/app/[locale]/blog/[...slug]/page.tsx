@@ -14,10 +14,12 @@ import ROUTES from "@/src/constants/routes";
 import MdxContent from "@/src/components/mdx/MdxComponent";
 import "@/src/styles/mdx.css";
 import { Link } from "@/src/i18n/navigation";
+import { Locales } from "@/src/i18n/request";
 
 type PostPageProps = {
   params: {
     slug: string[];
+    locale: Locales;
   };
 };
 
@@ -43,11 +45,13 @@ export const generateStaticParams = async (): Promise<
 > => {
   return posts.map((post) => ({
     slug: post.slugAsParams.split("/"),
+    locale: "en",
   }));
 };
 
 export default async function BlogPostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
+  const { locale } = await params;
   if (!post || !post.published) {
     notFound();
   }
@@ -80,12 +84,12 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       </div>
       <Separator />
       <MdxContent code={post.body} />
-      <Link
-        className="hover:text-orange-500 transition-all duration-300"
-        href={ROUTES.BLOG}
-      >
-        <div className="flex mt-9 items-center gap-2 text-gray-700 dark:text-gray-300">
-          <ArrowLeft className="w-4 h-4" /> <span>Back to Blog 🏃🏽‍♀️</span>
+      <Link className="mt-9 " href={ROUTES.BLOG}>
+        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <ArrowLeft className="w-4 h-4  hoverEffect" />{" "}
+          <span className="">
+            {locale === "en" ? "Back to Blog" : "回到部落格"} 🏃🏽‍♀️
+          </span>
         </div>
       </Link>
     </article>

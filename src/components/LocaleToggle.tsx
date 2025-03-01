@@ -18,8 +18,8 @@ export default function LocaleToggle({ lang }: { lang: Locales }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="flex flex-col items-center">
-        <Link href="/en/blog">{lang === "en" ? "EN" : "英文"}</Link>
-        <Link href="/zh_tw/blog">{lang === "zh_tw" ? "中文" : "ZH_TW"}</Link>
+        <Link href="/en">{lang === "en" ? "EN" : "英文"}</Link>
+        <Link href="/zh_tw">{lang === "zh_tw" ? "中文" : "ZH_TW"}</Link>
       </DropdownMenuContent>
     </DropdownMenu>
   );

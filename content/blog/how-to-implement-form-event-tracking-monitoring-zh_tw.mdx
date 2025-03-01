@@ -1,19 +1,19 @@
 ---
-title: "How to implement form event tracking and monitoring?"
-description: Let's get our hands dirty and implement form event tracking and monitoring
+title: "如何實作表單事件追蹤與監控？"
+description: 讓我們動手實作表單事件追蹤與監控
 date: 2024-11-22
 tags: ["javascript", "practical", "monitoring", "event tracking"]
 published: true
-language: "en"
+language: "zh_tw"
 ---
 
-In the last article - [Event tracking and monitoring](/en/blog/event-tracking-and-monitoring), I cover the basic use cases for event tracking and monitoring.
+在[上一篇文章](/zh_tw/blog/event-tracking-and-monitoring-zh_tw) - 事件追蹤與監控 中，我介紹了事件追蹤和監控的基本使用案例。
 
-In this article, let's get our hands dirty and implement form event tracking and monitoring.
+在這篇文章中，來練習動手實作表單事件追蹤與監控。
 
-## HTML Form
+## HTML 表單
 
-Let's start with a simple HTML form.
+首先從一個簡單的 HTML 表單開始。
 
 ```html
 <form
@@ -75,22 +75,22 @@ Let's start with a simple HTML form.
 </form>
 ```
 
-Above is a simple registration form with name, email and submit button.
+上面是一個包含姓名、電子郵件和提交按鈕的簡單註冊表單。
 
-## Identify what events we want to track
+## 確定我們想要追蹤的事件
 
-From marketing perspective, a registration form is a conversion funnel, I'd like to track how many users visit the form, how many of them interact with the form, and how many of them successfully submit the form, so basically I want to track the following events:
+從行銷的角度來看，註冊表單是一個轉換漏斗，我想要追蹤有多少使用者訪問表單、有多少使用者與表單互動，以及有多少使用者成功提交表單。基本上，我想要追蹤以下事件：
 
-- Web visit
-- Focus on the form / interact with the form
-- Click submit button
-- Submit form successfully
+- 網頁訪問
+- 聚焦於表單 / 與表單互動
+- 點擊提交按鈕
+- 成功提交表單
 
-## Implement event tracking
+## 實作事件追蹤
 
-Now that we have a basic event tracking plan, let's implement it.
+現在我們有了基本的事件追蹤計劃，讓我們來實作它。
 
-### Web visit
+### 網頁訪問
 
 ```html
 <script>
@@ -111,11 +111,11 @@ Now that we have a basic event tracking plan, let's implement it.
 </script>
 ```
 
-session id is a unique identifier for a user's session, with this we can track how many users visit the form and how many users interact with the form.
+**session id** 是使用者會話的唯一標識符，通過它我們可以追蹤有多少使用者訪問了表單以及有多少使用者與表單互動。
 
-### Focus on the form / interact with the form
+### 聚焦於表單 / 與表單互動
 
-Next, we want to track when a user focuses on the form or interacts with the form, we can use `focus` and `input` event to track this.
+接下來，我們想要追蹤使用者何時聚焦於表單或與表單互動，我們可以使用 `focus` 和 `input` 事件來追蹤這些。
 
 ```html
 <script>
@@ -134,9 +134,9 @@ Next, we want to track when a user focuses on the form or interacts with the for
 </script>
 ```
 
-### Click submit button and Submit form successfully
+### 點擊提交按鈕和成功提交表單
 
-Click button is not equals to submit form successfully, so let's track the click event first, and then if the form is valid, then we can track the submit event.
+點擊按鈕不等於成功提交表單，所以讓我們先追蹤點擊事件，然後，如果表單有效，我們再追蹤提交事件。
 
 ```html
 <script>
@@ -168,3 +168,5 @@ Click button is not equals to submit form successfully, so let's track the click
   });
 </script>
 ```
+
+以上就是基本的表單事件追蹤和監控的實作，你可以根據自己的需求和業務邏輯來擴展這些追蹤事件。不過一般來說公司都會選擇串接 Google Analytics 或其他分析工具來追蹤這些事件。畢竟這些工具提供了更多的功能和更好的視覺化報告。

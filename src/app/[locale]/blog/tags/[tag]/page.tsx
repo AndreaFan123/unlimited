@@ -5,10 +5,12 @@ import { generatePageMetadata } from "@/src/config/metadata";
 import { tagPageContent } from "@/src/config/metadata";
 import { Metadata } from "next";
 import { useTranslations } from "next-intl";
+import { Locales } from "@/src/i18n/request";
 
 type TagPageProps = {
   params: {
     tag: string;
+    locale: Locales;
   };
 };
 
@@ -27,7 +29,9 @@ const getTagsFromParams = async (params: TagPageProps["params"]) => {
 export default function TagPage({ params }: TagPageProps) {
   const t = useTranslations("tag");
   const tag = params.tag.toLowerCase();
-  const filteredPosts = posts.filter((post) => post?.tags?.includes(tag));
+  const filteredPosts = posts.filter(
+    (post) => post?.tags?.includes(tag) && post.language === params.locale
+  );
 
   return (
     <section className="flex flex-col gap-4 my-4">

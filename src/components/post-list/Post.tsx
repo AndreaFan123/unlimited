@@ -1,6 +1,7 @@
 import { Link } from "@/src/i18n/navigation";
 import { formatDate } from "@/src/lib/utils";
 import { ArrowRight, Calendar } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type PostListProps = {
   slug: string;
@@ -17,6 +18,7 @@ export default function Post({
   date,
   href,
 }: PostListProps) {
+  const t = useTranslations("blog");
   const formatTime = formatDate(date);
   return (
     <li className="flex justify-between gap-2 w-full font-mono py-3">
@@ -45,7 +47,7 @@ export default function Post({
           href={href ? href : slug}
           className="flex items-center bg-[#5350a6] text-white w-fit px-2 py-1 gap-2 mt-4 hover:text-orange-300 transition-all duration-300"
         >
-          Read more
+          {t("readMore")}
           <ArrowRight className="w-4 h-4 hover:animate-bounce " />
         </Link>
       </div>

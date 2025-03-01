@@ -9,7 +9,7 @@ import LocaleToggle from "../LocaleToggle";
 
 export default function Header({ lang }: { lang: Locales }) {
   const pathName = usePathname().split("/");
-  const showLocaleToggle = pathName[3] === undefined;
+  const showLocaleToggle = pathName[2] === undefined;
 
   return (
     <header className="sticky h-20 top-0 sm:max-w-full md:max-w-[800px] mx-auto z-50 w-full px-4 border-b-[1px] border-gray-400 border-dashed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

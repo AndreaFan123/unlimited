@@ -69,12 +69,12 @@ const components = {
     <strong className="rounded bg-[#c3c2ed] px-1 ">{children}</strong>
   ),
   a: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href} className="text-gray-700 dark:text-gray-300">
+    <a href={href} className="text-orange-600 hoverEffect">
       {children}
     </a>
   ),
   code: ({ children }: { children: React.ReactNode; href: string }) => (
-    <code className="text-gray-700 dark:text-gray-300">{children}</code>
+    <code className="text-pink-800 dark:text-orange-600">{children}</code>
   ),
 };
 

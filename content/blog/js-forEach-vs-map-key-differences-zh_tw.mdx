@@ -1,0 +1,73 @@
+---
+title: "JavaScript forEach vs map，有什麼關鍵差異？"
+description: forEach vs map，關鍵差異
+date: 2024-12-01
+tags: ["javascript", "fundamentals"]
+published: true
+language: "zh_tw"
+---
+
+作為程式設計師，我們處理不同種類的資料結構，而最常見的資料結構之一就是陣列（array），或在其他程式語言中稱為串列（list）。
+如果你已經用 JS 編程一段時間了，你可能已經遇到了不同的方法來遍歷陣列。
+在這篇文章中，我想回顧這兩種方法，**forEach** 和 **map**，看看它們之間有什麼不同。
+
+## 關鍵差異
+
+### 用途
+
+1. forEach() 用於對陣列中的每個元素執行副作用，意味著它用於諸如記錄、更新 DOM、儲存值等動作。
+2. map() 用於基於原始陣列建立一個新陣列，但對每個元素進行轉換，例如將每個元素乘以 2。
+
+### 回傳值
+
+1. forEach() 回傳 undefined。
+2. map() 回傳一個新陣列
+
+### 可鏈接性
+
+forEach() 不可鏈接，而 map() 可以鏈接，例如：
+
+```ts
+// forEach 不可鏈接
+[1, 2, 3]
+  .forEach((num) => num * 2)
+  .filter((num) => num > 2) // undefined
+
+  [
+    // map 可鏈接
+    (1, 2, 3)
+  ].map((num) => num * 2)
+  .filter((num) => num > 2); // [4, 6]
+```
+
+## React 使用案例，為什麼更偏好 map()？
+
+我們經常在 React 中使用 map() 將資料陣列轉換為 JSX 元素列表，主要原因是 map() 回傳一個新陣列，每個元素可以是 JSX 元素，這符合元件化和宣告式渲染的概念。
+
+1. 回傳值可以直接用於渲染。
+2. 更乾淨且更具宣告性，因為當我們使用 map() 時，我們知道我們想要將陣列中的每個值轉換為 JSX 元素，而且不需要手動管理陣列或索引。
+
+```tsx
+// 不推薦
+const animals = ["dog", "cat", "bird"];
+for (let i = 0; i < animals.length; i++) {
+  return <li key={animals[i]}>{animals[i]}</li>;
+}
+
+// 推薦
+// 使用索引作為 key 不推薦，但在這個例子中可以，但還是建議使用 id 或其他唯一值
+const animals = ["dog", "cat", "bird"];
+const animalList = animals.map((animal, index) => (
+  <li key={index}>{animal}</li>
+));
+```
+
+1. React 是單一資料來源，這意味著資料儲存在狀態中，且狀態是唯一的真實來源，使用 map() 可以維持資料一致性，因為它回傳一個新陣列，並且更容易追蹤和更新。
+2. 使用 map() 更靈活，因為它可以與其他陣列方法一起使用，例如 filter()、reduce() 等。
+
+```tsx
+const animals = ["dog", "cat", "bird"];
+const filteredAnimals = animals
+  .map((animal) => animal.toUpperCase())
+  .filter((animal) => animal !== "dog");
+```

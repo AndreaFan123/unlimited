@@ -1,37 +1,37 @@
 ---
-title: "JavaScript Type Conversion vs. Type Coercion"
-description: Explore the difference between type conversion and type coercion in JavaScript
+title: "JavaScript 型別轉換 vs. 型別強制轉換"
+description: 探索 JavaScript 中型別轉換和型別強制轉換的差異
 date: 2024-10-20
 tags: ["javascript", "fundamentals"]
 published: true
-language: "en"
+language: "zh_tw"
 ---
 
-The definition of type conversion in ECMAScript:
+ECMAScript 中型別轉換的定義：
 
-> The ECMAScript language implicitly performs automatic type conversion as needed. To clarify the semantics of certain constructs it is useful to define a set of conversion abstract operations. The conversion abstract operations are polymorphic; they can accept a value of any ECMAScript language type or of a Completion Record value. But no other specification types are used with these operations.
+> ECMAScript 語言會根據需要隱式地執行自動型別轉換。為了釐清某些結構的語義，定義一組轉換抽象操作是很有用的。轉換抽象操作是多態的；它們可以接受任何 ECMAScript 語言型別或完成記錄值的值。但這些操作不使用其他規範型別。
 
-## Types of Conversion
+## 轉換的類型
 
-- **Implicit conversion:** as known as type coercion: This is done automatically with the use of methods.
-- **Explicit conversion:** This is done with using built-in methods or functions.
+- 隱式轉換 **（也稱型別強制轉換（type coercion）**：這是通過使用方法自動完成的。
+- 顯式轉換： 這是通過使用內建方法或函式完成的。
 
-### Explicit Conversion
+### 顯式轉換 （Explicit Conversion）
 
-Below are common used methods and built-in functions.
+以下是常用的方法和內建函式。
 
-- ToBoolean
+- 轉換為布林值 (ToBoolean)
   - Boolean()
     - !!
-- ToNumber
+- 轉換為數字 (ToNumber)
   - Number()
   - parseInt()
   - parseFloat()
-- ToString
+- 轉換為字串 (ToString)
   - String()
   - toString()
 
-#### ToBoolean
+#### 轉換為布林值 (ToBoolean)
 
 ```js
 // Undefined
@@ -85,9 +85,9 @@ let bool = Boolean(a);
 console.log(bool); // true
 ```
 
-#### ToNumber
+#### 轉換為數字 (ToNumber)
 
-Convert to number is a bit complicated, especially when the argument is String and Symbol.
+轉換為數字有點複雜，特別是當參數是字串和符號（Symbol）時。
 
 ```js
 // Undefined
@@ -187,7 +187,7 @@ const newObj = Number(Obj);
 console.log(newObj); // NaN
 ```
 
-#### ToString
+#### 轉換為字串 (ToString)
 
 ```js
 // Undefined
@@ -239,24 +239,23 @@ let greeting = Symbol("Hello") + "World";
 console.log(String(greeting)); // TypeError: Cannot convert a Symbol value to a string
 ```
 
-> ❗️Although 0 and -0 is different when the type is number, when converting to string, both of them are "0".
+> ❗️ 雖然 0 和 -0 在數字型別時是不同的，但當轉換為字串時，兩者都是 0
 
-### Implicit Conversion (Coercion)
+### 隱式轉換（強制轉換）Implicit Conversion (Coercion)
 
-Type coercion typically occurs when two values of different types are used together in an operation.
-Different operators will apply type conversion to operands in various ways to ensure that the operation can be performed.
+型別強制轉換通常發生在兩個不同型別的值在一個操作中使用時。不同的運算子會以各種方式對運算元進行型別轉換，以確保操作可以執行。
 
-#### Operators:
+#### 運算子：:
 
-- Addition **(+)**
-- Subtraction **(-)**
-- Multiplication **(\*)**
-- Division **(/)**
-- Percentage **(%)**
+- 加法 **(+)**
+- 減法 **(-)**
+- 乘法 **(\*)**
+- 除法 **(/)**
+- 餘數 **(%)**
 
-##### Addition
+##### 加法
 
-When one of the operands is a string, the other operand will be converted to a string, and string concatenation will be performed.
+當其中一個運算元是字串時，另一個運算元將被轉換為字串，並執行字串連接。
 
 ```js
 let result_1 = "5" + 2;
@@ -270,9 +269,9 @@ console.log(result_2); // 25
 
 {/* Addition.png */}
 
-##### Other Arithmetic Operators:
+##### 其他算術運算子：
 
-It forces converting a string to number.
+它會強制將字串轉換為數字。
 
 ```js
 const result_1 = "5" - 2;
@@ -288,16 +287,16 @@ const result_4 = 12 / "6";
 console.log(result_4); // 2;
 ```
 
-##### Logic
+##### 邏輯
 
-When use loose equality, coercion is performed before comparison.
-When use strict equality, type comparison comes first, if type is different, return falsy.
+當使用寬鬆相等（==）時，在比較前會執行強制轉換。
+當使用嚴格相等（===）時，型別比較優先，如果型別不同，則返回 false。
 
 ```js
-// loose equality
+// 寬鬆相等
 console.log("5" == 5); // true;
 
-// strict equality
+// 嚴格相等
 console.log("5" === 5); // false
 ```
 
@@ -305,9 +304,9 @@ console.log("5" === 5); // false
 
 {/* logic.png */}
 
-##### Logical OR and Logical AND
+##### 邏輯 OR 和邏輯 AND
 
-The operands are converted to boolean values for the logical operation.
+運算元會被轉換為布林值以進行邏輯操作。
 
 ```js
 // OR(||)
@@ -321,15 +320,15 @@ console.log(0 && "hello"); // 0
 
 {/* and_or.png */}
 
-> In JavaScript, both the **&& (AND)** and **|| (OR)** logical operators use [short-circuit evaluation](https://en.wikipedia.org/wiki/Short-circuit_evaluation). Here's a more detailed explanation:
+> 在 JavaScript 中，**&& (AND)** 和 **|| (OR)** 邏輯運算子都使用[短路求值（最小化求值）](https://zh.wikipedia.org/wiki/%E7%9F%AD%E8%B7%AF%E6%B1%82%E5%80%BC)。以下是更詳細的解釋：
 >
-> - **OR (||)** Operator: If the first argument evaluates to true, the overall result is true, and the second argument is not evaluated.
+> - **OR (||) 運算子**：如果第一個參數評估為 true，則整體結果為 true，不會評估第二個參數。
 >
-> - **AND (&&)** Operator: If the first argument evaluates to false, the overall result is false, and the second argument is not evaluated.
+> - **AND (&&) 運算子**：如果第一個參數評估為 false，則整體結果為 false，不會評估第二個參數。
 
-##### Logical NOT 
+##### 邏輯 NOT
 
-The operand is converted to a boolean value and then negated.
+運算元會被轉換為布林值，然後取相反值。
 
 ```js
 console.log(!0); // true
@@ -339,9 +338,9 @@ console.log(!0); // true
 
 {/* not.png */}
 
-## Give a try!! Type Conversion Questions ( Created by GPT )
+## 試一試！型別轉換問題（由 GPT 創建）
 
-1. Explain how to explicitly convert different types to strings, numbers, and booleans, and provide example code.
+1. 解釋如何顯式地將不同型別轉換為字串、數字和布林值，並提供範例程式碼。
 
 ```js
 let num = 123;
@@ -357,7 +356,7 @@ let numBool = Number(bool);
 let boolNum = Boolean(numBool);
 ```
 
-2. Explain what implicit type conversion is and provide examples of when it occurs.
+2. 解釋什麼是隱式型別轉換，並提供它發生的例子。
 
 ```js
 console.log("5" - 2);
@@ -366,7 +365,7 @@ console.log(1 + true);
 console.log("5" * "2");
 ```
 
-3. Explain the difference between `==` and `===`, and provide examples of when to use them.
+3. 解釋 `==` 和 `===` 的區別，並提供何時使用它們的例子。
 
 ```js
 console.log("5" == 5);
@@ -376,14 +375,14 @@ console.log(null == undefined);
 console.log(null === undefined);
 ```
 
-4. Explain why "0" == false results in true, while "0" === false results in false.
+4. 解釋為什麼 "0" == false 的結果是 true，而 "0" === false 的結果是 false。
 
 ```js
 console.log("0" == false);
 console.log("0" === false);
 ```
 
-5. Explain what happens during arithmetic operations when numbers and strings are mixed, and provide examples.
+5. 解釋當數字和字串混合在算術運算中時會發生什麼，並提供例子。
 
 ```js
 console.log("5" + 2);
@@ -392,7 +391,7 @@ console.log("5" * 2);
 console.log("5" / 2);
 ```
 
-6. Explain which values are converted to false and which are converted to true in conditional statements.
+6. 解釋哪些值在條件語句中會被轉換為 false，哪些會被轉換為 true。
 
 ```js
 if (0) {
@@ -416,7 +415,7 @@ if ("hello") {
 }
 ```
 
-## References:
+## 參考資料：
 
 - [Equality comparisons and sameness](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness)
 - [ECMAScript - Type Conversion](https://tc39.es/ecma262/#sec-type-conversion)

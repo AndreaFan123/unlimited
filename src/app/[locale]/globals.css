@@ -25,6 +25,11 @@ body {
   }
 }
 
+/* scrollbar css */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

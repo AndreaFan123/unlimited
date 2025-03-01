@@ -31,19 +31,19 @@
       "description": "Developed web applications using React.js, Next.js, TailwindCSS, TypeScript and other frontend technologies."
     },
     "codapayment": {
-      "company": "Codapayment",
+      "company": "Coda (No. 1 online game publishers collect payment in Southeast Asia)",
       "title": "Senior Marketing",
       "duration": "2021-10-01 ~ 2022-12-01",
       "description": "Responsible for TW/HK/MO market, including marketing strategy, online and offline campaigns, competitor analysis, market research."
     },
     "elex": {
-      "company": "exe",
+      "company": "elex (Famous game developer and publisher in China)",
       "title": "Community Manager",
       "duration": "2020-05-01 ~ 2021-09-27",
       "description": "Built Mandarin community, hosted online and offline events."
     },
     "wargaming": {
-      "company": "Wargaming.net",
+      "company": "Wargaming.net (Famous game developer and publisher in Belarus)",
       "title": "Sales Optimization (Team Lead)",
       "duration": "2018-12-01 ~ 2020-03-01",
       "description": "Optimized sales process and increased sales efficiency."
@@ -56,7 +56,8 @@
     "blog": "Blog",
     "description": "Rambling about web development, management, and other random stuff in my life",
     "feature": "Featured",
-    "workingOnIt": "I am working on it"
+    "workingOnIt": "I am working on it",
+    "readMore": "Read More"
   },
   "tag": {
     "relatedPosts": "related Posts",
