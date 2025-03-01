@@ -42,22 +42,6 @@ export default function ProjectContainer() {
       status: true,
       tech: ["Next.js", "TailwindCSS", "TypeScript", "MDX", "Shadcn/UI"],
     },
-    {
-      name: "senryo",
-      description: t("senryo"),
-      link: ROUTES.SENRYO,
-      src: senryo,
-      status: true,
-      tech: ["Next.js", "TailwindCSS", "TypeScript", "i18n"],
-    },
-    {
-      name: "Unlimited",
-      description: t("unlimitedBlog"),
-      link: "",
-      src: unlimited,
-      status: true,
-      tech: ["Next.js", "TailwindCSS", "TypeScript", "MDX", "Shadcn/UI"],
-    },
   ];
   return (
     <div className="w-full mt-5 px-4 sm:px-0">
