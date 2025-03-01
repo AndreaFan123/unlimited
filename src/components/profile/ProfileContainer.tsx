@@ -46,7 +46,7 @@ export default function ProfileContainer({ lang }: { lang: Locales }) {
     {
       name: "Blog",
       icon: <Rss size={30} />,
-      url: ROUTES.BLOG,
+      url: "/blog",
       target: "",
       ariaLabel: tSocials("blog"),
     },

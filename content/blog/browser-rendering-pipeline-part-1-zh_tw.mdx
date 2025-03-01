@@ -1,0 +1,106 @@
+---
+title: "瀏覽器渲染 pipeline Part 1"
+description: 深入探討解析 HTML、CSS 與 JS 在瀏覽器中如何渲染頁面以及其關係
+date: 2024-11-18
+tags: ["web", "browser"]
+published: true
+language: "zh_tw"
+---
+
+## 回顧瀏覽器工作流程
+
+在從下載資源到渲染頁面的[瀏覽器工作流程第一部分](/zh_tw/blog/browser-workflow-from-downloading-resources-to-rendering-the-page-part-1-zh_tw)，我們回顧了當使用者輸入網址並按下 Enter 鍵後，瀏覽器背後的工作流程。接著在從[下載資源到渲染頁面的瀏覽器工作流程第二部分](/blog/browser-workflow-from-downloading-resources-to-rendering-the-page-part-2-zh_tw)，我們回顧了瀏覽器如何處理請求和回應的詳細過程。
+現在，是時候深入探討瀏覽器的渲染 pipeline 了。
+
+## HTML 解析
+
+在 TCP 連接建立並接收到 HTTP/HTTPS 回應後，瀏覽器會向伺服器請求 HTML 資源，然後開始解析 HTML，並將 HTML 轉換成 **DOM 樹（DOM tree）**。
+當遇到**外部 CSS**、**內部 CSS** 或**行內樣式**時，瀏覽器會立即解析它們嗎？還是等待 HTML 解析完成？或者兩者都有？
+
+## CSS 解析
+
+### 外部 CSS（link 標籤）
+
+當 CSS 透過 link 標籤載入時，預設會阻擋渲染，但不會阻擋 HTML 解析與 DOM 建構。
+
+```html
+<link rel="stylesheet" href="style.css" />
+```
+
+### 內部 CSS（style 標籤）
+
+當 CSS 在 style 標籤內時，不會阻擋 HTML 解析與 DOM 建構，因為它已經是 HTML 的一部分，所以不需要額外下載。
+
+```html
+<style>
+  ...;
+</style>
+```
+
+### 行內 CSS（style 屬性）
+
+當 CSS 在 style 屬性內時，不會阻擋 HTML 解析與 DOM 建構，因為它已經是 DOM 的一部分。
+所以我們可以說，無論 CSS 是透過 link 標籤、style 標籤或行內樣式載入，都不會阻擋 HTML 解析與 DOM 建構，它們是平行處理的（意味著它們不會互相阻擋）。
+就像 HTML 一樣，瀏覽器會解析這些 CSS 資源並將它們轉換成 **CSSOM 樹（CSS 物件模型）**。
+
+```html
+<div style="color: red;">...</div>
+```
+
+```json
+HTML 下載 -> DOM 建構
+          -> 外部 CSS 下載 -> CSS 解析 -> CSSOM 建構 -> 渲染樹 -> 渲染
+          -> 內部 CSS 解析 -^
+          -> 行內 CSS 解析 --^
+```
+
+## JavaScript 解析
+
+JavaScript 比 HTML 和 CSS 複雜得多，因為 JS 可以操作 DOM 和 CSSOM，載入 JS 有三種方式：
+
+### 一般 script 標籤（沒有 defer 或 async）
+
+```html
+<script src="script.js"></script>
+```
+
+當 JS 透過 **script** 標籤載入時，會阻擋 HTML 解析，且需要等待先前的 CSS 下載、解析和完成 CSSOM 建構。
+
+### Defer script 標籤
+
+```html
+<script src="script.js" defer></script>
+```
+
+會等待 HTML 解析和 DOM 建構、CSS 下載、解析和 CSSOM 建構。
+
+> 注意：具有 type="module" 的 Script 標籤預設會自動使用 defer。
+
+### Async script 標籤
+
+```html
+<script src="script.js" async></script>
+```
+
+不會阻擋 HTML 解析，當 JS 下載完成後，會立即執行，不會等待先前的 CSS 下載、解析和 CSSOM 建構，所以它可以在 DOM 尚未準備好時執行。
+
+### 何時使用 defer 與 async？
+
+1. 操作 DOM 的腳本。
+2. 需要按特定順序執行的多個腳本。
+3. 加速初始頁面載入。
+
+### async 使用案例
+
+1. 獨立功能的腳本。
+2. 追蹤和分析腳本。
+3. 廣告腳本。
+
+## 結論
+
+1. 瀏覽器會先請求 HTML 資源，然後解析 HTML 並建構 DOM 樹。
+2. 當遇到外部 CSS、內部 CSS 或行內樣式時，瀏覽器會解析它們並建構 CSSOM 樹，這會阻擋渲染，但不會阻擋 HTML 解析與 DOM 建構。
+3. 當遇到 JS 時，取決於 script 標籤的屬性：
+   - 如果是一般 script 標籤，會阻擋 HTML 解析與 DOM 建構。
+   - 如果是 defer script 標籤，會等待 HTML 解析與 DOM 建構，並按順序執行。
+   - 如果是 async script 標籤，下載完成後立即執行，不會阻擋 HTML 解析與 DOM 建構，可能會在存取 DOM 和 CSSOM 時遇到錯誤。

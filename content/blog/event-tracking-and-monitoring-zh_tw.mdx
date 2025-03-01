@@ -1,0 +1,167 @@
+---
+title: "事件追蹤與監控"
+description: 事件追蹤與監控的基本概念
+date: 2024-11-19
+tags: ["javascript", "practical", "monitoring", "event tracking"]
+published: true
+language: "zh_tw"
+---
+
+你是否曾經好奇網站是如何知道你在做什麼？他們如何知道你何時點擊了按鈕或滾動到頁面底部？
+作為一名前行銷人員，我曾經使用 Google Analytics (GA) 來追蹤網站上的使用者行為，進行許多數據分析和報告，以了解使用者行為並優化行銷策略，但我發現有時候數據並不準確或不夠詳細或清晰，這對我來說是一個很大的問題。
+現在我是一名前端開發人員，我有機會了解更多關於網站如何運作，以及其背後的原理。
+
+## 什麼是事件追蹤？
+
+**事件追蹤**，顧名思義，就是透過指令碼或工具追蹤網站上的使用者事件的過程，例如點擊、滾動、表單提交，以及對業務重要的關鍵指標，例如使用者對哪類產品類別感興趣或有多少使用者參與了調查。
+追蹤事件主要有三種方式：
+
+1. 手動將追蹤程式碼加入網站：實作事件追蹤程式碼來捕捉特定事件。
+2. 借助瀏覽器 API 自動追蹤：透過 DOM API。
+3. 第三方追蹤工具。
+
+## 什麼是監控？
+
+監控的主要目的是確保系統的穩定性。收集和分析錯誤日誌、載入時間、資源請求等數據，以識別和解決問題。
+通常，有 3 種類型的監控：
+
+1. 錯誤監控：捕捉 JS 錯誤、載入錯誤等。
+2. 效能監控：收集和分析載入時間、資源請求錯誤等數據，以識別和解決問題。
+3. 使用者體驗監控：收集白屏、長任務等數據。
+
+## 基本事件追蹤實作
+
+### 一般追蹤函式
+
+這個函式用來追蹤一般事件，例如點擊、滾動、表單提交等，並且會向伺服器發送一個「POST」請求來記錄事件。
+在這個函式中，我想獲取觸發事件的元素，
+
+```ts
+// 這裡定義事件的類型
+type EventType = "click" | "scroll" | "formSubmission";
+
+// 這裡定義按鈕的類型
+type ButtonType = "cta" | "close" | "submit";
+
+// 這裡定義事件的詳細資訊
+interface EventDetails {
+  element: Element;
+  buttonType: ButtonType;
+  campaign: string;
+  section: string;
+  timeStamp: number;
+  buttonPurpose: string;
+  metadata?: {
+    campaignId?: string;
+    pageType?: string;
+    url?: string;
+    position?: number;
+  };
+}
+const trackEvent = (eventType: EventType, details: EventDetails) => {
+  // 向伺服器發送「POST」請求來記錄事件，類似這樣：
+  fetch("/api/trackEvent", {
+    method: "POST",
+    body: JSON.stringify({ eventType, details }),
+  });
+};
+```
+
+假設我想追蹤一個「CTA」按鈕，這些數據可以用來分析使用者行為，並優化行銷活動或網站設計。
+
+```html
+<!-- 電競報名網站 -->
+<button id="ctaButton" type="button">報名</button>
+```
+
+```ts
+// DOMContentLoaded 是為了確保在加入事件監聽器之前 DOM 已經載入
+document.addEventListener("DOMContentLoaded", () => {
+  // 或者你可以宣告一個常數變數來獲取元素
+  // const ctaButton = document.getElementById("ctaButton");
+  // 由於 id 是唯一的，所以我們不必宣告一個常數變數
+  ctaButton.addEventListener("click", () => {
+    trackEvent("click", {
+      element: ctaButton,
+      buttonType: "cta",
+      campaign: "esport-signup-2024-10-11",
+      section: "section-1",、
+      timeStamp: Date.now(),
+      buttonPurpose: "signup",
+      metadata: {
+        campaignId: "E-signup",
+        pageType: "marketing",
+        url: window.location.href,
+        position: 1,
+      }
+    })
+  })
+})
+```
+
+## 基本監控實作
+
+### 頁面載入監控
+
+就像一般追蹤函式一樣，我們可以建立一個一般監控函式來追蹤頁面載入時間或 API 請求時間。
+
+```ts
+window.addEventListener("load", () => {
+  const pageLoad = Date.now();
+  trackEvent("page_load", {
+    duration: pageLoad,
+    timeStamp: Date.now(),
+  });
+});
+```
+
+### API 請求監控
+
+對於 API 監控，我們可以監控兩個階段：
+
+1. 請求發送前。
+2. 收到回應後。
+
+```ts
+const apiPerformance = (url: string) => {
+  const startTime = performance.now();
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      const duration = performance.now() - startTime;
+      trackEvent("api_request", {
+        endpoint: url,
+        duration,
+        timeStamp: Date.now(),
+      });
+    });
+};
+apiPerformance("https://www.example.com/api/data");
+```
+
+### JavaScript 錯誤監控
+
+如果我們想監控 JavaScript 錯誤，我們可以使用 window.onerror 事件，當此事件被觸發時，執行追蹤函式，例如：
+
+```html
+<html>
+  <body>
+    <script>
+      window.onerror = (message, source, lineno, colno, error) => {
+        trackEvent("js_error", {
+          message,
+          source,
+          lineno,
+          colno,
+          timeStamp: Date.now(),
+        });
+      };
+      "".push("123");
+    </script>
+  </body>
+</html>
+```
+
+我們可以在控制台中檢查錯誤，它應該顯示一個類似這樣的物件：
+
+<Image src="/static/js-error.png" alt="js error" width={1000} height={1000} />

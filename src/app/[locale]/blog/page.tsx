@@ -5,25 +5,33 @@ import { blogPageContent, generatePageMetadata } from "@/src/config/metadata";
 import { posts } from "#site/content";
 import { sortPosts } from "@/src/lib/utils";
 import { useTranslations } from "next-intl";
+import { Locales } from "@/src/i18n/request";
 
 type BlogPageProps = {
   searchParams: {
     page?: string;
   };
+  params: {
+    locale: Locales;
+  };
 };
 
 export const metadata: Metadata = generatePageMetadata(blogPageContent);
 
-export default async function BlogPage({ searchParams }: BlogPageProps) {
+export default function BlogPage({ searchParams, params }: BlogPageProps) {
   const t = useTranslations("blog");
-  const postsPerPage = 3;
+
+  const postsPerPage = 5;
   const currentPage = Number(searchParams?.page) || 1;
-  const sortedPosts = sortPosts(posts.filter((post) => post.published));
+  const sortedPosts = sortPosts(
+    posts.filter((post) => post.published && post.language === params.locale)
+  );
   const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
   const displayPosts = sortedPosts.slice(
     postsPerPage * (currentPage - 1),
     postsPerPage * currentPage
   );
+
   return (
     <>
       <section className="flex flex-col gap-4 pb-10">

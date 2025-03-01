@@ -11,8 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
+import { Locales } from "../i18n/request";
 
-export function ThemeToggle() {
+export function ThemeToggle({ lang }: { lang: Locales }) {
   const { setTheme } = useTheme();
 
   return (
@@ -24,15 +25,18 @@ export function ThemeToggle() {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent
+        align="center"
+        className="flex flex-col items-center"
+      >
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
+          {lang === "en" ? "Light" : "亮色"}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
+          {lang === "en" ? "Dark" : "暗色"}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
+          {lang === "en" ? "System" : "系統"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

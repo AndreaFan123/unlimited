@@ -1,0 +1,95 @@
+---
+title: "JavaScript 事件循環"
+description: 探索 JavaScript 事件循環
+date: 2024-10-10
+tags: ["javascript", "fundamentals"]
+published: true
+language: "zh_tw"
+---
+
+## 什麼是事件循環？
+
+在深入了解事件循環之前，讓我們先回顧一些 JavaScript 中基本但重要的概念。
+JavaScript 是一種**單執行緒語言**，這意味著 JavaScript 一次只能做一件事，它無法同時做多件事。
+但有時我們需要同時做多件事，例如當我們發起 API 呼叫時，我們不想等待回應，我們希望繼續執行程式碼，並在回應準備好時處理它。這就是事件循環發揮作用的地方。
+
+#### JavaScript 執行時期模型
+
+JavaScript 執行時期模型由以下組件組成：
+
+##### 呼叫堆疊 (Call Stack)
+
+- 程式碼的單執行緒執行。
+- 追蹤函式呼叫。
+- 後進先出 (LIFO) 的資料結構。
+
+##### 堆 (Heap)
+
+- 非結構化記憶體配置。
+- 物件存儲的地方。
+
+##### 佇列 (Queue)
+
+- 微任務佇列 (Microtask Queue)：
+  - 優先順序高於宏任務佇列。
+  - 處理 Promise、變動觀察器，例如 Promise.then()。
+- 宏任務佇列、任務佇列或回呼佇列 (Macrotask Queue / Task Queue / Callback Queue)（我將使用宏任務佇列，因為它更精確）：
+  - 處理事件、setTimeout、setInterval、I/O 操作，例如 setTimeout()、setInterval()、fetch()、DOM 事件。
+
+##### 事件循環 (Event Loop)
+
+- 持續檢查呼叫堆疊是否為空。
+
+  - 當呼叫堆疊為空時，將回呼從事件佇列移至呼叫堆疊。
+
+- **Web APIs（在瀏覽器中）**或 Node APIs（在 Node.js 中）：
+  - 提供額外功能。
+  - 處理非同步操作。
+
+### 事件循環如何運作？
+
+事件循環是一種使 JavaScript 非阻塞的機制。它允許 JavaScript 執行多個任務而無需等待每個任務完成，可以將它視為任務排程器，它將任務排程在未來執行。
+本質上，事件循環持續檢查呼叫堆疊是否為空，然後它會檢查微任務佇列中是否有任務，如果有，它會將任務移至呼叫堆疊，如果沒有，它會檢查宏任務佇列，如果宏任務佇列中有任務，它會將任務移至呼叫堆疊。
+讓我們看一張圖表來了解事件循環如何運作，以及它如何處理宏任務。
+
+<Image src="/static/macro.png" alt="macro task" width={1000} height={1000} />
+
+1. JavaScript 執行環境開始讀取程式碼，創建全域執行環境，並將其推入呼叫堆疊，在這個階段，可以將 main() 視為正在執行的函式。
+2. 第一行程式碼是 console.log('Start')，這會被推入呼叫堆疊，並立即執行，完成後會從呼叫堆疊中彈出。
+3. 第二行程式碼是 setTimeout()，它也會被推入呼叫堆疊，但隨後會被移至 Web APIs，並註冊一個計時器。
+
+{" "}
+
+<Image
+  src="/static/register-timer.png"
+  alt="register timer"
+  width={1000}
+  height={1000}
+/>
+
+4. 最後一行程式碼是 console.log('End')，和第一行一樣，它會被推入呼叫堆疊，並立即執行，完成後會從呼叫堆疊中彈出。
+5. 0 秒後，計時器完成，setTimeout() 的回呼函式會被移至宏任務佇列。
+6. 事件循環會檢查呼叫堆疊是否為空，然後檢查宏任務佇列，如果宏任務佇列中有任務，它會將任務移至呼叫堆疊。
+
+這是一個圖表，展示事件循環如何運作，以及它如何處理微任務。
+
+<Image src="/static/micro.png" alt="micro task" width={1000} height={1000} />
+
+當同時有微任務和宏任務時，事件循環總是先處理微任務，然後再處理宏任務。
+
+<Image
+  src="/static/micro-macro.png"
+  alt="micro and macro"
+  width={1000}
+  height={1000}
+/>
+
+### 結論
+
+- JavaScript 是一種單執行緒語言，一次只能做一件事，但感謝事件循環，它可以處理多個任務而無需等待每個任務完成。
+- 有兩種類型的任務，微任務和宏任務，事件循環總是先處理微任務，然後再處理宏任務。
+
+  - 微任務：Promise、變動觀察器，例如 Promise.then()。
+  - 宏任務：事件、setTimeout、setInterval、I/O 操作，例如 setTimeout()、setInterval()、fetch()、DOM 事件。
+
+- 事件循環持續檢查呼叫堆疊是否為空，然後檢查微任務佇列中是否有任務，如果有，它會將任務移至呼叫堆疊，如果沒有，它會檢查宏任務佇列，如果宏任務佇列中有任務，它會將任務移至呼叫堆疊。

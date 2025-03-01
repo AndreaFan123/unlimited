@@ -4,7 +4,7 @@
     "name": "范珊樂 (Andrea)",
     "title": "前端工程師 && 行銷",
     "content1": "具備行銷背景的自律、好奇心旺盛的前端工程師，熱衷於 Next.js、React、TailwindCSS、JavaScript、TypeScript、HTML 和 CSS。",
-    "content2": "擅長獨立和協作專案，專注於網站開發和使用者體驗。熱衷於將技術技能應用於志工專案，以產生社區影響。",
+    "content2": "擅長獨立和協作專案，專注於網站開發和使用者體驗。熱衷參與開源專案，協助繁體中文翻譯等。",
     "latestPosts": "最新文章"
   },
   "techStack": {
@@ -56,6 +56,10 @@
     "blog": "部落格",
     "description": "關於網頁開發、管理和生活中其他雜七雜八的事情",
     "feature": "精選",
+    "workingOnIt": "我正在努力中"
+  },
+  "tag": {
+    "relatedPosts": "相關文章",
     "workingOnIt": "我正在努力中"
   },
   "footer": {
