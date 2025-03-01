@@ -1,0 +1,421 @@
+---
+title: "JavaScript 型別轉換 vs. 型別強制轉換"
+description: 探索 JavaScript 中型別轉換和型別強制轉換的差異
+date: 2024-10-20
+tags: ["javascript", "fundamentals"]
+published: true
+language: "zh_tw"
+---
+
+ECMAScript 中型別轉換的定義：
+
+> ECMAScript 語言會根據需要隱式地執行自動型別轉換。為了釐清某些結構的語義，定義一組轉換抽象操作是很有用的。轉換抽象操作是多態的；它們可以接受任何 ECMAScript 語言型別或完成記錄值的值。但這些操作不使用其他規範型別。
+
+## 轉換的類型
+
+- 隱式轉換 **（也稱型別強制轉換（type coercion）**：這是通過使用方法自動完成的。
+- 顯式轉換： 這是通過使用內建方法或函式完成的。
+
+### 顯式轉換 （Explicit Conversion）
+
+以下是常用的方法和內建函式。
+
+- 轉換為布林值 (ToBoolean)
+  - Boolean()
+    - !!
+- 轉換為數字 (ToNumber)
+  - Number()
+  - parseInt()
+  - parseFloat()
+- 轉換為字串 (ToString)
+  - String()
+  - toString()
+
+#### 轉換為布林值 (ToBoolean)
+
+```js
+// Undefined
+let a = undefined;
+let bool = Boolean(a);
+console.log(bool); // false
+
+// Null
+let a = null;
+let bool = Boolean(a);
+console.log(bool); // false
+
+// boolean
+let a = true;
+let bool = Boolean(a);
+console.log(bool); // true
+
+// Number
+let a = 0;
+let bool = Boolean(a);
+console.log(bool); // false
+
+let a = -0;
+let bool = Boolean(a);
+console.log(a); // false
+
+let a = NaN;
+let bool = Boolean(a);
+console.log(a); // false
+
+let a = 1;
+let bool = Boolean(a);
+console.log(bool); // true
+
+// String
+let a = "";
+let bool = Boolean(a);
+console.log(bool); // false
+
+let a = " ";
+let bool = Boolean(a);
+console.log(bool); // true
+
+// object
+let a = {};
+let bool = Boolean(a); // true
+
+// Symbol
+let a = Symbol("Hello");
+let bool = Boolean(a);
+console.log(bool); // true
+```
+
+#### 轉換為數字 (ToNumber)
+
+轉換為數字有點複雜，特別是當參數是字串和符號（Symbol）時。
+
+```js
+// Undefined
+let value = undefined;
+let num = Number(value);
+console.log(num); // NaN
+
+// Null
+let value = null;
+let num = Number(value);
+console.log(num); // 0
+
+// Boolean
+let value = false;
+let num = Number(value);
+console.log(num); // 0
+
+let value = ture;
+let num = Number(value);
+console.log(num); // 1
+
+// Number
+let value = 23;
+let num = Number(value);
+console.log(num); // 23
+
+// Symbol
+let value = Symbol(23);
+let num = Number(value);
+console.log(num); // TypeError: Cannot convert a Symbol value to a number
+
+// String
+let valueWithEmptyString = "";
+let num1 = Number(valueWithEmptyString);
+console.log("valueWithEmptyString:", num1); // 0
+
+let valueWithEmptySpace = " 123";
+let num2 = Number(valueWithEmptySpace);
+console.log("valueWithEmptySpace:", num2); // 123
+
+let valueWithNumString = "123";
+let num3 = Number(valueWithNumString);
+console.log("valueWithNumString:", num3); // 123
+
+let valueWithNumString2 = "123.456";
+let num4 = Number(valueWithNumString2);
+console.log("valueWithNumString2:", num4); // 123.456
+
+let valueWithNumberStringAndChar = "123a";
+let num5 = Number(valueWithNumberStringAndChar);
+console.log("valueWithNumberStringAndChar:", num5); // NaN
+
+let valueWithChar = "abc";
+let num6 = Number(valueWithChar);
+console.log("valueWithChar:", num6); // NaN
+
+let valueWithInfinite = "Infinity";
+let num7 = Number(valueWithInfinite);
+console.log("valueWithInfinite:", num7); // Infinity
+
+let valueWithNegaInfinite = "-Infinity";
+let num8 = Number(valueWithNegaInfinite);
+console.log("valueWithNegaInfinite:", num8); // -Infinity
+
+let valueWithEmptySpacesBetweenChar = " 3 0 ";
+let num9 = Number(valueWithEmptySpacesBetweenChar);
+console.log("valueWithEmptySpacesBetweenChar:", num9); // NaN
+
+let valueWithUniCode = "😀";
+let num10 = Number(valueWithUniCode);
+console.log("valueWithUniCode:", num10); // NaN
+
+let valuewithUTF16 = "0x1A";
+let num11 = Number(valuewithUTF16);
+console.log("valuewithUTF16:", num11); // 26
+
+// Object
+let obj = {
+  valueOf() {
+    return 23;
+  },
+  toString() {
+    return "Hello";
+  },
+};
+
+const newObj = Number(Obj);
+console.log(newObj); // 42
+
+let obj = {
+  toString() {
+    return "Hello";
+  },
+};
+
+const newObj = Number(Obj);
+console.log(newObj); // NaN
+```
+
+#### 轉換為字串 (ToString)
+
+```js
+// Undefined
+let valueUndefined = undefined;
+let str1 = String(valueUndefined);
+console.log("valueUndefined:", str1); // "undefined"
+
+let valueNull = null;
+let str2 = String(valueNull);
+console.log("valueNull:", str2); // "null"
+
+let valueOfTrue = true;
+let str3 = String(valueOfTrue);
+console.log("valueOfTrue:", str3); // "true"
+
+let valueOfFalse = false;
+let str4 = String(valueOfFalse);
+console.log("valueOfFalse:", str4); // "false"
+
+let valueOfNumber = 123;
+let str5 = String(valueOfNumber);
+console.log("valueOfNumber:", str5); // "123"
+
+let valueOfNaN = NaN;
+let str6 = String(valueOfNaN);
+console.log("valueOfNaN:", str6); // "NaN"
+
+let valueOfInfinity = Infinity;
+let str7 = String(valueOfInfinity);
+console.log("valueOfInfinity:", str7); // "Infinity"
+
+let valueOfNegativeZero = -0;
+let str8 = String(valueOfNegativeZero);
+console.log("valueOfNegativeZero:", str8); // "0"
+
+let valueOfZero = 0;
+let str9 = String(valueOfZero);
+console.log("valueOfZero:", str9); // "0"
+
+let valueOfNegativeNum = -123;
+let str10 = String(valueOfNegativeNum);
+console.log("valueOfNegativeNum:", str10); // "-123"
+
+// Symbol
+let greeting = Symbol("Hello");
+console.log(String(greeting)); // Symbol(Hello) => string
+
+let greeting = Symbol("Hello") + "World";
+console.log(String(greeting)); // TypeError: Cannot convert a Symbol value to a string
+```
+
+> ❗️ 雖然 0 和 -0 在數字型別時是不同的，但當轉換為字串時，兩者都是 0
+
+### 隱式轉換（強制轉換）Implicit Conversion (Coercion)
+
+型別強制轉換通常發生在兩個不同型別的值在一個操作中使用時。不同的運算子會以各種方式對運算元進行型別轉換，以確保操作可以執行。
+
+#### 運算子：:
+
+- 加法 **(+)**
+- 減法 **(-)**
+- 乘法 **(\*)**
+- 除法 **(/)**
+- 餘數 **(%)**
+
+##### 加法
+
+當其中一個運算元是字串時，另一個運算元將被轉換為字串，並執行字串連接。
+
+```js
+let result_1 = "5" + 2;
+console.log(result_1); // 52 => string
+
+let result_2 = 2 + "5";
+console.log(result_2); // 25
+```
+
+{/* The conversion flow is like below: */}
+
+{/* Addition.png */}
+
+##### 其他算術運算子：
+
+它會強制將字串轉換為數字。
+
+```js
+const result_1 = "5" - 2;
+console.log(result_1); // 3
+
+const result_2 = 2 - "5";
+console.log(result_2); // -3
+
+const result_3 = "6" * "2";
+console.log(result_3); // 12
+
+const result_4 = 12 / "6";
+console.log(result_4); // 2;
+```
+
+##### 邏輯
+
+當使用寬鬆相等（==）時，在比較前會執行強制轉換。
+當使用嚴格相等（===）時，型別比較優先，如果型別不同，則返回 false。
+
+```js
+// 寬鬆相等
+console.log("5" == 5); // true;
+
+// 嚴格相等
+console.log("5" === 5); // false
+```
+
+{/* The flow is like below: */}
+
+{/* logic.png */}
+
+##### 邏輯 OR 和邏輯 AND
+
+運算元會被轉換為布林值以進行邏輯操作。
+
+```js
+// OR(||)
+console.log(0 || "hello"); // "hello"
+
+// AND(&&)
+console.log(0 && "hello"); // 0
+```
+
+{/* The flow is like below: */}
+
+{/* and_or.png */}
+
+> 在 JavaScript 中，**&& (AND)** 和 **|| (OR)** 邏輯運算子都使用[短路求值（最小化求值）](https://zh.wikipedia.org/wiki/%E7%9F%AD%E8%B7%AF%E6%B1%82%E5%80%BC)。以下是更詳細的解釋：
+>
+> - **OR (||) 運算子**：如果第一個參數評估為 true，則整體結果為 true，不會評估第二個參數。
+>
+> - **AND (&&) 運算子**：如果第一個參數評估為 false，則整體結果為 false，不會評估第二個參數。
+
+##### 邏輯 NOT
+
+運算元會被轉換為布林值，然後取相反值。
+
+```js
+console.log(!0); // true
+```
+
+{/* The flow is like below: */}
+
+{/* not.png */}
+
+## 試一試！型別轉換問題（由 GPT 創建）
+
+1. 解釋如何顯式地將不同型別轉換為字串、數字和布林值，並提供範例程式碼。
+
+```js
+let num = 123;
+let strNum = String(num);
+let strNum2 = num.toString();
+
+let str = "456";
+let numStr = Number(str);
+let numStr2 = parseInt(str);
+
+let bool = true;
+let numBool = Number(bool);
+let boolNum = Boolean(numBool);
+```
+
+2. 解釋什麼是隱式型別轉換，並提供它發生的例子。
+
+```js
+console.log("5" - 2);
+console.log("5" + 2);
+console.log(1 + true);
+console.log("5" * "2");
+```
+
+3. 解釋 `==` 和 `===` 的區別，並提供何時使用它們的例子。
+
+```js
+console.log("5" == 5);
+console.log("5" === 5);
+
+console.log(null == undefined);
+console.log(null === undefined);
+```
+
+4. 解釋為什麼 "0" == false 的結果是 true，而 "0" === false 的結果是 false。
+
+```js
+console.log("0" == false);
+console.log("0" === false);
+```
+
+5. 解釋當數字和字串混合在算術運算中時會發生什麼，並提供例子。
+
+```js
+console.log("5" + 2);
+console.log("5" - 2);
+console.log("5" * 2);
+console.log("5" / 2);
+```
+
+6. 解釋哪些值在條件語句中會被轉換為 false，哪些會被轉換為 true。
+
+```js
+if (0) {
+  console.log("This won't be logged");
+} else {
+  console.log("0 is falsy");
+}
+
+if ("") {
+  console.log("This won't be logged");
+} else {
+  console.log('"" is falsy');
+}
+
+if (1) {
+  console.log("1 is truthy");
+}
+
+if ("hello") {
+  console.log('"hello" is truthy');
+}
+```
+
+## 參考資料：
+
+- [Equality comparisons and sameness](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness)
+- [ECMAScript - Type Conversion](https://tc39.es/ecma262/#sec-type-conversion)

@@ -4,6 +4,7 @@ description: Explore the JavaScript event loop
 date: 2024-10-10
 tags: ["javascript", "fundamentals"]
 published: true
+language: "en"
 ---
 
 ## What is the event loop?
@@ -33,8 +34,8 @@ JavaScript runtime model consists of the following components:
 - Microtask Queue:
   - Has higher priority than the macrotask queue.
   - Handles promises, mutation observer, for example **Promise.then()**.
-  - Macrotask Queue or Task queue or Callback Queue (I'll use Macrotask queue as it's more precise):
-    - Handles events, setTimeout, setInterval, I/O operations, for example **setTimeout()**, **setInterval()**, **fetch()**, **DOM events**.
+- Macrotask Queue or Task queue or Callback Queue (I'll use Macrotask queue as it's more precise):
+  - Handles events, setTimeout, setInterval, I/O operations, for example **setTimeout()**, **setInterval()**, **fetch()**, **DOM events**.
 
 ##### Event Loop
 

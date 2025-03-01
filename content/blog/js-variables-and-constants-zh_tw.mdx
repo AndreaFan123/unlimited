@@ -1,0 +1,152 @@
+---
+title: "JavaScript 變數與常數"
+description: 深入探討 JavaScript 變數與常數
+date: 2024-10-9
+tags: ["javascript", "fundamentals"]
+published: true
+language: "zh_tw"
+---
+
+## 什麼是變數？
+
+變數是一個可以儲存值的儲存位置。在執行過程中可以更改其值。
+在 JavaScript 中，我們可以使用 var、let 或 const 來宣告變數。在現代 JavaScript 中，使用 let 和 const 來宣告變數是較推薦的選擇。
+
+```js
+var age = 23;
+age = 24;
+
+let height = 1.59;
+height = 1.62;
+```
+
+## 什麼是常數？
+
+常數與變數類似，但一旦賦值後，其值就不能更改。
+
+```js
+const PI = 3.14;
+PI = 3.14159; // This will throw an error
+```
+
+### 主要差異：
+
+- 可變性
+
+  - 變數：初始化後，值可以更改。
+  - 常數：初始化後，值不能更改。
+
+- 宣告
+  - 使用 let 來宣告變數。
+  - 使用 const 來宣告常數。
+
+### 作用域
+
+#### Let 和 Const 宣告
+
+> let 和 const 宣告定義的變數受限於目前執行環境的詞法環境（LexicalEnvironment）。
+
+#### Variable 陳述式
+
+> var 陳述式宣告的變數受限於目前執行環境的變數環境（VariableEnvironment）。
+
+### 詞法環境（LexicalEnvironment）
+
+- 一種規範類型，定義了在特定程式碼執行環境中變數和函式的可訪問性。處理**區塊作用域**變數（例如，使用 **let** 和 **const** 宣告的變數）。
+- 每次進入新的作用域時（例如，函式呼叫、區塊陳述式等），都會建立一個新的詞法環境。那麼，區塊作用域是什麼意思呢？**區塊作用域**指的是由區塊陳述式（例如，大括號內的內容）建立的作用域。在這些區塊內使用 let 和 const 宣告的變數只能在區塊內訪問。
+
+```js
+// Block-scoped
+function greeting() {
+  ...
+};
+
+if(true) {
+...
+} else {
+...
+};
+
+for(...) {
+...
+}
+```
+
+### 變數環境（VariableEnvironment）
+
+- 與詞法環境類似，它也包含環境記錄和外部環境引用。
+- 管理函式作用域和全域作用域內的變數宣告（例如，使用 var 宣告的變數）。
+- 當建立函式或全域執行環境時，變數環境會儲存使用 var 宣告的變數。
+
+### 詞法環境和變數環境的主要差異
+
+- 作用域類型：
+
+  - **詞法環境**處理使用 let、const 和 class 宣告的變數，以及函式宣告。
+  - **變數環境**處理使用 var 宣告的變數。
+
+- 環境記錄的創建：
+
+  - 在區塊作用域中（例如，if 或 for 區塊），只會建立一個新的詞法環境，而不會建立新的變數環境。
+
+- 作用域範圍：
+
+  - 詞法環境具有區塊作用域特性。
+  - 變數環境具有函式作用域特性（僅在函式執行環境內）。
+
+### 讓我們實際練習並回顧我們在本文中提到的概念。
+
+```js
+function testScope() {
+  var a = 1;
+  let b = 2;
+  const c = 3;
+
+  if (true) {
+    var a = 4;
+    let b = 5;
+    const c = 6;
+    console.log(a); // ?
+    console.log(b); // ?
+    console.log(c); // ?
+  }
+
+  console.log(a); // ?
+  console.log(b); // ?
+  console.log(c); // ?
+}
+
+testScope();
+```
+
+### 答案
+
+```js
+function testScope() {
+  var a = 1;
+  let b = 2;
+  const c = 3;
+
+  if (true) {
+    var a = 4;
+    let b = 5;
+    const c = 6;
+    console.log(a); // 4
+    console.log(b); // 5
+    console.log(c); // 6
+  }
+
+  console.log(a); // 4
+  console.log(b); // 2
+  console.log(c); // 3
+}
+
+testScope();
+```
+
+### 解釋
+
+在這個 testScope 函式中，變數 a 在 if 陳述式內從 1 修改為 4。這就是為什麼當我們 console.log(a) 時，答案是 4 而不是 1，因為 a 是由 變數環境 管理的，它存在於整個函式作用域中。
+想像當我們使用 var 宣告變數時，它可以訪問每個房間 (函式作用域和區塊作用域)。
+另一方面，使用 let 和 const 宣告變數意味著它們由 詞法環境 管理。我們可以把這想像成有兩個房間：第一組 b 和 c 存在於函式作用域的房間中，第二組 b 和 c 存在於 if 陳述式的房間中 (區塊作用域)。
+因此，當我們在 if 區塊內 console.log(b) 和 console.log(c) 時，值分別是 5 和 6，因為它只能訪問 if 陳述式內的值。當我們嘗試在 if 陳述式外部 console.log(b) 和 console.log(c) 時，它可以訪問函式作用域內的值，但不能訪問存在於 if 陳述式內的值。

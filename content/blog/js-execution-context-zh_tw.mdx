@@ -1,0 +1,85 @@
+---
+title: "JavaScript 執行環境"
+description: 深入探討 JavaScript 執行環境
+date: 2024-10-14
+tags: ["javascript", "fundamentals"]
+published: true
+language: "zh_tw"
+---
+
+> 執行環境（Execution Context）是一種規範裝置，用於追蹤 ECMAScript 實作對程式碼的執行時評估。
+
+## 執行環境（Execution Context）
+
+當一個執行環境被創建時，無論是全域範疇執行環境還是函式範疇執行環境，它們都有兩個階段：
+
+在創建階段，會創建兩個環境和一個記錄。
+
+1. 變數環境（VariableEnvironment）
+
+- 如果我們使用 var 宣告變數，初始值會是 undefined。
+- 如果我們使用 let 或 const 宣告變數，它會處於一種稱為 TDZ（暫時性死區，Temporal Dead Zone）的狀態。
+- 所有的函式宣告。
+
+2. 詞法環境（LexicalEnvironment）
+
+- 可以將它視為可以存取的範圍，當我們討論範疇時會介紹這個概念。
+
+3. 環境記錄（Environment Records）
+
+### 創建階段：當 JS 引擎執行時。
+
+1. 建立**全域執行環境**，可以將其視為最大的房間。
+2. 在全域執行環境中，JavaScript 儲存所有變數和函式定義。可以將此視為為這些變數和函式貼上名稱標籤並在記憶體中為它們分配位置。
+
+### 執行階段：JS 執行程式碼。
+
+1. 將值分配給已經儲存在全域執行環境中的變數。
+2. 執行函式（例如 greeting()）。
+
+執行函式時，它會創建自己的執行環境（創建自己的房間）。
+
+```js
+var greeting = "Hello";
+
+function sayHello(name) {
+  console.log(greeting + " " + name);
+}
+
+sayHello("Joe");
+```
+
+首先，JS 會從上到下「讀取」程式碼，然後創建全域執行環境，這個階段稱為創建階段。在這個階段，有幾個任務需要完成
+
+1. 儲存變數和函式定義，可以想像成創建兩個名稱標籤，一個是變數 greeting，另一個是函式 sayHello。
+
+- **greeting** => undefined
+- **sayHello** => fn
+
+然後我們進入第二個階段 - 執行階段。
+
+1. 將 Hello 的值分配給變數 greeting。
+2. 執行 sayHello("Joe")，這會創建它自己的執行環境，在這個執行環境內部，它也有如上所述的兩個階段，以下是 sayHello("Joe") 執行環境的詳細分解。
+
+- 建立階段：
+
+  - 初始化參數並將引數分配給它。（name = "Joe"）
+  - **Console.log(greeting + " " + name)**，這裡我們需要注意 greeting 來自全域，因為我們在函式內部找不到它，根據範疇鏈，它延伸至**全域執行環境**，而 name 的值為 "Joe"。
+
+- 執行階段：
+  - console.log 是一個瀏覽器 API，我們可以全域訪問它。
+  - 記錄結果為 Hello Joe。
+
+### 結論
+
+- 當 JS 引擎啟動時，它會創建一個全域執行環境。在每個執行環境中，都會有兩個階段，**建立階段**和**執行階段**。
+- 在創建階段，會初始化 3 個東西。
+
+  - 變數環境（VariableEnvironment）。
+  - 詞法環境（LexicalEnvironment）。
+  - 環境記錄（Environment Record）。
+
+- 變數環境負責儲存使用 var 宣告的變數和所有的函式宣告。
+- 詞法環境包含變數環境，並儲存使用 let 和 const 宣告的變數，以及外部環境引用。
+- 當使用 var 宣告變數時，初始值會是 undefined。
+- 當使用 let 或 const 宣告變數時，它會處於暫時性死區（TDZ）直到執行階段。

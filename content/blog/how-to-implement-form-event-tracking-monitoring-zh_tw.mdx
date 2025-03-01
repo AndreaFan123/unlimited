@@ -1,0 +1,172 @@
+---
+title: "如何實作表單事件追蹤與監控？"
+description: 讓我們動手實作表單事件追蹤與監控
+date: 2024-11-22
+tags: ["javascript", "practical", "monitoring", "event tracking"]
+published: true
+language: "zh_tw"
+---
+
+在[上一篇文章](/zh_tw/blog/event-tracking-and-monitoring-zh_tw) - 事件追蹤與監控 中，我介紹了事件追蹤和監控的基本使用案例。
+
+在這篇文章中，來練習動手實作表單事件追蹤與監控。
+
+## HTML 表單
+
+首先從一個簡單的 HTML 表單開始。
+
+```html
+<form
+  id="registrationForm"
+  name="registrationForm"
+  action="/submit"
+  method="post"
+  novalidate
+  aria-label="form-title"
+>
+  <h1 id="form-title" tabindex="-1">Registration</h1>
+  <div
+    id="error-summary"
+    class="error-summary visually-hidden"
+    role="alert"
+    aria-live="polite"
+  ></div>
+  <div>
+    <label for="name">
+      Name
+      <span class="required" aria-hidden="true">*</span>
+      <span class="visually-hidden">required</span>
+    </label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      required
+      aria-required="true"
+      aria-describedby="name-hint name-error"
+    />
+    <span id="name-hint" class="hint">Enter your first and last name</span>
+    <span id="name-error" class="error" role="alert"></span>
+  </div>
+  <div class="form-group">
+    <label for="email" class="label">
+      Email Address
+      <span class="required" aria-hidden="true">*</span>
+      <span class="visually-hidden">required</span>
+    </label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      required
+      aria-required="true"
+      aria-describedby="email-hint email-error"
+      autocomplete="email"
+    />
+    <span id="email-hint" class="hint">We'll never share your email</span>
+    <span id="email-error" class="error" role="alert"></span>
+  </div>
+  <button id="submit-button" type="submit" aria-describedby="submit-hint">
+    Register
+  </button>
+  <span id="submit-hint" class="visually-hidden">
+    Submitting this form will create your account
+  </span>
+</form>
+```
+
+上面是一個包含姓名、電子郵件和提交按鈕的簡單註冊表單。
+
+## 確定我們想要追蹤的事件
+
+從行銷的角度來看，註冊表單是一個轉換漏斗，我想要追蹤有多少使用者訪問表單、有多少使用者與表單互動，以及有多少使用者成功提交表單。基本上，我想要追蹤以下事件：
+
+- 網頁訪問
+- 聚焦於表單 / 與表單互動
+- 點擊提交按鈕
+- 成功提交表單
+
+## 實作事件追蹤
+
+現在我們有了基本的事件追蹤計劃，讓我們來實作它。
+
+### 網頁訪問
+
+```html
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    try {
+      trackEvent("registration_form_visit", {
+        eventType: "page_view",
+        eventCategory: "registration_form",
+        eventAction: "visit",
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+        sessionId: getSessionId(),
+      });
+    } catch (error) {
+      console.error("Error tracking web visit", error);
+    }
+  });
+</script>
+```
+
+**session id** 是使用者會話的唯一標識符，通過它我們可以追蹤有多少使用者訪問了表單以及有多少使用者與表單互動。
+
+### 聚焦於表單 / 與表單互動
+
+接下來，我們想要追蹤使用者何時聚焦於表單或與表單互動，我們可以使用 `focus` 和 `input` 事件來追蹤這些。
+
+```html
+<script>
+  const inputFields = document.querySelectorAll("input");
+  inputFields.forEach((input) => {
+    input.addEventListener("focus", () => {
+      trackEvent("registration_form_focus", {
+        eventType: "interaction",
+        eventCategory: "registration_form",
+        eventAction: "focus",
+        field: input.name,
+        sessionId: getSessionId(),
+      });
+    });
+  });
+</script>
+```
+
+### 點擊提交按鈕和成功提交表單
+
+點擊按鈕不等於成功提交表單，所以讓我們先追蹤點擊事件，然後，如果表單有效，我們再追蹤提交事件。
+
+```html
+<script>
+  const handleSubmit = () => {
+    const form = document.querySelector("#registrationForm");
+    if (!form.checkValidity()) {
+      console.error("Form is invalid");
+      return;
+    }
+    trackEvent("registration_form_submit_success", {
+      eventType: "registration_form_conversion",
+      sessionId: getSessionId(),
+      timestamp: new Date().toISOString(),
+      formData: new FormData(form),
+    });
+  };
+
+  const submitButton = document.querySelector("#submit-button");
+  submitButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    trackEvent("registration_form_click", {
+      eventType: "interaction",
+      eventCategory: "registration_form",
+      eventAction: "click",
+      sessionId: getSessionId(),
+      timestamp: new Date().toISOString(),
+    });
+    handleSubmit();
+  });
+</script>
+```
+
+以上就是基本的表單事件追蹤和監控的實作，你可以根據自己的需求和業務邏輯來擴展這些追蹤事件。不過一般來說公司都會選擇串接 Google Analytics 或其他分析工具來追蹤這些事件。畢竟這些工具提供了更多的功能和更好的視覺化報告。

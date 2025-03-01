@@ -1,0 +1,69 @@
+{
+  "logo": "Unlimited",
+  "profile": {
+    "name": "Shan Le Fan (Andrea)",
+    "title": "Frontend Developer && Marketer",
+    "content1": "Self-disciplined, curiosity-driven frontend engineer with a marketing background, and a passion for Next.js, React, TailwindCSS, JavaScript, TypeScript, HTML, and CSS.",
+    "content2": "Highly adept at independent and collaborative projects, with strong focus on website development and user experience. Passionate about applying technical skills in volunteer projects for community impact.",
+    "latestPosts": "Latest Posts"
+  },
+  "techStack": {
+    "title": "TI am focusing on..."
+  },
+  "projects": {
+    "title": "Projects",
+    "digitalCard": "Digital Business Card platform",
+    "senryo": "Food Delivery Platform",
+    "unlimitedBlog": "Personal Portfolio and Blog"
+  },
+  "socials": {
+    "linkedin": "Visit Linkedin",
+    "github": "Visit Github",
+    "resume": "Download Resume",
+    "blog": "Visit Blog"
+  },
+  "workExperience": {
+    "workExperience": "Work Experience",
+    "ringus": {
+      "company": "Ringus-solution",
+      "title": "Frontend Engineer",
+      "duration": "2022-11-01 ~ 2024-12-03",
+      "description": "Developed web applications using React.js, Next.js, TailwindCSS, TypeScript and other frontend technologies."
+    },
+    "codapayment": {
+      "company": "Coda (No. 1 online game publishers collect payment in Southeast Asia)",
+      "title": "Senior Marketing",
+      "duration": "2021-10-01 ~ 2022-12-01",
+      "description": "Responsible for TW/HK/MO market, including marketing strategy, online and offline campaigns, competitor analysis, market research."
+    },
+    "elex": {
+      "company": "elex (Famous game developer and publisher in China)",
+      "title": "Community Manager",
+      "duration": "2020-05-01 ~ 2021-09-27",
+      "description": "Built Mandarin community, hosted online and offline events."
+    },
+    "wargaming": {
+      "company": "Wargaming.net (Famous game developer and publisher in Belarus)",
+      "title": "Sales Optimization (Team Lead)",
+      "duration": "2018-12-01 ~ 2020-03-01",
+      "description": "Optimized sales process and increased sales efficiency."
+    }
+  },
+  "notFound": {
+    "returnHome": "Return Home"
+  },
+  "blog": {
+    "blog": "Blog",
+    "description": "Rambling about web development, management, and other random stuff in my life",
+    "feature": "Featured",
+    "workingOnIt": "I am working on it",
+    "readMore": "Read More"
+  },
+  "tag": {
+    "relatedPosts": "related Posts",
+    "workingOnIt": "I am working on it"
+  },
+  "footer": {
+    "allRightsReserved": "All Rights Reserved"
+  }
+}

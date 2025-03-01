@@ -1,0 +1,110 @@
+---
+title: "JavaScript 原型 part 1"
+description: 什麼是 JavaScript 原型？
+date: 2024-12-22
+tags: ["javascript", "prototype"]
+published: true
+language: "zh_tw"
+---
+
+在[上一篇文章](/zh_tw/blog/js-prototype-introduction-programming-paradigms-zh_tw)中，我們談到了程式設計法，以及 JavaScript 是一種多範式程式語言，並討論了它如何支援多種範式。
+今天，讓我們更深入地了解 JavaScript 原型。
+
+## 什麼是 JavaScript 中的原型？
+
+在深入了解 JavaScript 原型之前，你可能聽說過 JavaScript 中所有的資料型別都是物件，但原始型別和物件之間存在顯著差異。
+
+### 原始型別 (Primitive types)
+
+原始型別是不可變的，並且它們是 **傳值(by value)** 的，JavaScript 中的原始型別有：
+
+1. 數字 (number)
+2. 字串 (string)
+3. 布林值 (boolean)
+4. 空值 (null)
+5. 未定義 (undefined)
+6. 符號 (symbol)
+7. 大整數 (bigint)
+
+但為什麼我們可以在字串上使用像 `toUpperCase()` 這樣的方法，或在數字上使用 `toFixed() `呢？這是因為當你在原始型別上呼叫方法時，JavaScript 會自動將原始型別包裝成一個物件，這稱為**裝箱 (boxing)**。
+
+```js
+let str = "hello";
+console.log(str.toUpperCase()); // HELLO
+```
+
+在底層，JS 會做類似這樣的事情，數字、布林值等也是如此。
+
+```js
+let str = "hello";
+let strObj = new String(str); // 裝箱，但在方法呼叫後會被垃圾回收
+console.log(strObj.toUpperCase()); // HELLO
+
+// 數字也是一樣
+let num = 123;
+let numObj = new Number(num);
+console.log(numObj.toFixed(2)); // 123.00
+```
+
+### 物件型別 (Objects types)
+
+物件是可變的，並且它們是 **傳參(by reference)** 的，JavaScript 中的物件有：
+
+1. 函式 (function)
+2. 陣列 (array)
+3. 物件 (object)
+4. 日期 (Date)
+
+## 原型屬性和原型鏈
+
+在 JavaScript 中，當我們建立一個函式時，它會自動擁有一個原型屬性 (prototype property)，這個原型屬性是一個物件，它有一個指回函式本身的建構函式屬性 (constructor property)。
+我們可以為原型物件新增屬性和方法，由建構函式建立的所有實例都將繼承這些屬性和方法。
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+console.log(Person.prototype);
+// { constructor: [Function: Person] }
+
+Person.prototype.sayHello = function () {
+  console.log(`Hello, my name is ${this.name}`);
+};
+
+let person1 = new Person("Alice");
+let person2 = new Person("Bob");
+
+person1.sayHello(); // Hello, my name is Alice
+person2.sayHello(); // Hello, my name is Bob
+```
+
+在上面的例子中，我們建立了一個建構函式 `Person`，並新增了一個方法 `sayHello`，然後我們再建立了兩個實例 person1 和 person2，並透過它們呼叫 sayHello 方法。
+`person1` 和 `person2 `有 name 屬性，即使它們沒有 `sayHello `方法，它們仍然可以呼叫它，因為它們繼承了 Person.prototype 的 sayHello。
+當我們嘗試使用物件上的屬性或方法時，JavaScript 會先在物件本身尋找，如果找不到，它會在原型物件上尋找，並繼續向上查找鏈，直到找到它或到達鏈的末端，
+這稱為 **原型鏈 (prototype chain)**。
+
+```css
+null
+   ↑
+Object.prototype
+   ├─ toString()
+   ↑
+Person.prototype
+   ├─ sayHello()
+   ↑
+[[Prototype]]
+   ├─ name: "Alice"  (person1)
+   └─ name: "Bob"    (person2)
+```
+
+## 結論
+
+- JavaScript 有兩種資料型別，原始型別和物件。
+- 原始型別是不可變的並且傳值，物件是可變的並且傳參。
+- 當我們嘗試在原始型別上使用方法時，JavaScript 底層會將其包裝成物件並在物件上呼叫方法。
+- 當我們建立一個函式時，它會自動擁有一個原型屬性，我們可以為原型物件新增屬性和方法。
+- 由建構函式建立的所有實例都將繼承原型物件的屬性和方法。
+- 當我們嘗試使用物件上的屬性或方法時，JavaScript 會先在物件本身尋找，如果找不到，它會在原型物件上尋找，並繼續向上查找鏈，直到找到它或到達 **鏈的末端(null)**，這稱為原型鏈。
+
+接下來，會再花一點時間複習 JavaScript 原型，以及一些當我第一次學習 JavaScript 原型時讓我困惑的其他主題。🥲

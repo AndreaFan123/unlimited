@@ -1,0 +1,199 @@
+---
+title: "JavaScript 作用域"
+description: 深入探討 JavaScript 作用域
+date: 2024-10-12
+tags: ["javascript", "fundamentals"]
+published: true
+language: "zh_tw"
+---
+
+在我們深入了解 JS 中的作用域之前，我們需要回顧一些概念：**詞法作用域（Lexical Scope 或 Static Scope**）和 **動態作用域（Dynamic Scope）**，但作用域究竟是什麼呢？
+
+## 什麼是作用域？
+
+想像你正在一個有多個房間的大豪宅裡參加派對。每個房間都有自己的一套關於你可以談論和做什麼的規則。在程式設計中，作用域就像是規定某些東西（如變數）在哪裡可以被看見和使用的「規則」。
+
+### 詞法作用域（Lexical Scope 或 Static Scope）
+
+源碼的一部分（文字區域）。作用域是在程式語言被解釋時確定的，或者我們可以說作用域是在語言定義程式碼時確定的。
+
+```js
+// 詞法作用域
+function outerFunction() {
+  var outerVar = "I am outside!";
+
+  function innerFunction() {
+    // 這裡的 outerVar 是定義在 outerFunction 中
+    console.log(outerVar);
+  }
+
+  innerFunction();
+}
+outerFunction();
+```
+
+### 動態作用域（Dynamic Scope）
+
+執行期間的一部分。作用域是在程式碼執行時確定的。
+
+### 作用域的分類
+
+我們可以簡單地將作用域分類為全域作用域、**函式作用域**和**區塊作用域**，讓我們逐一深入了解。
+
+#### 全域作用域（Global Scope）
+
+在全域作用域中宣告的任何變數都可以全域訪問。我們可以在函式內部或外部訪問變數。
+
+```js
+var sayHey = "Hey!";
+let greeting = "Hello";
+const SayGoodBye = "Bye!";
+
+function sayBye() {
+  console.log("Inside function", sayHey);
+  console.log("Inside function", greeting);
+  console.log("Inside function", SayGoodBye);
+}
+
+sayBye();
+console.log("In global", sayHey);
+console.log("In global", greeting);
+console.log("In global", ayGoodBye);
+```
+
+#### 函式作用域（Function Scope）
+
+函式內部宣告的任何變數只能在函式內部訪問。
+
+```js
+function sayBye() {
+  let bye = "Bye bye!"; // 或使用 var 或 const 宣告
+  console.log(bye);
+}
+
+sayBye(); // "Bye bye"
+console.log(bye); // bye is not defined
+```
+
+#### 區塊作用域（Block Scope）
+
+使用 let 和 const 宣告的變數，只能在宣告它們的區塊內部訪問。
+
+```js
+{
+  let greeting = "Hello World!";
+}
+
+console.log(greeting); // ReferenceError: greeting is not defined
+```
+
+### 與 var 的比較
+
+使用 var 宣告的變數不限於區塊作用域，但它們確實具有函式作用域和全域作用域。為什麼使用 var 仍然可以在區塊作用域中訪問，原因是我們上面提到的概念。
+
+```js
+{
+  var greeting = "Hello World!";
+}
+
+console.log(greeting); // Hello World!
+```
+
+想像程式碼像這樣，看起來 var 變數被提升，如下所示。
+
+```js
+var greeting; // 在建立階段初始值為 undefined
+
+// 在執行階段賦值 "Hello World!"
+{
+  greeting = "Hello World!";
+}
+
+console.log(greeting);
+```
+
+但在背後發生的是 JS 先讀取程式碼，然後再執行，還記得 JS 創建全域執行環境時的兩個階段嗎？
+
+#### 建立階段：
+
+儲存變數 greeting 並初始化值為 undefined。
+
+#### 執行階段：
+
+- 將 "Hello World!" 的值賦給變數 greeting。
+
+### 總結
+
+- JS 中有三種作用域：
+  - 全域作用域
+  - 函式作用域
+  - 區塊作用域
+
+#### 全域作用域：
+
+在任何函式、區塊或模組外部宣告的任何變數或函式所在的區域。全域作用域中的變數和函式可以從程式碼的任何位置訪問，請參見下面的例子。
+
+```js
+// 全域作用域
+let greeting = "Hello World!";
+function sayHey() {
+  console.log("Hey there!");
+}
+function sayHello() {
+  console.log(greeting);
+}
+
+console.log(greeting); // Hello World!
+sayHey(); // Hey there!
+sayHello(); // Hello World
+```
+
+#### 函式作用域：
+
+在函式內部宣告的任何變數或函式只能在該函式內部訪問，無法從外部訪問。這也被稱為局部作用域。
+
+看看下面的程式碼，你知道答案嗎？
+
+```js
+function outerFunction() {
+  let myVariable = "I am in function scope";
+
+  function innerFunction() {
+    console.log(myVariable + ", i can access myVariable");
+  }
+  console.log(myVariable);
+  innerFunction();
+}
+
+console.log(myVariable); // ❌ ReferenceError: myVariable is not defined.
+innerFunction(); // => ❌ ReferenceError: innerFunction is not defined.
+
+// 如果我們想要 console.log myVariable 和 innerFunction，
+// 我們可以簡單地呼叫 outerFunction()
+// 它會先執行 console.log(myVariable)，然後執行 innerFunction() 並
+// console.log(myVariable + ", i can access myVariable")
+```
+
+#### 區塊作用域：
+
+在區塊（一對大括號 {}）內使用 let 和 const 宣告的變數的作用域。這些變數只能在宣告它們的區塊內部訪問，無法從該區塊外部訪問。
+
+```js
+{
+  let helloByLet = "Hello, usng let";
+  const helloByConst = "Hello, using const";
+  var helloByVar = "Hello, using var";
+
+  console.log(helloByLet); // ✅
+  console.log(helloByConst); // ✅
+  console.log(helloByVar); // ✅
+}
+
+console.log(helloByLet); // ❌ ReferenceError: helloByLet is not defined
+console.log(helloByConst); // ❌ ReferenceError: helloByConst is not defined
+console.log(helloByVar); // ✅
+```
+
+#### 作用域何時確定？
+
+作用域是在程式碼編寫時確定的。在 JavaScript 中，每當你創建一個新的函式或程式碼區塊（例如 if、for、while 等）時，都會創建一個新的詞法作用域。這些作用域在程式碼執行前就已確定。

@@ -4,6 +4,7 @@ description: Explore the difference between type conversion and type coercion in
 date: 2024-10-20
 tags: ["javascript", "fundamentals"]
 published: true
+language: "en"
 ---
 
 The definition of type conversion in ECMAScript:
@@ -265,7 +266,7 @@ let result_2 = 2 + "5";
 console.log(result_2); // 25
 ```
 
-The conversion flow is like below:
+{/* The conversion flow is like below: */}
 
 {/* Addition.png */}
 
@@ -300,7 +301,7 @@ console.log("5" == 5); // true;
 console.log("5" === 5); // false
 ```
 
-The flow is like below:
+{/* The flow is like below: */}
 
 {/* logic.png */}
 
@@ -316,11 +317,11 @@ console.log(0 || "hello"); // "hello"
 console.log(0 && "hello"); // 0
 ```
 
-The flow is like below:
+{/* The flow is like below: */}
 
 {/* and_or.png */}
 
-> In JavaScript, both the **&& (AND)** and **|| (OR)** logical operators use short-circuit evaluation. Here's a more detailed explanation:
+> In JavaScript, both the **&& (AND)** and **|| (OR)** logical operators use [short-circuit evaluation](https://en.wikipedia.org/wiki/Short-circuit_evaluation). Here's a more detailed explanation:
 >
 > - **OR (||)** Operator: If the first argument evaluates to true, the overall result is true, and the second argument is not evaluated.
 >
@@ -334,7 +335,7 @@ The operand is converted to a boolean value and then negated.
 console.log(!0); // true
 ```
 
-The flow is like below:
+{/* The flow is like below: */}
 
 {/* not.png */}
 

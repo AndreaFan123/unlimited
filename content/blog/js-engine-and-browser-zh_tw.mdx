@@ -1,0 +1,65 @@
+---
+title: "JavaScript 引擎與瀏覽器"
+description: 誰負責在瀏覽器中執行 JavaScript 程式碼？
+date: 2024-12-05
+tags: ["javascript", "web", "browser"]
+published: true
+language: "zh_tw"
+---
+
+在[瀏覽器渲染 pipeline part 1 ](/zh_tw/blog/browser-rendering-pipeline-part-1-zh_tw)和[瀏覽器渲染 pipeline part 2](/zh_tw/blog/browser-rendering-pipeline-part-2-zh_tw) 這兩篇文章中，我們已經回顧了瀏覽器渲染 pipeline，並了解瀏覽器會解析 HTML、CSS 和 JavaScript 程式碼來渲染頁面，現在讓我們談談 JavaScript 引擎。
+
+## 高階程式語言
+
+JavaScript 是一種高階程式語言，它被設計成易於理解和使用，但電腦無法直接理解它，電腦唯一能理解的是二進制程式碼，也就是由 0 和 1 組成的序列（CPU 只能理解 0 和 1）。
+JS 引擎的作用是將 JavaScript 程式碼翻譯成二進制程式碼，以便在電腦上執行。
+
+> 是否有低階程式語言？
+>
+> 是的，有一些低階程式語言，例如 C、C++、Rust 等。
+
+## 常見的 JS 引擎
+
+- V8 (Chrome, Edge)
+- SpiderMonkey (Firefox)
+- JavaScriptCore (Safari)
+- Chakra (Edge)
+
+## 瀏覽器與 JS 引擎的關係
+
+以 WebKit 為例，WebKit 由兩部分組成：
+
+- WebCore：渲染引擎，負責解析 HTML 和 CSS，並建立 DOM 樹和 CSSOM 樹。
+- JavaScriptCore
+
+## 主要流程
+
+當瀏覽器接收到 JS 程式碼時，JS 引擎會執行以下步驟：
+
+### 解析階段
+
+解析器（Parser）：將 JavaScript 程式碼轉換為抽象語法樹（Abstract Syntax Tree, AST），然後 AST 會被送到編譯器。
+
+### 執行階段
+
+- 直譯器（Interpreter）：將 AST 轉換為位元組碼（bytecode）並執行。
+- 編譯器（Compiler）：將頻繁使用的程式碼編譯成機器碼以提高效能。
+- 分析器（Profiler）：監控程式碼執行並優化熱點路徑。
+
+## 瀏覽器架構
+
+<Image
+  src="/static/browser.png"
+  alt="browser architecture"
+  width={1000}
+  height={1000}
+/>
+
+## 結論
+
+- 兩個主要組件：JS 引擎和渲染引擎。
+- JS 引擎：解析階段、執行階段。
+- 渲染引擎：解析階段、執行階段。
+- 當瀏覽器接收到 JS 程式碼時，JS 引擎會執行以下步驟：
+  - 解析階段：將 JavaScript 程式碼轉換為抽象語法樹（Abstract Syntax Tree, AST），然後 AST 會被送到編譯器。
+  - 執行階段：直譯器將 AST 轉換為位元組碼並執行。

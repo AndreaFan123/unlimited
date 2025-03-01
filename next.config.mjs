@@ -1,14 +1,18 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { build } from "velite";
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
-export default {
-  // othor next config here...
+const nextConfig = {
   webpack: (config) => {
     config.plugins.push(new VeliteWebpackPlugin());
     return config;
   },
 };
+
+export default withNextIntl(nextConfig);
 
 class VeliteWebpackPlugin {
   static started = false;
