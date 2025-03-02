@@ -54,7 +54,7 @@ JavaScript 執行時期模型由以下組件組成：
 
 <Image src="/static/macro.png" alt="macro task" width={1000} height={1000} />
 
-1. JavaScript 執行環境開始讀取程式碼，創建全域執行環境，並將其推入呼叫堆疊，在這個階段，可以將 main() 視為正在執行的函式。
+1. JavaScript 執行環境開始讀取程式碼，建立全域執行環境，並將其推入呼叫堆疊，在這個階段，可以將 main() 視為正在執行的函式。
 2. 第一行程式碼是 console.log('Start')，這會被推入呼叫堆疊，並立即執行，完成後會從呼叫堆疊中彈出。
 3. 第二行程式碼是 setTimeout()，它也會被推入呼叫堆疊，但隨後會被移至 Web APIs，並註冊一個計時器。
 
