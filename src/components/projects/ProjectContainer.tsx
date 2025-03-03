@@ -40,7 +40,14 @@ export default function ProjectContainer() {
       link: "",
       src: unlimited,
       status: true,
-      tech: ["Next.js", "TailwindCSS", "TypeScript", "MDX", "Shadcn/UI"],
+      tech: [
+        "Next.js",
+        "TailwindCSS",
+        "TypeScript",
+        "MDX",
+        "Shadcn/UI",
+        "i18n",
+      ],
     },
   ];
   return (
