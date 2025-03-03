@@ -62,7 +62,6 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       <div className="pb-5">
         <h1 className="text-gray-700 relative w-fit dark:text-gray-300">
           {post.title}
-          <span className="h-2 bg-yellow-400 absolute top-8 left-0 -z-10 w-full"></span>
         </h1>
         {post.description && (
           <p className="text-gray-700 dark:text-gray-300">{post.description}</p>
