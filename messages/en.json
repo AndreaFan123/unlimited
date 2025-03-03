@@ -8,13 +8,20 @@
     "latestPosts": "Latest Posts"
   },
   "techStack": {
-    "title": "TI am focusing on..."
+    "title": "I am focusing on..."
   },
   "projects": {
     "title": "Projects",
+    "volunteer": "Open Source/Volunteer",
     "digitalCard": "Digital Business Card platform",
     "senryo": "Food Delivery Platform",
-    "unlimitedBlog": "Personal Portfolio and Blog"
+    "unlimitedBlog": "Personal Portfolio and Blog",
+    "pyladies": "PyLadies (International Python Community)",
+    "pyladiesDescription": "PyLadies Taiwan Website maintainer",
+    "mdn": "MDN (Mozilla Developer Network)",
+    "mdnDescription": "MDN Web Docs zh_TW Translator",
+    "coseeing": "Taiwan Digital Accessibility Organization",
+    "coseeingDescription": "A11y evangelist"
   },
   "socials": {
     "linkedin": "Visit Linkedin",
@@ -24,6 +31,12 @@
   },
   "workExperience": {
     "workExperience": "Work Experience",
+    "freelancer": {
+      "company": "Freelancer",
+      "title": "Frontend Developer",
+      "duration": "2024-12-15 ~ Present",
+      "description": "Leading PyLadies Taiwan website revamp project, and personal projects."
+    },
     "ringus": {
       "company": "Ringus-solution",
       "title": "Frontend Engineer",
@@ -31,7 +44,7 @@
       "description": "Developed web applications using React.js, Next.js, TailwindCSS, TypeScript and other frontend technologies."
     },
     "codapayment": {
-      "company": "Coda (No. 1 online game publishers collect payment in Southeast Asia)",
+      "company": "Coda (No. 1 gaming payment in Southeast Asia)",
       "title": "Senior Marketing",
       "duration": "2021-10-01 ~ 2022-12-01",
       "description": "Responsible for TW/HK/MO market, including marketing strategy, online and offline campaigns, competitor analysis, market research."

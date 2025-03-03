@@ -3,8 +3,8 @@
   "profile": {
     "name": "范珊樂 (Andrea)",
     "title": "前端工程師 && 行銷",
-    "content1": "具備行銷背景的自律、好奇心旺盛的前端工程師，目前專注學習 Next.js、React、TailwindCSS、JavaScript、TypeScript、HTML 和 CSS 以及其他。",
-    "content2": "擅長獨立和協作專案，專注於網站開發和使用者體驗。熱衷參與開源專案，協助繁體中文翻譯等。",
+    "content1": "行銷背景，自律且好奇心旺盛的前端工程師，以 Next.js、React、TailwindCSS、JavaScript、TypeScript、HTML 和 CSS 以及其他後端相關技術開發專案",
+    "content2": "擅長獨立和協作專案，跨部門溝通等，目前專注於網站開發和研究使用者體驗。熱衷參與開源專案，協助繁體中文翻譯等。",
     "latestPosts": "最新文章"
   },
   "techStack": {
@@ -12,9 +12,16 @@
   },
   "projects": {
     "title": "專案",
+    "volunteer": "開源/志工",
     "digitalCard": "數位名片平台",
     "senryo": "日本壽司外送平台",
-    "unlimitedBlog": "個人作品集和部落格"
+    "unlimitedBlog": "個人作品集和部落格",
+    "pyladies": "PyLadies (國際 Python 社群)",
+    "pyladiesDescription": "PyLadies Taiwan 網站維護者",
+    "mdn": "MDN (Mozilla 開發者網路)",
+    "mdnDescription": "MDN Web Docs 繁體中文翻譯者",
+    "coseeing": "Coseeing 推廣無障礙協會",
+    "coseeingDescription": "無障礙推廣者"
   },
   "socials": {
     "linkedin": "前往 Linkedin",
@@ -24,6 +31,12 @@
   },
   "workExperience": {
     "workExperience": "工作經驗",
+    "freelancer": {
+      "company": "自由工作者",
+      "title": "前端工程師",
+      "duration": "2024-12-15 ~ 現在",
+      "description": "領導 PyLadies Taiwan 網站改版專案，以及個人專案。"
+    },
     "ringus": {
       "company": "Ringus-solution",
       "title": "前端工程師",
@@ -31,7 +44,7 @@
       "description": "使用 React.js、Next.js、TailwindCSS、TypeScript 和其他前端技術開發網頁應用程式。"
     },
     "codapayment": {
-      "company": "Coda (知名東南亞線上遊戲發行商)",
+      "company": "Coda (知名東南亞線上遊戲金流平台)",
       "title": "資深行銷",
       "duration": "2021-10-01 ~ 2022-12-01",
       "description": "負責台灣/香港市場，包括行銷策略、線上和線下活動、競爭對手分析、市場研究。"

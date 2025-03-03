@@ -35,8 +35,9 @@ export default function BlogPage({ searchParams, params }: BlogPageProps) {
   return (
     <>
       <section className="flex flex-col gap-4 pb-10">
-        <h1 className="text-4xl font-extrabold text-gray-700 dark:text-gray-300">
+        <h1 className="text-4xl relative w-fit font-extrabold text-gray-700 dark:text-gray-300">
           {t("blog")}
+          <span className="h-2 bg-yellow-400 absolute top-8 left-0 -z-10 w-full"></span>
         </h1>
         <p>{t("description")} 🚀</p>
       </section>

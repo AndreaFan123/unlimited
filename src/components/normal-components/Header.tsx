@@ -12,13 +12,14 @@ export default function Header({ lang }: { lang: Locales }) {
   const showLocaleToggle = pathName[2] === undefined;
 
   return (
-    <header className="sticky h-20 top-0 sm:max-w-full md:max-w-[800px] mx-auto z-50 w-full px-4 border-b-[1px] border-gray-400 border-dashed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky h-20 top-0 sm:max-w-full md:max-w-[900px] mx-auto z-30 w-full px-4 border-b-[1px] border-gray-400 border-dashed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <nav className="flex justify-between items-center h-full">
         <Link
           href={ROUTES.HOME}
-          className="font-extrabold text-gray-700 dark:text-gray-300 text-2xl"
+          className="font-extrabold relative text-gray-700 dark:text-gray-300 text-2xl"
         >
-          Unlimited
+          <span>Unlimited</span>
+          <span className="h-2 bg-yellow-400 absolute top-5 left-0 -z-10 w-full"></span>
         </Link>
         <div className="flex gap-4">
           {showLocaleToggle ? <LocaleToggle lang={lang} /> : null}

@@ -4,6 +4,12 @@ export default function WorkExperience() {
   const t = useTranslations("workExperience");
   const workExperience = [
     {
+      company: t("freelancer.company"),
+      position: t("freelancer.title"),
+      duration: t("freelancer.duration"),
+      description: t("freelancer.description"),
+    },
+    {
       company: t("ringus.company"),
       position: t("ringus.title"),
       duration: t("ringus.duration"),
@@ -29,9 +35,10 @@ export default function WorkExperience() {
     },
   ];
   return (
-    <div className="mt-[20px] md:pl-7 mb-8 px-4 sm:px-0">
-      <h2 className="text-2xl mb-[20px] font-bold text-gray-700 dark:text-gray-300">
+    <div className="mt-[20px] mb-8 px-4 sm:px-0">
+      <h2 className="text-2xl w-fit relative mb-[20px] font-bold text-gray-700 dark:text-gray-300">
         {t("workExperience")}
+        <span className="h-2 bg-indigo-300 absolute top-5 left-0 -z-10 w-full"></span>
       </h2>
       <div>
         {workExperience
@@ -43,17 +50,12 @@ export default function WorkExperience() {
           .map((experience, index) => (
             <div
               key={index}
-              className="mb-4 flex flex-col sm:flex-row sm:justify-between w-full"
+              className="mb-4 border-b border-gray-400 border-dashed pb-3 flex flex-col sm:flex-row sm:justify-between w-full"
             >
-              <div className="flex flex-col md:flex-row sm:w-[70%]">
-                <div className="w-[30px] mb-[7px] mt-[7px] h-[30px] bg-gray-800 dark:bg-gray-300 flex items-center justify-center">
-                  <span className="text-white dark:text-gray-700 text-sm font-semibold">
-                    {index + 1}
-                  </span>
-                </div>
-                <div className="md:ml-4">
-                  <div className="mb-2 relative">
-                    <h3 className="text-lg font-semibold ">
+              <div className="flex flex-col md:flex-row">
+                <div>
+                  <div className="mb-3 relative">
+                    <h3 className="text-lg font-semibold">
                       {experience.company} | {experience.position}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-300">

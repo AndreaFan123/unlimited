@@ -20,7 +20,7 @@ export default async function BlogLayout({
   return (
     <>
       <Header lang={locale} />
-      <main className="w-full mx-auto my-10 px-4 sm:max-w-full md:max-w-[800px]">
+      <main className="w-full mx-auto my-10 px-4 sm:max-w-full md:max-w-[900px]">
         {children}
       </main>
       <Footer />
