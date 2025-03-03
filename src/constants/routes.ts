@@ -8,6 +8,9 @@ const ROUTES = {
   BLOG: "/blog",
   BLOG_SLUG: "/blog/[slug]",
   TAG_SLUG: "/blog/tags/",
+  COSEEING: "https://a11yvillage.coseeing.org/en",
+  PYLADIES: "https://tw.pyladies.com/",
+  MDN: "https://developer.mozilla.org/zh-TW/",
 };
 
 export default ROUTES;
