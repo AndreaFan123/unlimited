@@ -45,13 +45,13 @@ export default function WorkExperience() {
               key={index}
               className="mb-4 flex flex-col sm:flex-row sm:justify-between w-full"
             >
-              <div className="flex sm:w-[70%]">
-                <div className="w-[30px] mt-[7px] h-[30px] bg-gray-800 dark:bg-gray-300 flex items-center justify-center">
+              <div className="flex flex-col md:flex-row sm:w-[70%]">
+                <div className="w-[30px] mb-[7px] mt-[7px] h-[30px] bg-gray-800 dark:bg-gray-300 flex items-center justify-center">
                   <span className="text-white dark:text-gray-700 text-sm font-semibold">
                     {index + 1}
                   </span>
                 </div>
-                <div className="ml-4">
+                <div className="md:ml-4">
                   <div className="mb-2 relative">
                     <h3 className="text-lg font-semibold ">
                       {experience.company} | {experience.position}
