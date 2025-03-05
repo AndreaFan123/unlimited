@@ -33,7 +33,7 @@ export default function ProfileContainer({ lang }: { lang: Locales }) {
         <div className="flex flex-col sm:px-0">
           <h2 className="text-3xl relative w-fit font-bold text-gray-700 dark:text-gray-300">
             {tProfile("latestPosts")}
-            <span className="h-2 bg-yellow-400 absolute top-6 left-0 -z-10 w-full"></span>
+            <span className="h-2 bg-yellow-400 dark:bg-orange-600 absolute top-6 left-0 -z-10 w-full"></span>
           </h2>
           <ul className="py-4 flex flex-col gap-3">
             {latestPosts.map((post) => (

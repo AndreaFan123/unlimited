@@ -25,7 +25,7 @@ export default function TechStack() {
       <div className="container mx-auto ">
         <h2 className="text-3xl w-fit relative font-bold text-gray-700 dark:text-gray-300 mb-5">
           {t("title")}
-          <span className="h-2 bg-yellow-400 absolute top-6 left-0 -z-10 w-full"></span>
+          <span className="h-2 bg-yellow-400 dark:bg-orange-600 absolute top-6 left-0 -z-10 w-full"></span>
         </h2>
 
         <div className="flex overflow-x-hidden">

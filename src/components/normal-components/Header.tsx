@@ -19,7 +19,7 @@ export default function Header({ lang }: { lang: Locales }) {
           className="font-extrabold relative text-gray-700 dark:text-gray-300 text-2xl"
         >
           <span>Unlimited</span>
-          <span className="h-2 bg-yellow-400 absolute top-5 left-0 -z-10 w-full"></span>
+          <span className="h-2 bg-yellow-400 dark:bg-orange-600  absolute top-5 left-0 -z-10 w-full"></span>
         </Link>
         <div className="flex gap-4">
           {showLocaleToggle ? <LocaleToggle lang={lang} /> : null}

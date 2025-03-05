@@ -47,7 +47,7 @@ export default function ProjectContainer() {
     <div className="w-full mt-5 px-4 sm:px-0">
       <h2 className="text-3xl w-fit relative font-bold mb-2 text-gray-700 dark:text-gray-300">
         {t("title")}
-        <span className="h-2 bg-indigo-300 absolute top-6 left-0 -z-10 w-full"></span>
+        <span className="h-2 bg-indigo-300 dark:bg-indigo-600 absolute top-6 left-0 -z-10 w-full"></span>
       </h2>
       <div className="pt-2 border-gray-400 dark:border-white border-dashed pb-5 w-full max-w-full">
         <div className="flex flex-col gap-5">
