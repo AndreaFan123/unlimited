@@ -74,7 +74,9 @@ const components = {
     </a>
   ),
   code: ({ children }: { children: React.ReactNode; href: string }) => (
-    <code className="text-pink-800 dark:text-orange-600">{children}</code>
+    <code className="text-pink-800 dark:text-orange-600 before:content-[''] after:content-['']">
+      {children}
+    </code>
   ),
 };
 
