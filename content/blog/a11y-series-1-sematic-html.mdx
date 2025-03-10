@@ -1,8 +1,108 @@
 ---
-title: "A11y 系列：1. 語意化 HTML"
-description: "深入探討如何使用語意化 HTML 來提升網站的可訪問性"
+title: "A11y series: semantic HTML Part 1"
+description: Intro of semantic HTML
 date: 2025-01-10
 tags: ["web", "a11y", "accessibility"]
-published: false
-language: "zh_tw"
+published: true
+language: "en"
 ---
+
+I;ve been learning frontend for more then two years, sometimes I still see my colleagues using `<div>` from top to bottom to develop a webpage. Although it achieves the same effect, as a promoter of accessibility, and recently started translating the documents of [MDN](https://developer.mozilla.org/), I decided to write a series of articles about accessibility in the process of translation, as my learning notes.
+
+## What is semantic?
+
+"Semantic" means "relating to meaning in language or logic." In web development, each tag can be regarded as a block, and the most commonly used is `<div>`. We can use it to make blocks, wrap articles or wrap lists, and it can be presented as follows.
+
+```html
+<!-- As an article block -->
+<div>
+  <h1>This is a title</h1>
+  <p>A paragraph</p>
+  <p>A paragraph</p>
+  <p>A paragraph</p>
+</div>
+
+<!-- As a structural block -->
+<div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+```
+
+The above uses `<div>` to plan HTML can still achieve the purpose of building a webpage, but for screen reader users, when they hear the reader read out, they cannot correctly interpret the webpage structure; imagine a map, but what you see is the same mark, the same color, and cannot correctly judge the current orientation.
+
+This is why using semantic HTML to write webpage structures is important, it can be more intuitive to develop, for example, using `<nav>` you can immediately know that this tag represents "Navigation" and the screen reader will read it out like this, so that visually impaired people can know that the current location is the navigation bar. Accessibility does not mean **specifically** creating something to suit a particular person, but more broadly, creating products that everyone can easily use, starting with HTML is the most basic and easily applied.
+
+## Basic structure
+
+Almost every webpage will have the following main tags:
+
+### `<nav>`
+
+The main purpose of this tag is to provide navigation, but not all navigation must use this tag, for example, some links in the footer do not need it. In practice, the main navigation of a page usually uses this tag.
+
+### `<header>`
+
+When we visit a webpage, you may see an introductory block or a navigation auxiliary block, you can use this tag to wrap the above navigation bar. If `<header>` is at the top level, it will be automatically assigned the role=banner role, but if it is wrapped by other tags, it will not be automatically assigned the banner role, and the screen reader will identify it as the main banner area when it encounters the top-level `<header>`.
+
+```html
+<!-- The header here will be automatically assigned role=banner -->
+<body>
+  <header>Welcome</header>
+  <main>Main content</main>
+</body>
+
+<!-- The header will not be automatically assigned role=banner -->
+<body>
+  <main>
+    <article>
+      <header>Welcome</header>
+    </article>
+  </main>
+</body>
+```
+
+### `<main>`
+
+The main content of the webpage, usually only one `<main>` tag is used on a page.
+
+### `<aside>`
+
+If there's some content that is not directly related to the main content, you can use `<aside>` to wrap it. For example, a sidebar, a pull quote, etc.
+
+### `<footer>`
+
+I always thought that the footer is only used to place at the bottom of the page, but in fact, it can be the footer of the main content of the page, such as the footer of an article, the footer of a blog post, etc.
+
+```html
+<!-- The footer here will be automatically assigned role=containinfo -->
+<body>
+  <header>
+    <nav>...</nav>
+  </header>
+  <main>
+    <h2>Title 2</h2>
+  </main>
+  <footer>© 2025 haha</footer>
+</body>
+
+<!-- The footer here will be assigned role=generic -->
+<article>
+  <h2>Title 2</h2>
+  <p>content</p>
+  <p>content</p>
+  <p>content</p>
+  <p>content</p>
+  <footer>© 2025 haha</footer>
+</article>
+```
+
+Other tags such as `<aside>`, `<section>`, `<figure>`, `<figcaption>`, etc., will not be introduce in this series, the most important point is to use semantic tags, make the webpage source code more recognizable, not only convenient in development (semantic tags have default accessibility functions), but also make the webpage more accessible.
+
+### A11y series HTML may be planned as follows
+
+- what is `role`?
+- `img` and `alt`
+- `form`- frontend good partner
