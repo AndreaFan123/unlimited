@@ -1,5 +1,5 @@
-import TechStack from "@/src/components/tech-stack/TechStack";
-import Header from "@/src/components/normal-components/Header";
+// import TechStack from "@/src/components/tech-stack/TechStack";
+// import Header from "@/src/components/normal-components/Header";
 
 import PersonInfo from "@/src/components/profile/PersonInfo";
 import PostContainer from "@/src/components/profile/PostContainer";
@@ -20,7 +20,6 @@ export default function ProfileContainer({ lang }: { lang: Locales }) {
 
   return (
     <aside className="px-4 lg:px-0 flex flex-col gap-5 text-gray-700 dark:text-gray-300 w-full lg:w-[30%] lg:mr-7">
-      <Header lang={lang} />
       <div className="flex flex-col gap-11">
         <div className="">
           <PersonInfo
@@ -41,7 +40,7 @@ export default function ProfileContainer({ lang }: { lang: Locales }) {
             ))}
           </ul>
         </div>
-        <TechStack />
+        {/* <TechStack /> */}
       </div>
     </aside>
   );

@@ -1,4 +1,4 @@
-import { Download, Ghost, Github, Linkedin, Rss } from "lucide-react";
+import { Eye, Ghost, Github, Linkedin, Rss } from "lucide-react";
 import ExternalLink from "@/src/components/profile/ExternalLink";
 import ROUTES from "@/src/constants/routes";
 import { useTranslations } from "next-intl";
@@ -33,7 +33,7 @@ export default function PersonInfo({
     },
     {
       name: "Resume",
-      icon: <Download size={30} />,
+      icon: <Eye size={30} />,
       url: ROUTES.RESUME,
       target: "_blank",
       ariaLabel: tSocials("resume"),
