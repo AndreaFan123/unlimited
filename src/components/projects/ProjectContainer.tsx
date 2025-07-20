@@ -1,4 +1,3 @@
-import meetToday from "@/public/meet-today.png";
 import senryo from "@/public/senryo.png";
 import unlimited from "@/public/unlimited.png";
 import TechTag from "./TechTag";
@@ -11,14 +10,6 @@ export default function ProjectContainer() {
   const t = useTranslations("projects");
 
   const projectList = [
-    {
-      name: "meet.today",
-      description: t("digitalCard"),
-      link: ROUTES.MEETUTODAY,
-      src: meetToday,
-      status: true,
-      tech: ["Next.js", "TailwindCSS", "TypeScript", "i18n"],
-    },
     {
       name: "senryo",
       description: t("senryo"),

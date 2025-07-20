@@ -1,26 +1,28 @@
-import ROUTES from "@/src/constants/routes";
-import { Link } from "@/src/i18n/navigation";
+import { useTranslations } from "next-intl";
+import Post from "@/src/components/profile/Post";
+import { posts } from "#site/content";
+import { sortPosts } from "@/src/lib/utils";
+import { Locales } from "@/src/i18n/request";
 
-type PostContainerProps = {
-  slug: string;
-  title: string;
-  date: string;
-  published: boolean;
-  body: string;
-  description?: string | undefined;
-} & {
-  slugAsParams: string;
-};
+export default function PostContainer({ lang }: { lang: Locales }) {
+  const tProfile = useTranslations("profile");
 
-export default function PostContainer({ post }: { post: PostContainerProps }) {
+  const sortedPosts = sortPosts(
+    posts.filter((post) => post.published && post.language === lang)
+  );
+
+  const latestPosts = sortedPosts.slice(0, 6);
   return (
-    <li>
-      <Link
-        className="hover:text-orange-500 flex items-baseline gap-3 transition-all duration-300"
-        href={ROUTES.BLOG_SLUG.replace("[slug]", post.slugAsParams)}
-      >
-        📓 <span className="text-md">{post.title}</span>
-      </Link>
-    </li>
+    <div className="flex flex-col sm:px-0">
+      <h2 className="text-3xl relative w-fit font-bold text-gray-700 dark:text-gray-300">
+        {tProfile("latestPosts")}
+        <span className="h-2 bg-yellow-400 dark:bg-orange-600 absolute top-6 left-0 -z-10 w-full"></span>
+      </h2>
+      <ul className="py-4 grid lg:grid-cols-2 gap-3">
+        {latestPosts.map((post) => (
+          <Post key={post.slug} post={post} />
+        ))}
+      </ul>
+    </div>
   );
 }

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import ProfileContainer from "../../components/profile/ProfileContainer";
-// import ProjectContainer from "../../components/projects/ProjectContainer";
-// import WorkExperience from "../../components/work-experience/WorkExperience";
+import PostContainer from "@/src/components/profile/PostContainer";
+import ProjectContainer from "../../components/projects/ProjectContainer";
+import WorkExperience from "../../components/work-experience/WorkExperience";
+import VolunteerProject from "@/src/components/work-experience/VolunteerProject";
+
 import {
   landingPageContent,
   generatePageMetadata,
 } from "@/src/config/metadata";
+
 import { Locales } from "@/src/i18n/request";
-// import VolunteerProject from "@/src/components/work-experience/VolunteerProject";
 
 export const metadata: Metadata = generatePageMetadata(landingPageContent);
 
@@ -17,20 +20,30 @@ export default async function Home({
   params: { locale: Locales };
 }) {
   const { locale } = await params;
+
   return (
-    <main className="container mx-auto">
-      <section className="h-screen flex w-full flex-col gap-14 lg:gap-0 lg:flex-row items-start justify-start">
-        <ProfileContainer lang={locale} />
+    <main className="w-full px-4 flex flex-col gap-36 h-screen sm:max-w-full md:max-w-[1200px] mx-auto">
+      <section className="mt-20">
+        <ProfileContainer />
       </section>
-      {/* <section className="w-full mt-20 lg:mt-0 lg:ml-[36%] lg:w-[57%] xl:ml-[40%] xl:min-h-screen lg:border-l-[1px] lg:border-gray-400 lg:border-dashed">
-        <div className="w-full lg:ml-9 flex flex-col lg:flex-row lg:justify-between lg:gap-6 border-b border-dashed border-b-gray-400">
-          <ProjectContainer />
-        </div>
-        <div className="w-full lg:ml-9">
+      <section>
+        <PostContainer lang={locale} />
+      </section>
+      {/* <div className="border-b-[1px] border-gray-400 border-dashed"></div> */}
+      <section>
+        <WorkExperience />
+        {/* <ProjectContainer /> */}
+        {/* <div className="w-full lg:ml-9">
           <WorkExperience />
           <VolunteerProject />
-        </div>
-      </section> */}
+        </div> */}
+      </section>
+      <section>
+        <VolunteerProject />
+      </section>
+      <section>
+        <WorkExperience />
+      </section>
     </main>
   );
 }

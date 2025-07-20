@@ -58,7 +58,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
 
   const formattedDate = formatDate(post.date);
   return (
-    <article className="flex w-full flex-col gap-4 items-start md:max-w-[900px] prose">
+    <article className="flex w-full flex-col gap-4 items-start md:max-w-[1200px] prose">
       <div className="pb-5">
         <h1 className="text-gray-700 relative w-fit dark:text-gray-300">
           {post.title}

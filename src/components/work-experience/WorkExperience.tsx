@@ -35,7 +35,7 @@ export default function WorkExperience() {
     },
   ];
   return (
-    <div className="mt-[20px] mb-8 px-4 sm:px-0">
+    <div className="mb-24">
       <h2 className="text-2xl w-fit relative mb-[20px] font-bold text-gray-700 dark:text-gray-300">
         {t("workExperience")}
         <span className="h-2 bg-indigo-300 dark:bg-indigo-600 absolute top-5 left-0 -z-10 w-full"></span>

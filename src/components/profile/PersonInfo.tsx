@@ -1,4 +1,4 @@
-import { Eye, Ghost, Github, Linkedin, Rss } from "lucide-react";
+import { Eye, Github, Linkedin, Rss } from "lucide-react";
 import ExternalLink from "@/src/components/profile/ExternalLink";
 import ROUTES from "@/src/constants/routes";
 import { useTranslations } from "next-intl";
@@ -49,15 +49,10 @@ export default function PersonInfo({
   return (
     <div>
       <div className="flex flex-col items-start gap-7 mb-11">
-        <div className="text-gray-700 flex gap-2 ites-center dark:text-gray-300 font-semibold">
-          <Ghost
-            width={50}
-            height={50}
-            className="text-gray-700 dark:text-gray-300"
-          />
-          <div>
-            <h5>{name}</h5>
-            <span>{title}</span>
+        <div className="text-gray-700 flex gap-2 items-center dark:text-gray-300 font-semibold">
+          <div className="flex flex-col gap-2">
+            <h5 className="text-5xl font-black">{name}</h5>
+            <span className="text-xl">{title}</span>
           </div>
         </div>
         <div className="flex gap-6">
