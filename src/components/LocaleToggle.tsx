@@ -12,7 +12,7 @@ import Link from "next/link";
 export default function LocaleToggle({ lang }: { lang: Locales }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="px-9">
+      <DropdownMenuTrigger asChild className="px-5">
         <Button variant="outline" size="icon">
           {lang === "zh_tw" ? "中文" : "EN"}
         </Button>

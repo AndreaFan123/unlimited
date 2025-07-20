@@ -2,7 +2,8 @@ const ROUTES = {
   HOME: "/",
   GITHUB: "https://github.com/AndreaFan123",
   LINKEDIN: "https://www.linkedin.com/in/andrea-fan/",
-  RESUME: "/Shan-Le-Fan-Andrea-Resume.pdf",
+  RESUME:
+    "https://docs.google.com/document/d/1BKuJGID1QKxnNVRZ2L81Y-5BVhPeIhDdMKmcIZ6gN68/edit?usp=sharing",
   SENRYO: "https://order.sen-ryo.com.hk/en",
   MEETUTODAY: "https://meetu.today/en",
   BLOG: "/blog",

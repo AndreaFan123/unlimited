@@ -1,10 +1,10 @@
 {
   "logo": "Unlimited",
   "profile": {
-    "name": "范珊樂 (Andrea)",
-    "title": "前端工程師 && 行銷",
-    "content1": "行銷背景，自律且好奇心旺盛的前端工程師，以 Next.js、React、TailwindCSS、JavaScript、TypeScript、HTML 和 CSS 以及其他後端相關技術開發專案",
-    "content2": "擅長獨立和協作專案，跨部門溝通等，目前專注於網站開發和研究使用者體驗。熱衷參與開源專案，協助繁體中文翻譯等。",
+    "name": "范珊樂 (Andrea Fan)",
+    "title": "生命的探險家 && 前端工程師 && 行銷",
+    "content1": "擁有超過3年前端開發與社群管理經驗，擅長使用Next.js、React和TypeScript構建網頁應用程式，適應多變環境並具備跨部門協作能力。",
+    "content2": "成功領導遊戲玩家社群互動，提升互動率超過10%，並利用自動化工具和行銷策略優化流程達30%，推動季節性收入增長100萬美元。熱衷於運用創新工具優化工作流程，提升用戶體驗與商業價值。",
     "latestPosts": "最新文章"
   },
   "techStack": {
@@ -31,11 +31,11 @@
   },
   "workExperience": {
     "workExperience": "工作經驗",
-    "freelancer": {
-      "company": "自由工作者",
-      "title": "前端工程師",
-      "duration": "2024-12-15 ~ 現在",
-      "description": "領導 PyLadies Taiwan 網站改版專案，以及個人專案。"
+    "shalom": {
+      "company": "Shalom (台灣頂尖的 PMS 平台)",
+      "title": "全端工程師",
+      "duration": "2025-04-01 ~ 現在",
+      "description": "重新設計並開發雲端自助入住系統和物聯網技術。"
     },
     "ringus": {
       "company": "Ringus-solution",
