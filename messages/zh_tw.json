@@ -31,11 +31,11 @@
   },
   "workExperience": {
     "workExperience": "工作經驗",
-    "freelancer": {
-      "company": "自由工作者",
-      "title": "前端工程師",
-      "duration": "2024-12-15 ~ 現在",
-      "description": "領導 PyLadies Taiwan 網站改版專案，以及個人專案。"
+    "shalom": {
+      "company": "Shalom (台灣頂尖的 PMS 平台)",
+      "title": "全端工程師",
+      "duration": "2025-04-01 ~ 現在",
+      "description": "重新設計並開發雲端自助入住系統和物聯網技術。"
     },
     "ringus": {
       "company": "Ringus-solution",

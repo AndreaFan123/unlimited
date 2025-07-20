@@ -13,7 +13,7 @@ export default function Header({ lang }: { lang: Locales }) {
 
   return (
     <header className="sticky h-20 top-0 max-w-full z-30 w-full border-b-[1px] border-gray-400 border-dashed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="flex justify-between items-center h-full max-w-[1200px] mx-auto">
+      <nav className="flex justify-between items-center h-full px-5 max-w-[1200px] mx-auto">
         <Link
           href={ROUTES.HOME}
           className="font-extrabold relative text-gray-700 dark:text-gray-300 text-2xl"

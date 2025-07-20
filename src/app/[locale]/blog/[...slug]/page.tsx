@@ -86,7 +86,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       </div>
       <Separator />
       <MdxContent code={post.body} />
-      <Link className="mt-9 " href={ROUTES.BLOG}>
+      <Link className="mt-4 " href={ROUTES.BLOG}>
         <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
           <ArrowLeft className="w-4 h-4  hoverEffect" />{" "}
           <span className="">

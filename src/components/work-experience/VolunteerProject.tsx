@@ -22,7 +22,7 @@ export default function VolunteerProject() {
     },
   ];
   return (
-    <div className="mt-[20px] mb-8 px-4 sm:px-0">
+    <>
       <h2 className="text-2xl relative w-fit mb-[20px] font-bold text-gray-700 dark:text-gray-300">
         {t("volunteer")}
         <span className="h-2 bg-indigo-300 dark:bg-indigo-600 absolute top-5 left-0 -z-10 w-full"></span>
@@ -41,6 +41,6 @@ export default function VolunteerProject() {
           </Link>
         ))}
       </div>
-    </div>
+    </>
   );
 }

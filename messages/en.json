@@ -31,11 +31,11 @@
   },
   "workExperience": {
     "workExperience": "Work Experience",
-    "freelancer": {
-      "company": "Freelancer",
-      "title": "Frontend Developer",
-      "duration": "2024-12-15 ~ Present",
-      "description": "Leading PyLadies Taiwan website revamp project, and personal projects."
+    "shalom": {
+      "company": "Shalom (Taiwan's top PMS platform)",
+      "title": "Full-stack Developer",
+      "duration": "2025-04-01 ~ Present",
+      "description": "Revamped and developed cloud-based self check-in system and IOT."
     },
     "ringus": {
       "company": "Ringus-solution",

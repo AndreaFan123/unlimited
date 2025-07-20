@@ -11,7 +11,7 @@ export default function ProfileContainer() {
   // const latestPosts = sortedPosts.slice(0, 6);
 
   return (
-    <div className="px-4 lg:px-0 flex flex-col gap-5 text-gray-700 dark:text-gray-300 w-full">
+    <div className="flex flex-col gap-5 text-gray-700 dark:text-gray-300 w-full">
       <PersonInfo
         name={tProfile("name")}
         title={tProfile("title")}
