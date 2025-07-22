@@ -1,0 +1,81 @@
+---
+title: "資料庫基本概念一：資料庫的種類（類型）"
+description: 事件追蹤與監控的基本概念
+date: 2025-07-21
+tags: ["database", "sql", "non-relational", "nosql", "mongodb", "mysql"]
+published: true
+language: "zh_tw"
+---
+
+近期因為工作的關係，接觸了不少後端的東西，也需要親自動手新增 API，以及配合新的功能，新增資料庫欄位等，接下來會花幾篇的時間來學習資料庫的相關知識，透過實務上的操作來學習資料庫的基本概念。
+本篇是第一篇，因此還是先聚焦在資料庫的基本介紹。
+
+## 資料庫的兩大分類
+
+資料庫可以分成以下兩大類：
+
+1. 關聯式資料庫 (Relational Database / SQL Database)
+2. 非關聯式資料庫 (Non-relational Database / NoSQL Database)
+
+### 關聯式資料庫 (Relational Database / SQL Database)
+
+- 數據以表格的形式呈現，表格即是欄（直 / column）和列（橫 / row）組成，前者稱為「屬性 (Attribute)」，後者稱「記錄 (Record)」。
+- 各表格之間可以有關係。
+- 關聯式資料庫中的查詢和操作都是使用 "SQL (SeQuel)"(Structure Query Language)。
+- 亦稱為「通用資料庫 (General Purpose Databases)」，是目前最廣泛用來建立系統和應用程式的資料庫。
+- 市面上主流的關聯式資料庫有：
+  - MySQL
+  - PostgreSQL
+  - Oracle
+  - Microsoft SQL server
+  - 基於雲端的關聯式資料庫有：
+    - Amazon Aurora
+    - Google Cloud Spanner
+    - Azure SQL DB
+
+由於發展越來越快，應用程式也越趨複雜，建立以及維護大型且複雜的資料庫是非常耗費資源和成本，因此市場上也出現了替代的資料庫類型，也就是「非關聯式資料庫」。
+
+### 非關聯式資料庫 (Non-relational Database / NoSQL Database)
+
+NoSQL 資料庫模型包括：
+- 鍵值 (Key-Value DB)
+- 記憶體 (In-memory DB)
+- 圖學 (Graph DB)
+- 欄位 (Columnar DB)
+- 文件 (Document DB)
+
+#### 鍵值資料庫 (Key-Value DB)
+
+- 採用鍵值組集合，以鍵作為唯一識別，鍵值資料型態不限。
+- 每筆資料都是獨立的，因此具備高度分散跟水平橫向擴展。
+- 不需執行任何資料表關聯。
+- 常見的有：Google Big Table, Amazon Dynamo 等。
+
+#### 記憶體資料庫  (In-memory DB)
+
+- 利用記憶體建立分散式資料庫，加快讀取資料速度。
+- 適合網站快取，遊戲，銀行交易等需要快速存取的應用。
+- 常見的有：Redis, Memcached 等。
+
+#### 文件資料庫  (Document DB)
+
+- 用來儲存非結構性文件，例如 JSON、HTML、XML 等。
+- 文件資料庫的資料結構多半為樹狀結構，並且可以儲存多種資料型態。
+- 常用的有：MongoDB, CouchDB 等。
+
+#### 欄位資料庫  (Columnar DB)
+
+- 將資料儲存在欄位中，而非列中，適合處理大量資料的分析和查詢。
+- 這種類型的資料庫通常用於大數據分析和機器學習分析。
+- 常見的有：Snowflake, MariaDB, BigQuery 等。
+
+#### 圖學資料庫  (Graph DB)
+
+- 專門運用圖學架構來儲存節點關係的資料架構，例如樹狀結構表示從屬關係或網狀結構來表示關係。
+- 此種類資料庫有強大的擴充力，關係越複雜的資料越適合這種類型。
+- 這類資料結構無標準作法，但基本包括：
+  - 節點 (Node)：資料的實體，例如人、物品等。
+  - 邊 (Edge)：節點之間的關係，例如朋友、購買等。
+  - 屬性 (Property)：節點或邊的附加資訊，例如年齡、價格等。
+- 常見的有：Neo4j, Amazon Neptune 等。
+
