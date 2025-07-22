@@ -3,6 +3,70 @@ title: "Database Basics Part 1: Types of Databases"
 description: An introduction to the basic concepts of databases
 date: 2025-07-21
 tags: ["database", "sql", "non-relational", "nosql", "mongodb", "mysql"]
-published: false
+published: true
 language: "en"
 ---
+
+Recently, due to work requirements, I've been delving into backend technologies, including creating APIs and adding new database fields for new features. Over the next few articles, I will explore database-related knowledge through practical operations to learn the basic concepts of databases. This is the first article, so we will focus on a basic introduction to databases.
+
+## Two Main Categories of Databases
+
+Databases can be divided into two main categories:
+
+1. Relational Databases (SQL Databases)
+2. Non-relational Databases (NoSQL Databases)
+
+### Relational Databases (SQL Databases)
+
+- Data is presented in tables, which consist of columns (vertical) and rows (horizontal). The former is called "Attributes", and the latter is called "Records".
+- Tables can have relationships with each other.
+- Queries and operations in relational databases are performed using "SQL (Structured Query Language)".
+- Also known as "General Purpose Databases", they are currently the most widely used databases for building systems and applications.
+- Mainstream relational databases in the market included:
+  - MySQL
+  - PostgreSQL
+  - Oracle
+  - Microsoft SQL Server
+  - Cloud-based relational databases include:
+    - Amazon Aurora
+    - Google Cloud Spanner
+    - Azure SQL DB
+
+Due to rapid development and increasingly complex applications, building and maintaining large and complex databases can be resource-intensive and costly. This has led to the emergence of alternative database types, known as "Non-relational Databases".
+
+### Non-relational Databases (NoSQL Databases)
+
+NoSQL databases include:
+- Key-Value Databases
+- In-memory Databases
+- Graph Databases
+- Columnar Databases
+- Document Databases
+
+#### Key-Value Databases
+
+- Use a collection of key-value pairs, with keys serving as unique identifiers. The data type of the value can vary.
+- Each piece of data is independent, allowing for high distribution and horizontal scaling.
+- No need to perform any table relationships.
+- Common examples include: Google Big Table, Amazon Dynamo, etc.  
+
+#### In-memory Databases
+- Create distributed databases using memory to speed up data retrieval.
+- Suitable for applications requiring fast access, such as website caching, gaming, and banking transactions.
+- Common examples include: Redis, Memcached, etc.
+
+#### Document Databases
+- Store data in documents, typically in JSON or BSON format.
+- Each document can have a different structure, allowing for flexibility in data storage.
+- Document databases are often used for applications that require complex data structures.
+- Common examples include: MongoDB, CouchDB, etc.
+
+#### Columnar Databases
+- Store data in columns rather than rows, making them suitable for handling large-scale data analysis and queries.
+- This type of database is often used in big data analytics and machine learning applications.
+- Common examples include: Snowflake, MariaDB, BigQuery, etc.   
+
+#### Graph Databases
+- Specifically designed to store data in a graph structure, representing relationships between nodes.
+- This type of database is highly scalable and is suitable for complex relationships.
+- Common examples include: Neo4j, Amazon Neptune, etc. 
