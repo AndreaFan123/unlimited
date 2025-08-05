@@ -1,11 +1,4 @@
-"use client";
-
 import { useTranslations } from "next-intl";
-import dynamic from "next/dynamic";
-
-const GsapComponent = dynamic(() => import("../animation/Copy"), {
-  ssr: false,
-});
 
 export default function VolunteerProject() {
   const t = useTranslations("projects");
@@ -27,14 +20,12 @@ export default function VolunteerProject() {
             key={project.name}
             className="flex flex-col gap-1 border-b border-gray-400 border-dashed pb-3"
           >
-            <GsapComponent>
-              <div>
-                <h3 className="text-lg font-semibold">{project.name}</h3>
-                <p className="text-gray-600 dark:text-white block">
-                  {project.description}
-                </p>
-              </div>
-            </GsapComponent>
+            <div>
+              <h3 className="text-lg font-semibold">{project.name}</h3>
+              <p className="text-gray-600 dark:text-white block">
+                {project.description}
+              </p>
+            </div>
           </div>
         ))}
       </div>
