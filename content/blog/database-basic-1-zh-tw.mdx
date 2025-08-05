@@ -3,7 +3,7 @@ title: "資料庫基本概念一：資料庫的種類（類型）"
 description: 事件追蹤與監控的基本概念
 date: 2025-07-21
 tags: ["database", "sql", "non-relational", "nosql", "relational"]
-published: true
+published: false
 language: "zh_tw"
 ---
 
@@ -38,6 +38,7 @@ language: "zh_tw"
 ### 非關聯式資料庫 (Non-relational Database / NoSQL Database)
 
 NoSQL 資料庫模型包括：
+
 - 鍵值 (Key-Value DB)
 - 記憶體 (In-memory DB)
 - 圖學 (Graph DB)
@@ -51,25 +52,25 @@ NoSQL 資料庫模型包括：
 - 不需執行任何資料表關聯。
 - 常見的有：Google Big Table, Amazon Dynamo 等。
 
-#### 記憶體資料庫  (In-memory DB)
+#### 記憶體資料庫 (In-memory DB)
 
 - 利用記憶體建立分散式資料庫，加快讀取資料速度。
 - 適合網站快取，遊戲，銀行交易等需要快速存取的應用。
 - 常見的有：Redis, Memcached 等。
 
-#### 文件資料庫  (Document DB)
+#### 文件資料庫 (Document DB)
 
 - 用來儲存非結構性文件，例如 JSON、HTML、XML 等。
 - 文件資料庫的資料結構多半為樹狀結構，並且可以儲存多種資料型態。
 - 常用的有：MongoDB, CouchDB 等。
 
-#### 欄位資料庫  (Columnar DB)
+#### 欄位資料庫 (Columnar DB)
 
 - 將資料儲存在欄位中，而非列中，適合處理大量資料的分析和查詢。
 - 這種類型的資料庫通常用於大數據分析和機器學習分析。
 - 常見的有：Snowflake, MariaDB, BigQuery 等。
 
-#### 圖學資料庫  (Graph DB)
+#### 圖學資料庫 (Graph DB)
 
 - 專門運用圖學架構來儲存節點關係的資料架構，例如樹狀結構表示從屬關係或網狀結構來表示關係。
 - 此種類資料庫有強大的擴充力，關係越複雜的資料越適合這種類型。
@@ -78,4 +79,3 @@ NoSQL 資料庫模型包括：
   - 邊 (Edge)：節點之間的關係，例如朋友、購買等。
   - 屬性 (Property)：節點或邊的附加資訊，例如年齡、價格等。
 - 常見的有：Neo4j, Amazon Neptune 等。
-

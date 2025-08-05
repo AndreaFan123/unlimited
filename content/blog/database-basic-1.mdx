@@ -3,7 +3,7 @@ title: "Database Basics Part 1: Types of Databases"
 description: An introduction to the basic concepts of databases
 date: 2025-07-21
 tags: ["database", "sql", "non-relational", "nosql", "relational"]
-published: true
+published: false
 language: "en"
 ---
 
@@ -37,6 +37,7 @@ Due to rapid development and increasingly complex applications, building and mai
 ### Non-relational Databases (NoSQL Databases)
 
 NoSQL databases include:
+
 - Key-Value Databases
 - In-memory Databases
 - Graph Databases
@@ -48,25 +49,29 @@ NoSQL databases include:
 - Use a collection of key-value pairs, with keys serving as unique identifiers. The data type of the value can vary.
 - Each piece of data is independent, allowing for high distribution and horizontal scaling.
 - No need to perform any table relationships.
-- Common examples include: Google Big Table, Amazon Dynamo, etc.  
+- Common examples include: Google Big Table, Amazon Dynamo, etc.
 
 #### In-memory Databases
+
 - Create distributed databases using memory to speed up data retrieval.
 - Suitable for applications requiring fast access, such as website caching, gaming, and banking transactions.
 - Common examples include: Redis, Memcached, etc.
 
 #### Document Databases
+
 - Store data in documents, typically in JSON or BSON format.
 - Each document can have a different structure, allowing for flexibility in data storage.
 - Document databases are often used for applications that require complex data structures.
 - Common examples include: MongoDB, CouchDB, etc.
 
 #### Columnar Databases
+
 - Store data in columns rather than rows, making them suitable for handling large-scale data analysis and queries.
 - This type of database is often used in big data analytics and machine learning applications.
-- Common examples include: Snowflake, MariaDB, BigQuery, etc.   
+- Common examples include: Snowflake, MariaDB, BigQuery, etc.
 
 #### Graph Databases
+
 - Specifically designed to store data in a graph structure, representing relationships between nodes.
 - This type of database is highly scalable and is suitable for complex relationships.
-- Common examples include: Neo4j, Amazon Neptune, etc. 
+- Common examples include: Neo4j, Amazon Neptune, etc.
