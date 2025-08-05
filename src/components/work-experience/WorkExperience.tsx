@@ -1,4 +1,11 @@
+"use client";
+
 import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+
+const GsapComponent = dynamic(() => import("../animation/Copy"), {
+  ssr: false,
+});
 
 export default function WorkExperience() {
   const t = useTranslations("workExperience");
@@ -8,30 +15,35 @@ export default function WorkExperience() {
       position: t("shalom.title"),
       duration: t("shalom.duration"),
       description: t("shalom.description"),
+      delay: 0.1,
     },
     {
       company: t("ringus.company"),
       position: t("ringus.title"),
       duration: t("ringus.duration"),
       description: t("ringus.description"),
+      delay: 0.2,
     },
     {
       company: t("codapayment.company"),
       position: t("codapayment.title"),
       duration: t("codapayment.duration"),
       description: t("codapayment.description"),
+      delay: 0.3,
     },
     {
       company: t("elex.company"),
       position: t("elex.title"),
       duration: t("elex.duration"),
       description: t("elex.description"),
+      delay: 0.4,
     },
     {
       company: t("wargaming.company"),
       position: t("wargaming.title"),
       duration: t("wargaming.duration"),
       description: t("wargaming.description"),
+      delay: 0.5,
     },
   ];
   return (
@@ -55,16 +67,22 @@ export default function WorkExperience() {
               <div className="flex flex-col md:flex-row">
                 <div>
                   <div className="mb-3 relative">
-                    <h3 className="text-lg font-semibold">
-                      {experience.company} | {experience.position}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-300">
-                      {experience.duration}
-                    </p>
+                    <GsapComponent delay={experience.delay}>
+                      <h3 className="text-lg font-semibold">
+                        {experience.company} | {experience.position}
+                      </h3>
+                    </GsapComponent>
+                    <GsapComponent delay={experience.delay}>
+                      <p className="text-sm text-gray-500 dark:text-gray-300">
+                        {experience.duration}
+                      </p>
+                    </GsapComponent>
                   </div>
-                  <p className="text-base text-gray-700 dark:text-gray-300">
-                    {experience.description}
-                  </p>
+                  <GsapComponent delay={experience.delay}>
+                    <p className="text-base text-gray-700 dark:text-gray-300">
+                      {experience.description}
+                    </p>
+                  </GsapComponent>
                 </div>
               </div>
             </div>

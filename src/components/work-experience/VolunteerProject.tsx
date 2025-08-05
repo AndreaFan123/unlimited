@@ -1,24 +1,18 @@
+"use client";
+
 import { useTranslations } from "next-intl";
-import ROUTES from "@/src/constants/routes";
-import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const GsapComponent = dynamic(() => import("../animation/Copy"), {
+  ssr: false,
+});
 
 export default function VolunteerProject() {
   const t = useTranslations("projects");
-  const vulunteerProjects = [
-    {
-      name: t("mdn"),
-      description: t("mdnDescription"),
-      link: ROUTES.MDN,
-    },
+  const volunteerProjects = [
     {
       name: t("pyladies"),
       description: t("pyladiesDescription"),
-      link: ROUTES.PYLADIES,
-    },
-    {
-      name: t("coseeing"),
-      description: t("coseeingDescription"),
-      link: ROUTES.COSEEING,
     },
   ];
   return (
@@ -28,17 +22,20 @@ export default function VolunteerProject() {
         <span className="h-2 bg-indigo-300 dark:bg-indigo-600 absolute top-5 left-0 -z-10 w-full"></span>
       </h2>
       <div className="flex flex-col gap-9 ">
-        {vulunteerProjects.map((project) => (
-          <Link
+        {volunteerProjects.map((project) => (
+          <div
             key={project.name}
-            href={project.link}
             className="flex flex-col gap-1 border-b border-gray-400 border-dashed pb-3"
           >
-            <h3 className="text-lg font-semibold">{project.name}</h3>
-            <p className="text-gray-600 dark:text-white block">
-              {project.description}
-            </p>
-          </Link>
+            <GsapComponent>
+              <div>
+                <h3 className="text-lg font-semibold">{project.name}</h3>
+                <p className="text-gray-600 dark:text-white block">
+                  {project.description}
+                </p>
+              </div>
+            </GsapComponent>
+          </div>
         ))}
       </div>
     </>
