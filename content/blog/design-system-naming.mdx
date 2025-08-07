@@ -1,8 +1,77 @@
 ---
-title: "Design System"
-description: 學習設計系統第二篇，常見的命名規則。
-date: 2025-07-21
+title: "Common Naming Conventions in Design Systems"
+description: common naming conventions.
+date: 2025-08-04
 tags: ["design-system", "ui", "ux", "frontend"]
-published: false
+published: true
 language: "en"
 ---
+
+When practicing the creation of design systems, I also referenced some well-known companies like Google and GitLab. Below is a compilation of naming conventions they use for their own design systems.
+
+## What are Design Tokens?
+
+Google Material Design 3 mentions:
+
+> Design tokens are small, reusable design decisions that make up the visual style of a design system. Tokens use semantic names to replace static values.
+
+A Design token contains two elements:
+
+1. A code-like name, such as md.ref.palette.secondary90
+2. An associated value, such as: #E8DEF8
+
+### Naming Principles
+
+Principles exist to facilitate management. As companies grow larger and develop their own brands, design systems should follow the brand direction. This helps establish recognition and provides guidelines for various future projects within the company.
+Unfortunately, the companies I've worked for haven't been large enough, and they were all service providers (乙方), so I haven't had the opportunity to participate in establishing or maintaining design systems. Here are several principles:
+
+- **Consistency**: Naming style, such as whether the project must be all uppercase or all lowercase, using dashes or dots, etc.
+- **Descriptive**: Mainly for token descriptions that need to be more specific, such as `color.text.error` vs. `color.red1`. The former clearly tells engineers or designers that this token is used to indicate error red.
+- **Scalability**: Can support multiple states or modes.
+- **Avoid Confusion with CSS**: Taking the currently most popular TailwindCSS as an example, many class names are simplified, so when designing, avoid using the same naming conventions.
+
+### Common Rules
+
+| Level           | Meaning                                   | Examples                  |
+| --------------- | ----------------------------------------- | ------------------------- |
+| category        | Category (color, spacing, typography)     | color, font, radius       |
+| type            | Type (background, text, border)           | background, text, primary |
+| variant         | Variant (primary, secondary, danger)      | primary, secondary        |
+| state           | State (defaults, hover, active, disabled) | hover, active             |
+| mode (optional) | Light/dark mode                           | light, dark               |
+
+### Google Material Design Token Naming Convention
+
+For Google's Material Design, all token naming includes:
+
+1. Must start with the system name, such as **md** for Material Design.
+2. Token type abbreviations:
+
+- **ref**: Represents **reference tokens**, defining the most basic design values, such as: `md.ref.color.blue.50`
+- **sys**: Represents **system semantic tokens**, with semantic meaning describing usage, such as: `md.sys.text.primary`
+- **comp**: Represents **component-level tokens**, styles specific to a particular component, such as: `md.comp.primary.background`
+
+3. Token ending names usually describe the role or purpose of this token
+
+Tokens can point to different values based on a set of specific conditions. These conditions are called **contexts**, and the corresponding values based on different contexts are called **contextual values**.
+
+Common context examples include:
+
+- Device form (such as mobile, tablet, desktop)
+- Dark theme
+- Compact layout
+- Right-to-left text direction
+
+### Pajamas Design System Naming Convention
+
+Pajamas Design System is GitLab's brand guide. Their Design Tokens include three categories:
+
+- **Constants**: Define basic, raw design values (such as color codes, font sizes, spacing), not directly applied to components, but referenced by other tokens, such as: `color.natural.950`.
+- **Semantic**: Used to describe the "purpose" of tokens rather than specific styles, these are tokens actually applied during design and development, such as: `status.brand.background.color`
+- **Contextual**: Provide different values based on different contexts (such as dark mode, mobile devices, RTL layout), such as: `avatar.fallback.background.purple`
+
+### Conclusion
+
+Currently, unless you're like Google with your own design components, most naming convention patterns, besides basic definitions, almost always use semantics and context. A scalable and specifically descriptive token system not only makes it easier for designers and engineers to communicate because they can understand the meaning and purpose of tokens; besides improving the maintainability of design systems, because each token has a clear description and can be given different values based on context, it's also more scalable, because new tokens can be named according to existing naming conventions and can be given different values based on context.
+
+Looking forward to having the opportunity to participate in this development with a team in the future.

@@ -1,7 +1,7 @@
 ---
 title: "設計系統 (Design System) 常見的命名規則"
 description: 學習設計系統第二篇，常見的命名規則。
-date: 2025-07-21
+date: 2025-08-04
 tags: ["design-system", "ui", "ux", "frontend"]
 published: true
 language: "zh_tw"
@@ -17,7 +17,7 @@ Google Material Design 3 提到
 
 一個 Design token 會包含兩種元素：
 
-1. 類似程式碼的名字，例如 md.ref.palette.secondary90
+1. 類似程式碼的名字，例如 `md.ref.palette.secondary90`
 2. 關聯的值，例如：#E8DEF8
 
 ### 命名原則
@@ -26,19 +26,19 @@ Google Material Design 3 提到
 可惜目前待過的公司都不夠大，且都是乙方，因此沒能有機會參與建立或者維護設計系統。以下列出幾項原則：
 
 - 一致性：命名風格，例如專案必須全大寫或全小寫，用 dash 或是 dot 等等。
-- 描述性：主要對於 token 的描述需要更具體，例如 color.text.error vs. color.red1，前者很明顯就是告知工程師或是設計，這個 token 是用來標示錯誤用的紅色。
+- 描述性：主要對於 token 的描述需要更具體，例如 `color.text.error` vs. `color.red1`，前者很明顯就是告知工程師或是設計，這個 token 是用來標示錯誤用的紅色。
 - 可擴展性：可支援多狀態或多模式。
 - 避免與 CSS 混淆：以目前最流行的 TailwindCSS 來說，很多 class 名稱都經過簡化，因此在設計時要避免重覆使用相同命名。
 
 ### 常用的規則
 
-| 層級            | 意義                                    | 範例                      |
-| --------------- | --------------------------------------- | ------------------------- |
-| category        | 類別 (color, spacing, typography)       | color, font, radius       |
-| type            | 類型 (background, text, border)         | background, text, primary |
-| variant         | 變體 (primary, secondary, danger)       | primary, secondary        |
-| state           | 狀態 (default, hover, active, disabled) | hover, active             |
-| mode (optional) | light/dark 模式                         | light, dark               |
+| 層級            | 意義                                        | 範例                      |
+| --------------- | ------------------------------------------- | ------------------------- |
+| category        | 類別 (color, spacing, typography)           | color, font, radius       |
+| type            | 類型 (background, text, border)             | background, text, primary |
+| variant         | 變體 (primary, secondary, danger)           | primary, secondary        |
+| state           | 狀態 (**default**, hover, active, disabled) | hover, active             |
+| mode (optional) | light/dark 模式                             | light, dark               |
 
 ### Google Material Design token 命名規範
 
@@ -47,13 +47,13 @@ Google Material Design 3 提到
 1. 必須以系統名為開頭，例如 Material Design 就以 **md** 開頭。
 2. Token 類型的縮寫：
 
-- ref：代表 **Reference Token (參考值)**，定義最基本的設計數值，例如：md.ref.color.blue.50
-- sys：代表 **System Token (系統語意 token)**，具備語意化，描述用途，例如：md.sys.text.primary
-- comp：代表 **Component Token (元件層級 token)**，專屬某一個元件的樣式，例如：md.comp.primary.background
+- ref：代表 **參考值 (reference token)**，定義最基本的設計數值，例如：`md.ref.color.blue.50`
+- sys：代表 **系統語意 (system token)**，具備語意化，描述用途，例如：`md.sys.text.primary`
+- comp：代表 **元件層級 (component token)**，專屬某一個元件的樣式，例如：`md.comp.primary.background`
 
 3. Token 結尾的命名通常作為描述此 token 的角色或用途
 
-Token 可以根據一組特定條件指向不同的數值。這些條件稱為**情境（contexts）**，而根據不同情境所對應的值，稱為**情境值 (contextual values)**。
+Token 可以根據一組特定條件指向不同的數值。這些條件稱為**情境(contexts)**，而根據不同情境所對應的值，稱為**情境值 (contextual values)**。
 
 常見的情境範例包括：
 
@@ -63,3 +63,17 @@ Token 可以根據一組特定條件指向不同的數值。這些條件稱為**
 - 文字書寫方向為從右至左
 
 ### Pajamas Design system 命名規範
+
+Pajamas Design System 是 GitLab 的品牌指南。他們的 Design Token 包含三種類別：
+
+- 常數 (constant)：定義基本、原始的設計值（如顏色代碼、字體大小、間距），不直接套用在元件上，而是被其他 token 參考使用，例如：`color.natural.950`。
+- 語意 (semantic)：用來描述 token 的「用途」而非具體樣式，是設計和開發時實際會套用的 token，例如：`status.brand.background.color`
+- 情境 (contextual)：根據不同情境（如深色模式、行動裝置、RTL 排版）給予不同值，例如：`avatar.fallback.background.purple`
+
+### 結論
+
+就目前來看，除非像是 Google 一樣有自己產出的設計元件，大多數的命名規範的模式除了基本定義之外，語意跟情境是幾乎都會用上的，而一套可擴充且描述性具體的 token，
+不僅讓設計師和工程師更容易溝通，因為他們都能理解 token 的意義和用途；除了提高設計系統的可維護性，因為每個 token 都有明確的描述，並且可以根據情境給予不同的值之外，
+更能夠可擴展性，因為新的 token 可以根據現有的命名規範進行命名，並且可以根據情境給予不同的值。
+
+期待未來有機會可以與團隊參與這部分的開發。
