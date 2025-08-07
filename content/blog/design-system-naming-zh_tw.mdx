@@ -1,0 +1,65 @@
+---
+title: "設計系統 (Design System) 常見的命名規則"
+description: 學習設計系統第二篇，常見的命名規則。
+date: 2025-07-21
+tags: ["design-system", "ui", "ux", "frontend"]
+published: true
+language: "zh_tw"
+---
+
+在練習建立設計系統時，也參考了一些知名大廠，如 Google, GitLab，以下整理了一些針對他們自己的設計系統的命名規範。
+
+## 什麼是 Design token?
+
+Google Material Design 3 提到
+
+> Design tokens 是組成設計系統視覺風格的小型、可重複使用的設計決策。Tokens 會用具備語意的名稱來取代靜態的數值。
+
+一個 Design token 會包含兩種元素：
+
+1. 類似程式碼的名字，例如 md.ref.palette.secondary90
+2. 關聯的值，例如：#E8DEF8
+
+### 命名原則
+
+原則的存在是為了方便管理，如果公司越來越大，有自己的品牌，設計系統也應該跟著品牌走，如此一來可以建立識別度，對公司未來各種專案都有規範可以依循。
+可惜目前待過的公司都不夠大，且都是乙方，因此沒能有機會參與建立或者維護設計系統。以下列出幾項原則：
+
+- 一致性：命名風格，例如專案必須全大寫或全小寫，用 dash 或是 dot 等等。
+- 描述性：主要對於 token 的描述需要更具體，例如 color.text.error vs. color.red1，前者很明顯就是告知工程師或是設計，這個 token 是用來標示錯誤用的紅色。
+- 可擴展性：可支援多狀態或多模式。
+- 避免與 CSS 混淆：以目前最流行的 TailwindCSS 來說，很多 class 名稱都經過簡化，因此在設計時要避免重覆使用相同命名。
+
+### 常用的規則
+
+| 層級            | 意義                                    | 範例                      |
+| --------------- | --------------------------------------- | ------------------------- |
+| category        | 類別 (color, spacing, typography)       | color, font, radius       |
+| type            | 類型 (background, text, border)         | background, text, primary |
+| variant         | 變體 (primary, secondary, danger)       | primary, secondary        |
+| state           | 狀態 (default, hover, active, disabled) | hover, active             |
+| mode (optional) | light/dark 模式                         | light, dark               |
+
+### Google Material Design token 命名規範
+
+以 Google 開發的 Material Design 來說，所有的 token 命名都包含：
+
+1. 必須以系統名為開頭，例如 Material Design 就以 **md** 開頭。
+2. Token 類型的縮寫：
+
+- ref：代表 **Reference Token (參考值)**，定義最基本的設計數值，例如：md.ref.color.blue.50
+- sys：代表 **System Token (系統語意 token)**，具備語意化，描述用途，例如：md.sys.text.primary
+- comp：代表 **Component Token (元件層級 token)**，專屬某一個元件的樣式，例如：md.comp.primary.background
+
+3. Token 結尾的命名通常作為描述此 token 的角色或用途
+
+Token 可以根據一組特定條件指向不同的數值。這些條件稱為**情境（contexts）**，而根據不同情境所對應的值，稱為**情境值 (contextual values)**。
+
+常見的情境範例包括：
+
+- 裝置形式（如手機、平板、桌機）
+- 深色主題
+- 緊密排版
+- 文字書寫方向為從右至左
+
+### Pajamas Design system 命名規範
