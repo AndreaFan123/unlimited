@@ -1,11 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import dynamic from "next/dynamic";
-
-const GsapComponent = dynamic(() => import("../animation/Copy"), {
-  ssr: false,
-});
 
 export default function WorkExperience() {
   const t = useTranslations("workExperience");
@@ -67,22 +62,16 @@ export default function WorkExperience() {
               <div className="flex flex-col md:flex-row">
                 <div>
                   <div className="mb-3 relative">
-                    <GsapComponent delay={experience.delay}>
-                      <h3 className="text-lg font-semibold">
-                        {experience.company} | {experience.position}
-                      </h3>
-                    </GsapComponent>
-                    <GsapComponent delay={experience.delay}>
-                      <p className="text-sm text-gray-500 dark:text-gray-300">
-                        {experience.duration}
-                      </p>
-                    </GsapComponent>
-                  </div>
-                  <GsapComponent delay={experience.delay}>
-                    <p className="text-base text-gray-700 dark:text-gray-300">
-                      {experience.description}
+                    <h3 className="text-lg font-semibold">
+                      {experience.company} | {experience.position}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">
+                      {experience.duration}
                     </p>
-                  </GsapComponent>
+                  </div>
+                  <p className="text-base text-gray-700 dark:text-gray-300">
+                    {experience.description}
+                  </p>
                 </div>
               </div>
             </div>

@@ -3,12 +3,7 @@
 import { Eye, Github, Linkedin, Rss } from "lucide-react";
 import ExternalLink from "@/src/components/profile/ExternalLink";
 import ROUTES from "@/src/constants/routes";
-import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-
-const GsapComponent = dynamic(() => import("../animation/Copy"), {
-  ssr: false,
-});
 
 type PersonInfoProps = {
   name: string;
@@ -59,12 +54,8 @@ export default function PersonInfo({
       <div className="flex flex-col items-start gap-7 mb-11">
         <div className="text-gray-700 flex gap-2 items-center dark:text-gray-300 font-semibold">
           <div className="flex flex-col gap-2">
-            <GsapComponent>
-              <h5 className="text-5xl font-black">{name}</h5>
-            </GsapComponent>
-            <GsapComponent>
-              <span className="text-xl">{title}</span>
-            </GsapComponent>
+            <h5 className="text-5xl font-black">{name}</h5>
+            <span className="text-xl">{title}</span>
           </div>
         </div>
         <div className="flex gap-6">
@@ -80,12 +71,8 @@ export default function PersonInfo({
         </div>
       </div>
       <article className="text-base leading-relaxed font-light flex flex-col gap-3">
-        <GsapComponent delay={0.1}>
-          <p>{content_1}</p>
-        </GsapComponent>
-        <GsapComponent delay={0.2}>
-          <p>{content_2}</p>
-        </GsapComponent>
+        <p>{content_1}</p>
+        <p>{content_2}</p>
       </article>
     </div>
   );

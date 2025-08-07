@@ -1,11 +1,6 @@
 "use client";
 
 import { Link } from "@/src/i18n/navigation";
-import dynamic from "next/dynamic";
-
-const GsapComponent = dynamic(() => import("../animation/Copy"), {
-  ssr: false,
-});
 
 type ExternalLinkProps = {
   icon: JSX.Element;
@@ -21,15 +16,13 @@ export default function ExternalLink({
   ariaLabel,
 }: ExternalLinkProps) {
   return (
-    <GsapComponent>
-      <Link
-        href={url}
-        target={target}
-        aria-label={ariaLabel}
-        className="hoverEffect"
-      >
-        {icon}
-      </Link>
-    </GsapComponent>
+    <Link
+      href={url}
+      target={target}
+      aria-label={ariaLabel}
+      className="hoverEffect"
+    >
+      {icon}
+    </Link>
   );
 }

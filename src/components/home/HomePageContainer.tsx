@@ -4,13 +4,11 @@ import ProfileContainer from "../../components/profile/ProfileContainer";
 import PostContainer from "@/src/components/profile/PostContainer";
 import WorkExperience from "@/src/components/work-experience/WorkExperience";
 import VolunteerProject from "@/src/components/work-experience/VolunteerProject";
-// import { ReactLenis } from "lenis/react";
 import { Locales } from "@/src/i18n/request";
 
 export default function HomePageContainer({ locale }: { locale: Locales }) {
   return (
     <>
-      {/* <ReactLenis root> */}
       <div className="px-5 flex flex-col gap-28">
         <section className="mt-20 md:mt-28">
           <ProfileContainer />
@@ -25,7 +23,6 @@ export default function HomePageContainer({ locale }: { locale: Locales }) {
           <VolunteerProject />
         </section>
       </div>
-      {/* </ReactLenis> */}
     </>
   );
 }
