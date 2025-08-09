@@ -78,6 +78,12 @@ const components = {
       {children}
     </code>
   ),
+  th: ({ children }: { children: React.ReactNode; href: string }) => (
+    <th className="text-gray-700 dark:text-gray-300">{children}</th>
+  ),
+  td: ({ children }: { children: React.ReactNode; href: string }) => (
+    <td className="text-gray-700 dark:text-gray-300">{children}</td>
+  ),
 };
 
 type MdxProps = {
