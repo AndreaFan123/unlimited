@@ -1,0 +1,125 @@
+---
+title: "AWS 安全群組設定記錄"
+description: 學習 AWS 安全群組設定
+date: 2025-08-18
+tags: ["aws", "cloud"]
+published: true
+language: "zh_tw"
+---
+
+最近剛開始接案，主要協助朋友處理電商的網站相關問題，因近期發生架構改變之後，但仍有奇怪的請求打到 EC2，此篇是查詢安全群組設定的一些記錄。
+
+## 架構調整
+
+原有的架構是基於 Lambda，但因為 Lambda 本身在沒有流量的狀況下會休眠，一但有流量後會需要經過一點時間啟動，就會影響搜索引擎爬蟲，過慢的回應會影響 SEO 排名。
+最前面一樣由 CloudFront 防禦。
+
+```markdown
+AWS CloudFront
+AWS API Gateway
+AWS Lambda
+```
+
+後來我們將架構轉為如下，一樣最前面由 CloudFront，由 EB(Elastic Beanstalk) 管理 LoadBalancer 和 EC2 資源。
+
+```markdown
+AWS CloudFront
+AWS Elastic Beanstalk
+AWS LoadBalancer
+AWS EC2
+```
+
+### 目前遇到的問題
+
+由於會遭受 DDOS 攻擊，因此先暫時轉回去 Lambda 架構，我的任務則是確認 CloudFront, LoadBalancer 和 EB 中間是否有什麼遺漏的部分，
+導致直接打到 EC2，此篇是查詢安全群組設定的一些記錄。
+
+### 檢查安全群組(Security Group)
+
+我看到有幾組不同的安全群組，Inbound Rules 均是開放所有流量的 `0.0.0.0/0` 的設定，後來將其中一個的 Inbound Rules 依舊是 `0.0.0.0/0`，
+並且將這個安全群組關聯到 LoadBalancer，而 EC2 的 Inbound Rules 則關聯到 LoadBalancer 這組，EB 的安全群組也是關聯到 LoadBalancer，例如：
+
+```markdown
+<!-- LoadBalancer -->
+
+security group id 1
+-> http | 80 | 0.0.0.0/0
+-> https | 43 | 0.0.0.0/0
+-> https | 43 | CloudFront prefix list
+
+<!-- EC2 -->
+
+security group id 2
+-> http | 80 | 1
+-> https| 43 | 1
+
+<!-- Elastic Beanstalk configuration 內-->
+
+security group -> 1
+```
+
+### 新增 CloudFront Function
+
+由於目前我們沒有開 WAF，因此就防禦效果來說不是那麼理想，但 Function 是 CF 提供的一個基本的功能，可以在裡面做檢查。
+因此在 Function 內，加入了一些基本的資安過濾，例如檢查過長的 URL，或者奇怪的檔名，以及封鎖的 IP 名單等等。
+
+```markdown
+Internet → CloudFront → Function 過濾 → LoadBalancer (限制來源) → EC2
+```
+
+通過 Function 的檢查後，再導入到 LoadBalancer 的流程如下：
+
+#### 第一階段：到達 LoadBalancer
+
+```markdown
+Function 通過 → CloudFront 轉發 → LoadBalancer 安全群組檢查
+```
+
+- LoadBalancer SG 檢查：
+
+  - 驗證請求來源是否為 CloudFront IP 範圍
+  - HTTPS: 檢查 CloudFront prefix list
+  - HTTP: 檢查指定的 CloudFront CIDR 範圍
+
+#### 第二階段：LoadBalancer 處理
+
+```markdown
+SG 通過 → LoadBalancer 接收 → 健康檢查 → 選擇目標 EC2
+```
+
+- LoadBalancer 功能：
+
+  - 執行健康檢查確認 EC2 狀態
+  - 根據負載均衡算法選擇實例
+  - 維持 session sticky (如有設定)
+
+#### 第三階段：到達 EC2
+
+```markdown
+LoadBalancer 轉發 → EC2 安全群組檢查 → EC2 接收請求
+```
+
+- EC2 SG 檢查：
+  - 驗證來源是否為 LoadBalancer 安全群組
+  - 只允許來自 ALB 的流量通過
+
+### 總結
+
+以目前的架構來說，防禦的層次如下：
+
+1. 第一層：CloudFront Functions，這是最前端的防線，它可以在流量到達你的伺服器之前，根據程式邏輯進行過濾。
+
+2. 第二層：CloudFront 邊緣節點，所有正常的流量都會在這裡被快取，減少對後端伺服器的負擔。
+
+3. 第三層：Load Balancer 安全群組，確保只有經過 CloudFront 的流量，才能進入伺服器。所有直接攻擊 LoadBalancer 的請求會被拒絕。
+
+4. 第四層：EC2/EB 安全群組，只允許來自 LoadBalancer 的流量，確保 EC2 Instances 不會被直接訪問。
+
+## 為什麼要分層安全群組？
+
+通過建立多層安全群組，我們建立了一個深度防禦策略：
+
+1. 外部流量：必須首先通過 CloudFront
+2. CloudFront 流量：在到達 LoadBalancer 之前必須經過驗證
+3. LoadBalancer 流量：在到達 EC2 之前必須經過驗證
+4. EC2 實例：受到保護，無法直接從網路訪問

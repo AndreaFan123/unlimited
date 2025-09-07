@@ -1,0 +1,121 @@
+---
+title: "AWS Security Group Configuration Notes"
+description: Learning AWS Security Group Configuration
+date: 2025-08-18
+tags: ["aws", "cloud"]
+published: true
+language: "en"
+---
+
+I recently started freelancing, mainly helping friends with e-commerce website issues. After recent architectural changes, we were still receiving strange requests hitting our EC2 instances. This post documents my investigation into security group configurations.
+
+## Architecture Changes
+
+The original architecture was based on Lambda, but since Lambda goes to sleep when there's no traffic, it takes time to wake up when traffic arrives. This affects search engine crawlers, and slow responses can impact SEO rankings.
+CloudFront was still used as the first line of defense.
+
+```markdown
+AWS CloudFront
+AWS API Gateway
+AWS Lambda
+```
+
+Later, we changed the architecture to the following, still using CloudFront at the front, with EB (Elastic Beanstalk) managing LoadBalancer and EC2 resources.
+
+```markdown
+AWS CloudFront
+AWS Elastic Beanstalk
+AWS LoadBalancer
+AWS EC2
+```
+
+### Current Issues
+
+Due to DDoS attacks, we temporarily switched back to the Lambda architecture. My task was to verify if there were any missing configurations between CloudFront, LoadBalancer, and EB that might allow direct access to EC2.
+
+### Checking Security Groups
+
+I found several different security groups with Inbound Rules all set to allow all traffic from `0.0.0.0/0`. Later, I kept one security group's Inbound Rules as `0.0.0.0/0` and CloudFront Prefix list and associated this security group with the LoadBalancer. The EC2's Inbound Rules were then associated with the LoadBalancer group, and EB's security group was also associated with the LoadBalancer. For example:
+
+```markdown
+<!-- LoadBalancer -->
+
+security group id 1
+-> http | 80 | 0.0.0.0/0
+-> https | 443 | 0.0.0.0/0
+-> https | 443 | CloudFront prefix list
+
+<!-- EC2 -->
+
+security group id 2
+-> http | 80 | 1
+-> https | 443 | 1
+
+<!-- Elastic Beanstalk configuration -->
+
+security group -> 1
+```
+
+### Adding CloudFront Function
+
+Since we don't currently have WAF enabled, the defense effectiveness isn't ideal. However, CloudFront Functions is a basic feature provided by CF that allows for filtering.
+I added some basic security filtering in the Function, such as checking for overly long URLs, suspicious filenames, blocked IP lists and so on.
+
+```markdown
+Internet → CloudFront → Function filtering → LoadBalancer (restricted source) → EC2
+```
+
+After passing through the Function's checks, the flow to LoadBalancer is as follows:
+
+#### Stage 1: Reaching LoadBalancer
+
+```markdown
+Function passed → CloudFront forwarding → LoadBalancer security group check
+```
+
+- LoadBalancer SG check:
+  - Verify request source is from CloudFront IP range
+  - HTTPS: Check CloudFront prefix list
+  - HTTP: Check specified CloudFront CIDR range
+
+#### Stage 2: LoadBalancer Processing
+
+```markdown
+SG passed → LoadBalancer receives → Health check → Select target EC2
+```
+
+- LoadBalancer functions:
+  - Perform health checks to confirm EC2 status
+  - Select instances based on load balancing algorithm
+  - Maintain session sticky (if configured)
+
+#### Stage 3: Reaching EC2
+
+```markdown
+LoadBalancer forwarding → EC2 security group check → EC2 receives request
+```
+
+- EC2 SG check:
+  - Verify source is from LoadBalancer security group
+  - Only allow traffic from ALB
+
+### Summary
+
+With the current architecture, the defense layers are as follows:
+
+1. First Layer: CloudFront Functions - This is the frontmost defense line. It can filter traffic based on program logic before it reaches your server.
+
+2. Second Layer: CloudFront Edge Nodes - All normal traffic is cached here, reducing the load on backend servers.
+
+3. Third Layer: Load Balancer Security Group - Ensures only traffic that has passed through CloudFront can enter the server. All direct attacks on LoadBalancer are rejected.
+
+4. Fourth Layer: EC2/EB Security Group - Only allows traffic from LoadBalancer, ensuring EC2 instances cannot be accessed directly.
+
+Why Layer Security Groups?
+
+By creating multiple layers of security groups, we create a defense-in-depth strategy:
+
+1. External traffic: must first pass through CloudFront
+2. CloudFront traffic: must be verified before reaching LoadBalancer
+3. LoadBalancer traffic: must be verified before reaching EC2
+4. EC2 instances: are protected from direct internet access
