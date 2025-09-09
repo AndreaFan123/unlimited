@@ -12,7 +12,7 @@ export default function NotFound() {
           404
         </div>
       </h2>
-      <p>Could not find requested resource</p>
+      <p>{t("notFoundDescription")}</p>
       <Link href={ROUTES.HOME} className="font-bold underline">
         {t("returnHome")}
       </Link>
