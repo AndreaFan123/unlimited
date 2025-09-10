@@ -1,0 +1,90 @@
+---
+title: "Functional Programming Part 2 - Identifying Actions, Calculations and Data"
+description: This post records how to identify actions, calculations and data in functional programming
+date: 2025-09-07
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "en"
+---
+
+A brief review of the previous post [Functional Programming Part 1 - Concepts](/en/blog/functional-programming-part-1-concept), functional programming categorizes programs into three major types:
+
+**Actions**
+
+- Produce side effects, most affected by time factors, hardest to control
+- Also called "impure functions"
+- Examples: sending emails, reading data from database
+
+**Calculations**
+
+- Time-independent, easier to control
+- Transform input to output through computation
+- Also called "pure functions" or "mathematical functions"
+- Examples: finding maximum value, validating email address format
+
+**Data**
+
+- Passive elements that need to be interpreted, factual records about various events
+- Examples: user input addresses or amounts read from API
+
+## ACD in Daily Life
+
+Taking grocery shopping as an example, we can roughly categorize these actions:
+
+- Check the refrigerator
+- Drive to the store
+- Buy needed groceries
+- Drive home
+
+At first glance, everything seems like actions, but actually each action has parts that need to consider calculations and data. If we carefully break down the above actions, we can find corresponding calculations and data.
+
+### Breaking Down Actions to Find Calculations and Data
+
+#### Check the Refrigerator
+
+What we need to do is see what items are currently in the refrigerator, so we need to know how much vegetables, meat, etc. we have (Calculations) and list current inventory (Data).
+
+#### Drive to the Store
+
+This action basically requires a lot of data, but it's not very related to shopping unless we're designing for driving or route optimization, then we would need things like:
+store location, routes, or fuel consumption.
+
+#### Buy Needed Groceries
+
+When we check the refrigerator, we get current inventory through calculations. When shopping, we need to decide how much to buy, and how much to buy can be calculated through "current stock" to generate a shopping list.
+So we have three data, one calculation and one action:
+
+- Action
+  - Shop according to shopping list
+- Calculation
+  - Needed ingredients - current stock
+- Data
+  - Current inventory
+  - Needed ingredients
+  - Shopping list
+
+```markdown
+Shopping List(Data) = Needed Ingredients(Data) - Current Stock(Data)
+```
+
+#### Drive Home
+
+Driving home is similar to driving to the store - there are also some calculations and data involved, but they're not directly related to this example.
+
+### Data
+
+Data is factual records about events. In JS terms, it's building data through data structures like numbers, strings, arrays, etc. When we choose a data structure, this structure needs to reflect information in the Domain. Here Domain refers to messages or knowledge related to the target/problem. For a shopping list, order isn't very important, so the chosen data structure doesn't need to care much about order. Conversely, if it's an instruction manual, order might be very important during assembly, then this data structure must be able to preserve its order.
+
+Functional programming achieves data immutability through the following methods:
+
+1. Copy-on-write: Copy before modifying data.
+2. Defensive copying: Copy data that needs to be preserved.
+
+### Conclusion
+
+The above is just using life examples to get familiar with how to distinguish actions, calculations and data. The above shopping example definitely has many more details that can be further categorized:
+
+- Actions may contain calculations and data. If we can clearly separate the code we write, it will be more convenient for us to manage.
+- Calculations may also be composed of other calculations and data. Functional programming hopes to maintain pure functions, so each calculation should do its own job well, aiming for one input one output.
+  - Calculations may be easily overlooked. If we can develop the habit of asking ourselves "what needs decision making" or what needs to be obtained through data.
+- Data is just data. If we can first identify this fixed factor in a large action and calculation, it will be easier to handle.

@@ -37,14 +37,11 @@ export default function BlogPage({ searchParams, params }: BlogPageProps) {
       <section className="flex flex-col gap-4 pb-10">
         <h1 className="text-4xl relative w-fit font-extrabold text-gray-700 dark:text-gray-300">
           {t("blog")}
-          <span className="h-2 bg-yellow-400 absolute top-8 left-0 -z-10 w-full"></span>
+          <span className="h-2 bg-yellow-400 dark:bg-orange-500 absolute top-8 left-0 -z-10 w-full"></span>
         </h1>
         <p>{t("description")} 🚀</p>
       </section>
       <section className="flex flex-col gap-4 my-4">
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">
-          {t("feature")}
-        </h2>
         {displayPosts?.length > 0 ? (
           <ul className="flex flex-col gap-10">
             {displayPosts.map((post) => (

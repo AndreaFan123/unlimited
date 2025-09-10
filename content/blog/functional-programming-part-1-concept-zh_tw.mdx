@@ -1,0 +1,162 @@
+---
+title: "函式程式設計 Part 1 - FP 概念"
+description: 學習如何使用函式程式設計重構程式碼
+date: 2025-09-03
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "zh_tw"
+---
+
+這些是我閱讀《[Simplicity: 簡約的軟體開發思維](https://www.amazon.com/Grokking-Simplicity-software-functional-thinking/dp/1617296201)》這本書的讀書筆記。
+
+## 程式設計典範
+
+主要有兩種程式設計典範：
+
+- 物件導向程式設計 (Object-Oriented Programming, OOP)
+- 函數式程式設計 (Functional Programming, FP)
+
+### 特性
+
+- **物件導向程式設計**：專注於將軟體建模為物件的集合
+- **函數式程式設計**：將計算視為數學函數的求值過程
+
+### 函數式程式設計的「經典」定義
+
+- 強調使用數學函數，並避免副作用
+- 依賴純函數，不會產生副作用
+
+現在讓我們來談談這兩個概念：
+
+#### 副作用 (Side Effects)
+
+副作用指的是函數除了回傳值之外所執行的任何行為。
+
+#### 純函數 (Pure Functions)
+
+純函數在給定相同輸入時總是產生相同的輸出，我們稱之為「數學函數」。
+
+## 現實情況
+
+在現實世界中，副作用是必要的——它們是我們使用軟體的主要原因。畢竟，我們希望程式能夠與外部世界互動，無論是顯示輸出、儲存檔案，還是發送網路請求。因此，雖然函數式程式設計強調最小化副作用，但並不會完全消除它們——只是更謹慎地管理它們。
+
+## 動作、計算和資料
+
+學習函數式程式設計時，我們需要學會區分三個核心概念：
+
+- **動作 (Actions)**：代表涉及副作用的操作，它會受到時間或執行次數的影響，例如輸入/輸出操作、網路請求或資料庫互動。這些是我們程式中與外部世界互動的部分。
+
+- **計算 (Calculations)**：不產生副作用的純函數，用於轉換資料。它們在相同輸入下始終產生相同輸出，使其可預測且易於測試。
+
+- **資料 (Data)**：由不可變的資料結構組成，包含資訊但沒有行為。與物件導向程式設計中的物件不同，函數式程式設計中的資料結構是被動的資訊容器，沒有附加的方法或操作。
+
+讓我們來看一些範例：
+
+### 範例 1：
+
+```ts
+{
+  firstName: "Eric",
+  age: 18,
+};
+
+sendEmailTo(to, from, subject, body);
+sum(numbers);
+saveUserDB(user);
+string_length(str)
+getCurrentTime()
+[3, "hello", 5, 8]
+```
+
+```ts
+// 動作
+sendEmailTo(to, from, subject, body);
+saveUserDB(user);
+getCurrentTime();
+
+// 計算
+sum(numbers);
+string_length(str);
+
+// 資料
+{
+  firstName: "Eric",
+  age: 18,
+};
+[3, "hello", 5, 8]
+```
+
+### 範例 2：
+
+```ts
+// 哪些是動作、計算和資料？
+
+type WeatherStation = {
+    id: string
+    location: {
+        latitude: number
+        longitude: number
+    }
+    lastReading: number
+    status: 'active' | 'offline'
+}
+
+calculateAverageTemperature(num);
+saveUserProfile(id:string, name:string, email:string)
+filterActiveStations(stations:WeatherStation[])
+fetchLatestReadings()
+convertToFahrenheit(celsiusTemp:number)
+logUserActivity(id:string, action:string)
+```
+
+```ts
+// 動作
+saveUserProfile(id:string, name:string, email:string)
+logUserActivity(id:string, action:string)
+
+// 計算
+calculateAverageTemperature(num);
+filterActiveStations(stations:WeatherStation[])
+fetchLatestReadings()
+convertToFahrenheit(celsiusTemp:number)
+
+// 資料
+WeatherStation
+```
+
+## 總結
+
+- **兩種程式設計典範**：OOP 和 FP
+- **函數式程式設計的經典定義**：
+  - 使用數學函數並避免副作用
+  - 依賴純函數
+- **副作用的作用**：
+  - 修改本地範圍外的狀態
+  - 函數除了回傳值之外執行的任何行為
+- **純函數**：
+  - 在給定相同輸入時產生相同輸出
+  - 也稱為「數學函數」
+- **學習函數式程式設計的三個核心概念**：
+  - 動作
+  - 計算
+  - 資料
+
+## 學習重點
+
+### 為什麼要學習這些概念？
+
+理解動作、計算和資料的區別對於寫出更好的程式碼非常重要：
+
+1. **可測試性**：純函數（計算）更容易測試，因為它們的行為是可預測的
+2. **可讀性**：清楚地區分哪些操作會影響外部狀態，哪些不會
+3. **除錯**：當問題出現時，你可以更容易地定位是動作還是計算出了問題
+4. **重構**：理解這些概念可以幫助你安全地重構程式碼
+
+### 實際應用建議
+
+- **盡可能使用純函數**：將複雜的邏輯分解為純函數
+- **隔離副作用**：將副作用集中在特定的函數中
+- **優先使用不可變資料**：避免直接修改資料結構
+- **組合小函數**：將複雜的功能分解為小的、可組合的函數
+
+這些概念是函數式程式設計的基礎，掌握它們將幫助你寫出更清晰、更可維護的程式碼。

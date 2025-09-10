@@ -25,7 +25,7 @@ export default function Post({
       <div className="flex flex-col w-full md:w-[70%]">
         <Link
           href={href ? href : slug}
-          className="text-xl font-semibold pb-2 text-[#5350a6] dark:text-[#a19efc] hover:text-orange-500 transition-all duration-300"
+          className="text-xl w-fit font-semibold pb-2 text-[#5350a6] dark:text-[#a19efc] hover:text-orange-500 transition-all duration-300"
         >
           {title}
         </Link>
