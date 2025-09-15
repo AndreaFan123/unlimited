@@ -17,7 +17,7 @@
     "senryo": "Food Delivery Platform",
     "unlimitedBlog": "Personal Portfolio and Blog",
     "pyladies": "PyLadies (International Python Community)",
-    "pyladiesDescription": "PyLadies Taiwan Website maintainer",
+    "pyladiesDescription": "PyLadies Taiwan Website maintainer and team leader",
     "mdn": "MDN (Mozilla Developer Network)",
     "mdnDescription": "MDN Web Docs zh_TW Translator",
     "coseeing": "Taiwan Digital Accessibility Organization",
@@ -31,11 +31,17 @@
   },
   "workExperience": {
     "workExperience": "Work Experience",
+    "freelance": {
+      "company": "Dezctop (Taiwan's leading computer desk and equipment supplier)",
+      "title": "Frontend Developer (Freelance)",
+      "duration": "2025-08-01 ~ Present",
+      "description": "Used Nuxt.js、scss、TypeScript to maintain e-commerce website UI/frontend logic and its management system, handling AWS deployment and security-related matters."
+    },
     "shalom": {
       "company": "Shalom (Taiwan's top PMS platform)",
       "title": "Full-stack Developer",
-      "duration": "2025-04-01 ~ Present",
-      "description": "Revamped and developed cloud-based self check-in system and IOT."
+      "duration": "2025-04-01 ~ 2025-07-01",
+      "description": "Used React.js、Next.js、TailwindCSS、TypeScript to revamp and develop cloud-based self check-in system and IOT."
     },
     "ringus": {
       "company": "Ringus-solution",

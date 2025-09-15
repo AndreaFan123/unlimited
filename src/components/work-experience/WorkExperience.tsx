@@ -6,39 +6,40 @@ export default function WorkExperience() {
   const t = useTranslations("workExperience");
   const workExperience = [
     {
+      company: t("freelance.company"),
+      position: t("freelance.title"),
+      duration: t("freelance.duration"),
+      description: t("freelance.description"),
+    },
+    {
       company: t("shalom.company"),
       position: t("shalom.title"),
       duration: t("shalom.duration"),
       description: t("shalom.description"),
-      delay: 0.1,
     },
     {
       company: t("ringus.company"),
       position: t("ringus.title"),
       duration: t("ringus.duration"),
       description: t("ringus.description"),
-      delay: 0.2,
     },
     {
       company: t("codapayment.company"),
       position: t("codapayment.title"),
       duration: t("codapayment.duration"),
       description: t("codapayment.description"),
-      delay: 0.3,
     },
     {
       company: t("elex.company"),
       position: t("elex.title"),
       duration: t("elex.duration"),
       description: t("elex.description"),
-      delay: 0.4,
     },
     {
       company: t("wargaming.company"),
       position: t("wargaming.title"),
       duration: t("wargaming.duration"),
       description: t("wargaming.description"),
-      delay: 0.5,
     },
   ];
   return (

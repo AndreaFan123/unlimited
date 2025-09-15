@@ -18,7 +18,7 @@ export default async function Home({
   const { locale } = await params;
 
   return (
-    <main className="w-full h-screen sm:max-w-full md:max-w-[1200px] mx-auto">
+    <main className="w-full min-h-screen sm:max-w-full md:max-w-[1200px] mx-auto">
       <HomePageContainer locale={locale} />
     </main>
   );
