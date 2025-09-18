@@ -1,0 +1,130 @@
+---
+title: "函式程式設計 Part 2 - 實作優惠碼電子報"
+description: 透過切合實務的例子練習函式思維
+date: 2025-09-017
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "zh_tw"
+---
+
+上一篇著重在練習分辨「動作」、「計算」和「資料」，可以參考這一篇 [函式程式設計 Part 1 - 分辨動作、計算和資料](/en/blog/functional-programming-part-2-identify-action-calculations-data-zh_tw)，
+今天透過書裡面的實務案例加強對動作、計算和資料的分辨和思考。
+
+## 實務情境
+
+- 產品性質：優惠碼資訊網站
+- 使用者流程：輸入信箱，平台將會每週發送優惠碼電子報
+- 行銷部門策略：每推薦 10 名好友，推薦人以及朋友會獲得折扣更好的優惠碼
+- 技術分析(資料庫)：
+  - 訂閱 Email 資料表：紀錄使用者信箱以及推薦次數
+  - 優惠碼資料表：區分等級：best, good, bad
+    - 推薦數最高者會獲得 best 優惠碼
+    - 其餘則獲得 good 優惠碼資料表
+    - Bad 為備用優惠碼
+
+#### 訂閱 Email 資料表
+
+| email             | re_count |
+| ----------------- | -------- |
+| alice@example.com | 3        |
+| bob@test.com      | 0        |
+| carol@demo.org    | 7        |
+| david@sample.net  | 12       |
+| emma@company.com  | 1        |
+| frank@business.io | 5        |
+| grace@startup.co  | 9        |
+| henry@tech.org    | 12       |
+| iris@digital.com  | 8        |
+| jack@online.net   | 4        |
+
+#### 優惠碼資料表
+
+| coupon     | rank |
+| ---------- | ---- |
+| WELCOME10  | bad  |
+| FRIEND20   | good |
+| VIP30      | good |
+| PREMIUM40  | good |
+| ELITE50    | best |
+| GOLD60     | best |
+| PLATINUM70 | best |
+| DIAMOND80  | best |
+| MASTER90   | best |
+| LEGEND100  | best |
+
+#### 針對這個行銷策略，列出需要處理的事項以及區分它們的 ACD
+
+| 事項                       | ACD         |
+| -------------------------- | ----------- |
+| 讀取資料庫的使用者         | Action      |
+| 讀取資料庫的優惠碼         | Action      |
+| 每個優惠碼的等級           | Data        |
+| 單筆使用者訂閱紀錄         | Data        |
+| 決定使用者收到的優惠碼等級 | calculation |
+| 單筆優惠碼記錄清單         | Data        |
+| 使用者訂閱記錄清單         | Data        |
+| 優惠碼記錄清單             | Data        |
+| 推薦次數                   | Data        |
+| 寄送電子報                 | Action      |
+| 電子報標題                 | Data        |
+| 電子郵件地址               | Data        |
+| 電子報內容                 | Data        |
+
+接下來可以一步一步拆解，大致流程如下：
+
+#### 讀取資料庫的訂閱者進而產生訂閱者清單和讀取資料庫的優惠碼進而產生優惠碼清單
+
+<Image
+  src="/static/read-subscriber.png"
+  alt="read subscriber from DB and return a list of subscriber 從資料庫讀取訂閱者資訊進而產生訂閱者清單"
+  width={1000}
+  height={1000}
+/>
+<Image
+  src="/static/read-coupon.png"
+  alt="read coupons from DB and return a list of coupons  讀取資料庫的優惠碼進而產生優惠碼清單"
+  width={1000}
+  height={1000}
+/>
+
+#### 產生電子報寄送清單
+
+<Image
+  src="/static/newsletter-sending-list.png"
+  alt="from subscriber and coupons list, then decide newsletter content and a sending list  產生電子報寄送清單"
+  width={1000}
+  height={1000}
+/>
+
+#### 等等，為什麼「決定電子報內容」會視為一種計算？
+
+在上述的行銷策略中，有看到電子報的內容會依照訂閱者的推薦數來決定會拿到 best 或者 good 的優惠碼，而這一個決策就會有兩種小計算：
+
+- 透過優惠碼清單區分出 best 跟 good 優惠碼
+- 透過訂閱者清單以及推薦次數區分優惠碼等級清單
+
+透過以上才能夠決定電子報內容：
+
+- 訂閱者的優惠碼等級如果是 Best，內容以 Best 優惠碼為主
+- 訂閱者的優惠碼等級如果是 Good，內容以 Good 優惠碼為主
+
+<Image
+  src="/static/newsletter-content.png"
+  alt="from subscriber and coupons list, then decide newsletter content and a sending list  產生電子報寄送清單"
+  width={1000}
+  height={1000}
+/>
+
+基於上述，一個電子報內容，就會需要以下幾種資料：
+
+- 訂閱者資訊
+  - 優惠碼等級
+- 優惠碼清單
+  - Best 優惠碼清單
+  - good 優惠碼清單
+
+### 結論
+
+在實作一些功能的時候，若能嘗試寫下來相關的細節先區分出 ACD，再從其中的 A 或 C 思考有無拆分的可能，若能作為計算會是較易於測試。
+對我來說若拆分得太細，其實並不能說好管理，但可能是我經驗不夠，因此對於什麼時候要拆，拆到什麼程度還沒有足夠的掌握度，會開始讀這本
+的原因亦是希望自己能從中學習到 FP 的應用和思維，希望可以幫助我在思考時有一個可參考的依據。

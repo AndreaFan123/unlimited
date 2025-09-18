@@ -1,0 +1,129 @@
+---
+title: "Functional Programming Part 3 - Implementing Coupon Newsletter System"
+description: Practice functional thinking through practical examples
+date: 2025-09-17
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "en"
+---
+
+The previous post focused on practicing how to distinguish "Actions", "Calculations" and "Data". You can refer to this post [Functional Programming Part 2 - Identifying Actions, Calculations and Data](/en/blog/functional-programming-part-2-identify-action-calculations-data),
+today we'll strengthen our understanding and thinking about actions, calculations and data through practical cases from the book.
+
+## Practical Scenario
+
+- Product nature: Coupon information website
+- User flow: Enter email, platform will send weekly coupon newsletter
+- Marketing strategy: For every 10 friends recommended, both the referrer and friends will receive better discount coupons
+- Technical analysis (database):
+  - Email subscription table: Records user email and referral count
+  - Coupon table: Categorized by level: best, good, bad
+    - Users with highest referral count will receive best coupons
+    - Others will receive good coupon table
+    - Bad coupons are backup coupons
+
+#### Email Subscription Table
+
+| email             | re_count |
+| ----------------- | -------- |
+| alice@example.com | 3        |
+| bob@test.com      | 0        |
+| carol@demo.org    | 7        |
+| david@sample.net  | 12       |
+| emma@company.com  | 1        |
+| frank@business.io | 5        |
+| grace@startup.co  | 9        |
+| henry@tech.org    | 12       |
+| iris@digital.com  | 8        |
+| jack@online.net   | 4        |
+
+#### Coupon Table
+
+| coupon     | rank |
+| ---------- | ---- |
+| WELCOME10  | bad  |
+| FRIEND20   | good |
+| VIP30      | good |
+| PREMIUM40  | good |
+| ELITE50    | best |
+| GOLD60     | best |
+| PLATINUM70 | best |
+| DIAMOND80  | best |
+| MASTER90   | best |
+| LEGEND100  | best |
+
+#### For this marketing strategy, list the items that need to be handled and categorize their ACD
+
+| Item                            | ACD         |
+| ------------------------------- | ----------- |
+| Read users from database        | Action      |
+| Read coupons from database      | Action      |
+| Each coupon's level             | Data        |
+| Single user subscription record | Data        |
+| Decide user's coupon level      | Calculation |
+| Single coupon record list       | Data        |
+| User subscription record list   | Data        |
+| Coupon record list              | Data        |
+| Referral count                  | Data        |
+| Send newsletter                 | Action      |
+| Newsletter title                | Data        |
+| Email address                   | Data        |
+| Newsletter content              | Data        |
+
+Next, we can break it down step by step, the general process is as follows:
+
+#### Read subscribers from database to generate subscriber list and read coupons from database to generate coupon list
+
+<Image
+  src="/static/read-subscriber.png"
+  alt="read subscriber from DB and return a list of subscriber 從資料庫讀取訂閱者資訊進而產生訂閱者清單"
+  width={1000}
+  height={1000}
+/>
+<Image
+  src="/static/read-coupon.png"
+  alt="read coupons from DB and return a list of coupons  讀取資料庫的優惠碼進而產生優惠碼清單"
+  width={1000}
+  height={1000}
+/>
+
+#### Generate newsletter sending list
+
+<Image
+  src="/static/newsletter-sending-list.png"
+  alt="from subscriber and coupons list, then decide newsletter content and a sending list  產生電子報寄送清單"
+  width={1000}
+  height={1000}
+/>
+
+#### Wait, why is "deciding newsletter content" considered a calculation?
+
+In the above marketing strategy, we can see that the newsletter content will be determined based on the subscriber's referral count to decide whether they get best or good coupons. This decision involves two small calculations:
+
+- Distinguish best and good coupons through the coupon list
+- Distinguish coupon level list through subscriber list and referral count
+
+Through the above, we can decide the newsletter content:
+
+- If subscriber's coupon level is Best, content focuses on Best coupons
+- If subscriber's coupon level is Good, content focuses on Good coupons
+
+<Image
+  src="/static/newsletter-content.png"
+  alt="from subscriber and coupons list, then decide newsletter content and a sending list  產生電子報寄送清單"
+  width={1000}
+  height={1000}
+/>
+
+Based on the above, a newsletter content will require the following types of data:
+
+- Subscriber information
+  - Coupon level
+- Coupon list
+  - Best coupon list
+  - Good coupon list
+
+### Conclusion
+
+When implementing some features, if we can try to write down the relevant details and first distinguish ACD, then think about whether there's a possibility to break down from A or C. If it can be used as a calculation, it will be easier to test.
+For me, if it's broken down too finely, it can't really be said to be well managed, but it might be that I don't have enough experience. Therefore, I don't have enough grasp of when to break down and to what extent. The reason I started reading this book is also hoping to learn FP applications and thinking from it, hoping it can help me have a reference basis when thinking.
