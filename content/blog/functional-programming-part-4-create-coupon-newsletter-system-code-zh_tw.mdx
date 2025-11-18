@@ -1,0 +1,279 @@
+---
+title: "函式程式設計 Part 4 - 實作優惠碼電子報程式碼"
+description: 實作優惠碼電子報程式碼
+date: 2025-11-17
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "zh_tw"
+---
+
+上一篇著重在練習分辨「動作」、「計算」和「資料」，可以參考這一篇 [函式程式設計 Part 2 - 分辨動作、計算和資料](/zh_tw/blog/functional-programming-part-2-identify-action-calculations-data-zh_tw)，
+今天來實作優惠碼電子報程式碼，在此之前先複習一下上一篇的實務情境。
+
+### 從資料庫讀取訂閱者資料並決定優惠券等級，進而區分出優惠券清單
+
+在這個流程中，有一個「計算」以及一個「資料」：
+
+- 決定優惠券等級：計算
+- 訂閱者資料：資料
+
+訂閱者的資料一個陣列，陣列中的每個元素都是一個物件，這個物件包含訂閱者信箱以及推薦次數。
+
+```javascript
+const subscribers = [
+  {
+    email: 'alice@example.com',
+    re_count: 3
+  },
+  {
+    email: 'bob@test.com',
+    re_count: 0
+  },
+  {
+    email: 'carol@demo.org',
+    re_count: 7
+  },
+  {
+    email: 'david@sample.net',
+    re_count: 12
+  }
+]
+```
+
+上述已經把所需的資料都「讀取出來」了，接下來要做的就是透過這個資料來計算出哪些訂閱者應該要收到哪種等級的優惠碼。
+在先前的文章有提到條件-「每推薦 10 名好友，推薦人以及朋友將會獲得更好的優惠碼」，因此這個流程中的計算，我們可以先推導出計算公式：
+
+```javascript
+// 推薦次數 >= 10 為 best
+// 推薦次數 < 10 為 good
+
+const getSubscriberRank = subscribers.map(sub => {
+  if(sub.re_count >= 10) {
+    return 'best';
+  }
+  return 'good';
+})
+```
+
+### 從資料庫內的優惠碼清單找出給定的優惠碼
+
+這個流程有一個「資料」以及一個「計算」：
+
+- 優惠碼清單：資料
+- 選取特定等級的優惠碼：計算
+
+
+優惠碼的資料如同一個物件，這個物件包含優惠碼以及等級，這邊先簡單列出三筆資料：
+
+```javascript
+const coupons = [
+  {
+    code: 'WELCOME10',
+    rank: 'bad'
+  },
+  {
+    code: 'FRIEND20',
+    rank: 'good'
+  },
+  {
+    code: 'VIP30',
+    rank: 'good'
+  },
+]
+```
+
+此時的計算，會需要兩個引數，一個是優惠碼清單，一個是等級，給定等級 `good`，我們就會得到一個只包含 `good` 等級的優惠碼清單，反之給定等級 `best`，我們就會得到一個只包含 `best` 等級的優惠碼清單。
+
+```javascript
+const selectCouponsByRank = (coupons, rank) => {
+  let couponList = [];
+  for (let i = 0; i < coupons.length; i++) {
+    let coupon = coupons[i];
+    if (coupon.rank === rank) {
+      couponList.push(coupon.code)
+    }
+  }
+  return couponList;
+}
+```
+
+如果了解 JS 的進階語法，也可以簡化成：
+
+```javascript
+const selectCouponsByRank = (coupons, rank) => {
+  // 可加入檢查 coupons 是否為陣列以及 rank 是否為字串
+  if (!Array.isArray(coupons)) {
+    return [];
+  }
+
+  if (typeof rank !== 'string' || !['best', 'good', 'bad'].includes(rank)) {
+    return [];
+  }
+
+  return coupons.filter(coupon => coupon.rank === rank).map(coupon => coupon.code);
+}
+```
+
+### 決定單一訂閱者要收到的電子報內容
+
+從上述的流程，我們獲得個幾種資料：
+
+- 訂閱者資訊
+- good 優惠碼列表
+- best 優惠碼列表
+
+接下來我們要藉由第一個計算 `getSubscriberRank` 來決定每位訂閱者要收到的電子報內容。
+這個計算會需要三個引數，一個是訂閱者資訊，一個是 good 優惠碼列表，一個是 best 優惠碼列表。
+
+
+```javascript
+let emailContent = {
+  from: 'coupon@example.com',
+  to: 'alice@example.com',
+  subject: 'Your Weekly Coupon Newsletter',
+  body: 'Here are your coupons for this week:',
+}
+
+// 將優惠碼清單分為 good 和 best 兩種等級
+const couponsByRank = {
+  good: selectCouponsByRank(coupons, 'good'),
+  best: selectCouponsByRank(coupons, 'best'),
+}
+
+const decideEmailContentForOne = (subscriber) => {
+  const rank = getSubscriberRank(subscriber);
+
+  return {
+    from: 'coupon@example.com',
+    to: subscriber.email,
+    subject: 'Your Weekly Coupon Newsletter',
+    body: `Here are your coupons for this week:\n${couponsByRank[rank].join('\n')}`
+  }
+}
+```
+
+### 決定所有訂閱者要收到的電子報內容
+
+```javascript
+const decideEmailContentForAll = (subscribers, couponsByRank) => {
+  return subscribers.map(subscriber => decideEmailContent(subscriber, couponsByRank));
+}
+```
+
+### 集合成一個「寄送電子報」的動作
+
+```javascript
+const sendAllEmails = () => {
+  // 從 DB 拿取 coupons，這個上述沒有，但實務情況下，是要從資料庫讀取的
+  const coupons = fetchCouponsFromDB();
+  const couponsByRank = {
+    good: selectCouponsByRank(coupons, 'good'),
+    best: selectCouponsByRank(coupons, 'best'),
+  }
+  // 從 DB 拿取 subscribers，這個上述沒有，但實務情況下，是要從資料庫讀取的
+  const subscribers = fetchSubscribersFromDB();
+  const emailContent = decideEmailContentForAll(subscribers, couponsByRank);
+  emailContent.forEach(email => {
+    sendEmail(email);
+  })
+}
+```
+
+### 最佳化：重構成純函數
+
+上述的 `sendAllEmails` 函式中，有兩個地方是不符合純函式的定義 - 也就是讀取 DB 的部分。在 函式設計中，讀取資料庫是有副作用的（I/O 操作），因此我們需要將這兩個地方獨立出來。
+
+```javascript
+const fetchCouponsFromDB = () => {
+  return fetch('https://api.example.com/coupons');
+}
+
+const fetchSubscribersFromDB = () => {
+  return fetch('https://api.example.com/subscribers');
+}
+```
+
+### 完整程式碼
+
+```javascript
+// 資料庫讀取 (I/O operation)
+const fetchCouponsFromDB = async () => {
+  const response = await fetch('https://api.example.com/coupons');
+  return await response.json();
+}
+
+const fetchSubscribersFromDB = async () => {
+  const response = await fetch('https://api.example.com/subscribers');
+  return await response.json();
+}
+
+// 核心計算
+const getSubscriberRank = (subscriber) => {
+  if(subscriber.re_count >= 10) {
+    return 'best';
+  }
+  return 'good';
+}
+
+const selectCouponsByRank = (coupons, rank) => {
+  return coupons.filter(coupon => coupon.rank === rank).map(coupon => coupon.code);
+}
+
+const decideEmailContentForOne = (subscriber, couponsByRank) => {
+  const rank = getSubscriberRank(subscriber);
+  return {
+    from: 'coupon@example.com',
+    to: subscriber.email,
+    subject: 'Your Weekly Coupon Newsletter',
+    body: `Here are your coupons for this week:\n${couponsByRank[rank].join('\n')}`
+  }
+}
+
+const decideEmailContentForAll = (subscribers, couponsByRank) => {
+  return subscribers.map(subscriber => decideEmailContentForOne(subscriber, couponsByRank));
+}
+
+// 應用層
+const sendAllEmails = async () => {
+  const coupons = await fetchCouponsFromDB();
+  const subscribers = await fetchSubscribersFromDB();
+  
+  const couponsByRank = {
+    good: selectCouponsByRank(coupons, 'good'),
+    best: selectCouponsByRank(coupons, 'best'),
+  };
+
+  const allEmails = decideEmailContentForAll(subscribers, couponsByRank);
+
+  allEmails.forEach(email => {
+    sendEmailToUser(email);
+  });
+}
+```
+
+### 總結
+
+剛開始接觸函式程式設計時，會覺得似乎只是把很多函式拆分出來，讓我有種要管理很多函式的感覺，這或許只是因為我還沒掌握到哪些要拆，哪些不拆，
+透過詢問自己以下幾個問題，來幫助自己決定是否要拆分。
+
+1. 這段邏輯是否「重覆使用」？
+2. 這段邏輯是否「有明確的單一目的」？
+3. 是否能夠用「組合」來理解函式？
+4. 這段邏輯是否需要單獨測試？
+5. 如果不拆，是否會變成巨型的函式？
+
+FP 的目標是分離「純邏輯」和「副作用」：
+
+#### 純邏輯
+- 計算
+- 資料轉換
+- 驗證
+- 排序
+- 過濾
+
+#### 副作用
+- 呼叫 api
+- 寫 localStorage
+- console.log
+- DOM 操作
+- 設定 state

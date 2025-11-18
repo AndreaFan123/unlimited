@@ -1,0 +1,142 @@
+---
+title: "CSS 回顧 1"
+description: "回顧 CSS 的基本概念"
+date: 2025-11-09
+tags: ["web", "css"]
+published: false
+language: "zh_tw"
+---
+
+接觸前端也差不多快三年了，期間也許多技術如雨後春筍般冒出，像是以 Utility-first 為主的 TailwindCSS，以及以 Component-first 為主的 Shadcn/UI，都讓我們在開發上更加方便快速。
+許多框架也把 TailwindCSS 作為預設的 CSS 框架，雖然開發上非常便利以及快速，但目前仍有接觸以及維護舊專案的機會，回顧一般的 CSS 撰寫以及一些更高階的用法是很重要的，以我自己來說，
+若遇到舊專案時，在寫 CSS 時的確會需要思考寫法，希望藉由這一系列的回顧來複習 CSS 的撰寫方式、高階語法以及一些實務上的用法。
+
+## CSS 命名的幾種方式
+
+當我們在撰寫非 Utility-first 的 CSS 時，我們會需要為我們的 CSS 命名，以下是幾種常見的命名方式：
+
+### BEM
+
+[BEM](https://en.bem.info/methodology/quick-start/) 全名是 "Blokc Element Modifier"，它主要是以三個部分來組成：
+
+- Block: 代表一個獨立的區塊，例如一個按鈕、一個表單、一個導航列等，例如：`header`, `button`, `input` 等。
+- Element: 代表一個區塊內的元素，例如一個按鈕內的文字、一個表單內的輸入框等，例如：`header__title`, `button__text`, `input__field` 等。
+- Modifier: 代表一個區塊的變體，例如一個按鈕的狀態、一個表單的狀態等，例如：`button--primary`, `button--secondary`, `input--error` 等。
+
+```css
+.card {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.card__title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.card__content {
+  font-size: 16px;
+  color: #666;
+}
+
+.card--primary {
+  background-color: #007bff;
+  color: #fff;
+}
+```
+
+### OOCSS
+
+[OOCSS](https://www.smashingmagazine.com/2011/12/an-introduction-to-object-oriented-css-oocss/) 全名是 "Object Oriented CSS"，它有兩個原則：
+
+- Separation of Structure and Skin: 分離結構和樣式，結構指的是元素，樣式則是像是顏色等。
+- Separation of Container and Content: 分離容器和內容，容器指的是 HTML 的容器，內容指的是 CSS。
+
+大原則就是使用 class 寫樣式，每一個都有其用途，例如：
+
+```css
+.card {
+  background-color: #fff;
+}
+
+.card-small {
+  width: 100px;
+  height: 100px;
+}
+
+.card-medium {
+  width: 150px;
+  height: 150px;
+}
+
+.card-large {
+  width: 200px;
+  height: 200px;
+}
+
+.card-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.card-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+```
+
+上述範例從 `.card` 開始即是規範 card 的預設樣式，而 `.card-small`, `.card-medium`, `.card-large` 則是規範 card 的大小，而 `.card-primary`, `.card-secondary` 則是規範 card 的顏色。
+這樣的分類可以創造不同的組合。
+
+### SMACSS
+
+[SMACSS](https://smacss.com/book/categorizing/) 全名是 "Scalable and Modular Architecture for CSS"，它有五個原則：
+
+- Base: 基礎規則，例如：`body`, `html`, `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `p`, `a`, `button`, `input`, `textarea`, `select`, `option`, `ul`, `ol`, `li`, `table`, `tr`, `td`, `th` 等。
+- Layout: 佈局規則，將網頁切割不同區塊，且須以 id 作為識別，如果該區塊會重覆出現，可使用 class 將其串連，例如：`#ads-container.ads-item`, `#header.header-item` 等。
+- Module: 模組規則，與如同佈局，只能用 class 命名，使用 dash 分隔，例如：`.ads-item`
+- State: 狀態規則，例如：`.tab-item--active`, `.tab-item--inactive` 等。
+- Theme: 主題規則，例如：`light`, `dark` 等。
+
+### rscss
+
+[rscss](https://ricostacruz.com/rscss/) 全名是 "Reasonable System for CSS Stylesheet Structure."，它有以下幾個原則：
+
+- 組件：需要用兩個字命名，中間使用 dash 分隔，例如：`button-primary`
+- 元素：只能以一個字命名，如果遇到多個字，不用 dash 分隔。
+
+這種 CSS style 的核心就是以組件來看網頁，我似乎比較可理解這種規劃方式，例如導航列，它本身就由許多小元素組成一個元件，例如：
+
+```css
+/* 元件 */
+.search-form {
+  ...
+  /* 元素 */
+  > .field {
+    ...
+  }
+  /* 元素 */
+  > .action {
+    ...
+  }
+}
+
+.search-form {
+  ...
+  /* 元素:多個字不用 dash 分隔 */
+  > .firstname {
+    ...
+  }
+  /* 元素:多個字不用 dash 分隔 */
+  > .lastname {
+    ...
+  }
+}
+```
+
+在選擇元素上，會儘可能地使用 `>` 子元素選擇器，遇上巢狀元素食，可避免類別衝突，效能上也會比較好 (📓 關於 CSS 的選擇器跟效能又可以寫幾篇來複習了！)
+
+## CSS Reset
