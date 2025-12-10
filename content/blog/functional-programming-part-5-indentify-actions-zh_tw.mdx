@@ -1,0 +1,142 @@
+---
+title: "函式程式設計 Part 5 - 分辨 Actions"
+description: 分辨函式程式設計內的 Actions
+date: 2025-11-24
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "zh_tw"
+---
+
+上一篇 [函式程式設計 Part 4 - 實作優惠碼電子報程式碼](/zh_tw/blog/functional-programming-part-4-create-coupon-newsletter-system-code-zh_tw) 透過實際程式碼來練習分辨「動作」、「計算」和「資料」，
+接著要來更近一步地分辨函式程式設計內的 Actions。
+
+書裡假設開發部門內的同仁被分配到建立一個分紅的功能，透過他寫的程式碼來逐一拆解，以下是程式碼範例：
+
+```js
+function figurePayout(affiliate) {
+  const owed = affiliate.sales;
+  if (owed > 100) {
+    sendPayout(affiliate.bank_code, owed);
+  }
+}
+
+function affiliatePayout(affiliates) {
+  for (let a = 0; a < affiliates.length; a++) {
+    figurePayout(affiliate[a]);
+  }
+}
+
+function main(affiliates) {
+  affiliatePayout(affiliates);
+}
+```
+
+### Actions 特性
+
+- Actions 的結果取決於執行時間或次數。
+  - 執行時間稱為順序(order)
+  - 執行次數稱為重複(repetition)
+
+- Actions 一般稱為非純函式(impure functions)
+
+### 拆解範例程式碼
+
+上述三個函式都是 Actions。
+
+第一個 `figurePayout` 內會調用 `sendPayout` 函式，這個函式會受到執行時間和次數的影響。又因為 `figurePayout` 調用了 `sendPayout`，
+自然而然地， `figurePayout` 也會受到時間影響。
+
+```js 
+function figurePayout(affiliate) {
+  const owed = affiliate.sales;
+  if (owed > 100) {
+    sendPayout(affiliate.bank_code, owed);
+  }
+}
+```
+以此類推，因為 `affiliatePayout` 內調用了 `figurePayout`， `main` 又調用了 `affiliatePayout`，每一個函式因為調用了受到執行時間或次數的影響，導致
+自己也成為了 Actions。
+
+### Actions 會擴散且形式多變
+
+函式內調用其他函式，似乎是很常見甚至並不真的影響到執行結果，但若以函式程式設計的概念來看，佈滿著 Actions 意味著如果函式內調用的函式是非純函式，那麼相關的函式都會變得不乾淨。
+函式程式設計並非要避免函式內調用函式，而是要避免函式內調用有副作用的函式。
+
+#### 副作用 side-effects
+
+- 寫檔案
+- call API
+- 調用 DB
+- console.log
+- 改全域變數
+- 改參數本身（mutation）
+- 使用 random()、Date.now()
+
+如果函式內調用的函式是純函式，那麼整個函式也是純函式，例如：
+
+```js
+const add = (a, b) => a + b;
+const double = (n) => n * 2;
+
+const addThenDouble = (a, b) => double(add(a, b));
+```
+
+### 改寫不乾淨的範例程式碼
+
+在原本的範例中，`figurePayout` 函式負責判斷小於 100 的要執行 `sendPayout`，這段會觸發付款(IO)；`affiliatePayout` 函式只是 loop affiliates 然後調用 `figurePayout` 函式；而 `main`
+只是單純調用 `affiliatePayout` 函式，但也因為執行 `main` 之後，接續著的調用最後會觸發付款，改變了狀態，因此整組函式都變得不純。
+
+```js
+function figurePayout(affiliate) {
+  const owed = affiliate.sales;
+  if (owed > 100) {
+    sendPayout(affiliate.bank_code, owed); //付款
+  }
+}
+
+function affiliatePayout(affiliates) {
+  for (let a = 0; a < affiliates.length; a++) {
+    figurePayout(affiliate[a]);
+  }
+}
+
+function main(affiliates) {
+  affiliatePayout(affiliates);
+}
+```
+
+如果要改寫的話，可以試著把一些純計算的部分拉出來，例如 `figurePayout` 這段程式碼裡面有一段 `if (owed > 100)`，我們可以寫一段純粹過濾需要付款的函式
+`getEligiblePayouts` 的輸入和輸出一致，沒有其他的寫入或者讀取外部狀態。
+
+```js
+function getEligiblePayouts(affiliates) {
+  affiliates
+    .filter(a => a.sales > 100)
+    .map(a => {
+      bankCode: a.bank_code,
+      amount: a.sales
+    })
+}
+```
+
+接著把 IO 另外處理，當然這裡就會是非純函式
+
+```js
+function sendPayouts(payouts) {
+  payouts.forEach(p => {
+    sendPayout(p.bankCode, p.amount)
+  })
+}
+```
+
+最後是 `main` 函式
+
+```js
+function main(affiliates) {
+  const payouts = getEligiblePayouts(affiliates); // 純函式
+  sendPayouts(payouts); // 非純函式
+}
+```
+
+雖然函式內調用其他函式是很正常且常見的，但是分辨哪些可以抽出作為純函式，來減少函式鏈整個都成為非純函式，且維持重要的邏輯作為純函式也能方便測試。
+

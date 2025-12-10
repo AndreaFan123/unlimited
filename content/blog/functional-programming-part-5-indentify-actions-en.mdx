@@ -1,0 +1,141 @@
+---
+title: "Functional Programming Part 5 - Identifying Actions"
+description: Identifying Actions in Functional Programming
+date: 2025-11-24
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "en"
+---
+
+In the previous article [Functional Programming Part 4 - Implementing Coupon Newsletter System Code](/en/blog/functional-programming-part-4-create-coupon-newsletter-system-code-en), we practiced identifying "actions", "calculations", and "data" through actual code examples.
+Now, let's take a closer look at identifying Actions in functional programming.
+
+The book assumes that a developer in the development department is assigned to create a payout feature. We'll break down the code they wrote step by step. Here's the code example:
+
+```js
+function figurePayout(affiliate) {
+  const owed = affiliate.sales;
+  if (owed > 100) {
+    sendPayout(affiliate.bank_code, owed);
+  }
+}
+
+function affiliatePayout(affiliates) {
+  for (let a = 0; a < affiliates.length; a++) {
+    figurePayout(affiliate[a]);
+  }
+}
+
+function main(affiliates) {
+  affiliatePayout(affiliates);
+}
+```
+
+### Characteristics of Actions
+
+- The result of Actions depends on when they are executed or how many times they are executed.
+  - When they are executed is called order
+  - How many times they are executed is called repetition
+
+- Actions are generally called impure functions
+
+### Breaking Down the Example Code
+
+All three functions above are Actions.
+
+The first function `figurePayout` calls the `sendPayout` function, which is affected by when and how many times it is executed. Since `figurePayout` calls `sendPayout`,
+naturally, `figurePayout` is also affected by timing.
+
+```js 
+function figurePayout(affiliate) {
+  const owed = affiliate.sales;
+  if (owed > 100) {
+    sendPayout(affiliate.bank_code, owed);
+  }
+}
+```
+By the same token, because `affiliatePayout` calls `figurePayout`, and `main` calls `affiliatePayout`, each function becomes an Action because it calls functions that are affected by when or how many times they are executed.
+
+### Actions Spread and Take Many Forms
+
+Calling functions within functions seems very common and may not really affect the execution results, but from a functional programming perspective, having Actions everywhere means that if a function calls an impure function, all related functions become impure.
+Functional programming is not about avoiding calling functions within functions, but about avoiding calling functions with side effects within functions.
+
+#### Side Effects
+
+- Writing files
+- Calling APIs
+- Database calls
+- console.log
+- Modifying global variables
+- Modifying parameters themselves (mutation)
+- Using random(), Date.now()
+
+If the functions called within a function are pure functions, then the entire function is also a pure function, for example:
+
+```js
+const add = (a, b) => a + b;
+const double = (n) => n * 2;
+
+const addThenDouble = (a, b) => double(add(a, b));
+```
+
+### Refactoring the Impure Example Code
+
+In the original example, the `figurePayout` function is responsible for determining which affiliates with sales less than 100 should execute `sendPayout`, which triggers payment (IO); the `affiliatePayout` function just loops through affiliates and calls the `figurePayout` function; and `main`
+simply calls the `affiliatePayout` function, but because executing `main` eventually triggers payment through the chain of calls, changing the state, the entire set of functions becomes impure.
+
+```js
+function figurePayout(affiliate) {
+  const owed = affiliate.sales;
+  if (owed > 100) {
+    sendPayout(affiliate.bank_code, owed); // payment
+  }
+}
+
+function affiliatePayout(affiliates) {
+  for (let a = 0; a < affiliates.length; a++) {
+    figurePayout(affiliate[a]);
+  }
+}
+
+function main(affiliates) {
+  affiliatePayout(affiliates);
+}
+```
+
+If we want to refactor this, we can try to extract some pure calculation parts. For example, in the `figurePayout` code, there's an `if (owed > 100)` condition. We can write a pure function to filter eligible payouts.
+`getEligiblePayouts` has consistent input and output, with no other writes or reads of external state.
+
+```js
+function getEligiblePayouts(affiliates) {
+  affiliates
+    .filter(a => a.sales > 100)
+    .map(a => {
+      bankCode: a.bank_code,
+      amount: a.sales
+    })
+}
+```
+
+Then handle IO separately. Of course, this will be an impure function.
+
+```js
+function sendPayouts(payouts) {
+  payouts.forEach(p => {
+    sendPayout(p.bankCode, p.amount)
+  })
+}
+```
+
+Finally, the `main` function
+
+```js
+function main(affiliates) {
+  const payouts = getEligiblePayouts(affiliates); // pure function
+  sendPayouts(payouts); // impure function
+}
+```
+
+Although calling functions within functions is normal and common, identifying which parts can be extracted as pure functions helps reduce the entire function chain from becoming impure, and keeping important logic as pure functions also makes testing easier.
+
