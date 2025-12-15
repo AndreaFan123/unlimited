@@ -1,0 +1,288 @@
+---
+title: "函式程式設計 Part 6 - 擷取 Actions 中的 Calculations"
+description: 從函式內判斷 Actions 和 calculations，並嘗試重構...
+date: 2025-11-30
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "zh_tw"
+---
+
+上一篇 [函式程式設計 Part 5 - 分辨 Actions](/zh_tw/blog/functional-programming-part-5-indentify-actions-zh_tw) 透過實際程式碼來練習分辨 Actions，接著要來更近一步地擷取 Actions 中的 Calculations。
+
+書裡透過三段程式碼來展示從原先一個大的函式內來分辨哪一段是屬於 Actions，哪一段是屬於 calculations，或 data，再合理地擷取可以抽出作為純函式(Pure functions)，以下是原本的程式碼：
+
+```js
+/**
+ * 程式碼 1: 本段程式碼主要展示當使用者把商品加入到購物車後，可以同步看到總金額的變化
+ */
+const shoppingCart = [];
+const shoppingCartTotal = 0;
+
+
+function addItemToCart(name, price) {
+  shoppingCart.push({
+    name,
+    price,
+  });
+
+  calcCartTotal();
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = 0;
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM(); // 更新 DOM 顯示總金額
+}
+
+/**
+ * 程式碼 2: 計算免運費，如果超過免運費門檻(20美元)，不收取運費
+ * 如果 A 商品加入購物車後超過門檻，A 商品會顯示 FREE 的 logo，反之則不顯示
+*/
+
+function updateShippingIcons(){
+  const buyButtons = getBuyButtons();
+  for (let i = 0; i < buyButtons.length; i++) {
+    const button = buyButtons[i];
+    const item = button.item;
+    if (item.price + shoppingCartTotal > 20) {
+      button.showFreeShippingIcon();
+    } else {
+      button.hideFreeShippingIcon();
+    }
+  }
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = 0;
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+
+/**
+ * 程式碼 3: 計算稅金
+*/
+
+function updateTaxDOM() {
+  setTaxDOM(shoppingCartTotal * 0.10);
+}
+```
+
+### 先找出 Actions, Calculations 和 Data
+
+先複習一下 Actions, Calculations 和 Data 的定義：
+
+- Actions: 會產生副作用(Side effect)，最受時間因素影響，最不易控制
+- Calculations: 與時間無關，較好控制
+- Data: 被動且需要被解讀的元素，關於各種事件的事實紀錄
+
+
+```js
+const shoppingCart = []; // A -> 會隨時改變
+const shoppingCartTotal = 0; // A -> 會隨時改變
+
+
+function addItemToCart(name, price) {
+  shoppingCart.push({ // A -> 修改全域變數
+    name,
+    price,
+  });
+
+  calcCartTotal();
+}
+
+function updateShippingIcons(){
+  const buyButtons = getBuyButtons(); // A -> 取得 DOM 元素
+  for (let i = 0; i < buyButtons.length; i++) {
+    const button = buyButtons[i];
+    const item = button.item;
+    if (item.price + shoppingCartTotal > 20) {
+      button.showFreeShippingIcon(); // A -> 修改 DOM
+    } else {
+      button.hideFreeShippingIcon(); // A -> 修改 DOM
+    }
+  }
+}
+
+function updateTaxDOM() {
+  setTaxDOM(shoppingCartTotal * 0.10); // A -> 修改 DOM
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = 0; // A -> 修改全域變數
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+```
+
+基本上全部都屬於 Actions，因為只要一個函式內有 Actions，整個函式就會成為 Actions 😅
+
+### 函式的輸入與輸出
+
+函式的輸入和輸出有分**顯性(explicit input and output)** 跟**隱性(implicit input and output)**，又稱**副作用(Side effect)**，那這些隱性跟顯性的輸入和輸出有什麼差別呢？
+
+  顯性輸入和輸出，指得是**傳入的引數(arguments)**和**回傳的值(return value)**，其餘的皆為隱性輸入和輸出，例如：
+
+```js
+function addToTotal(amount) {
+  console.log(amount);
+  total += amount;
+  return total;
+}
+```
+
+上面程式碼的引數(arguments)是 `amount`，回傳的值(return value)是 `total`，這兩者就是顯性輸入和輸出。另外 `console.log(amount)` 和 `total += amount` 就是隱性輸入和輸出，因為它不是明確的輸入和輸出，而是額外的行為。
+而一個函式內若只有顯性輸入和輸出，則稱為純函式(Pure function)，反之則稱為非純函式(Impure function)。
+
+### 改寫上述程式碼
+
+```js
+/**
+ * 改寫前 ========================================================
+*/
+function calcCartTotal() {
+  shoppingCartTotal = 0;
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+
+/**
+ * 改寫後 v1 ========================================================
+*/
+
+// 仍為 Actions
+function calcTotal() {
+  shoppingCartTotal = 0; // 輸出
+  for (let i = 0; i < shoppingCart.length; i++) { // shoppingCart.length 輸入
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price; // 輸出
+  }
+}
+
+function calcCartTotal() {
+  calcTotal();
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+
+/**
+ * 改寫後 v2 ========================================================
+*/
+
+function calcTotal(cart) {
+  let total = 0; // 把全域變數改為區域變數
+  for (let i = 0; i < cart.length; i++) { // 將 cart 作為引數傳入，不使用全域變數
+    const item = cart[i];
+    total += item.price;
+  }
+  return total; // 回傳區域變數
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = calcTotal(shoppingCart);
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+```
+
+另外一段程式碼的改寫：
+
+```js
+/**
+ * 改寫前 ========================================================
+*/
+function addItemToCart(name, price) {
+  shoppingCart.push({
+    name,
+    price,
+  });
+  calcCartTotal();
+}
+
+/**
+ * 改寫後 v1 ========================================================
+*/
+
+function addItem (cart, name, price) {
+  cart.push({ // 用 cart 作為引數傳入，不使用全域變數，但這邊的 push 會更改全域的陣列
+    name,
+    price,
+  });
+}
+
+function addItemToCart(name, price) {
+  addItem(shoppingCart, name, price); 
+  calcCartTotal();
+}
+
+/**
+ * 改寫後 v2 ========================================================
+*/
+
+function addItem (cart, name, price) {
+  const newCart = [...cart]; // 或 const newCart = cart.slice(); 
+  newCart.push({
+    name,
+    price,
+  });
+  return newCart;
+}
+
+function addItemToCart(name, price) {
+  shoppingCart = addItem(shoppingCart, name, price); 
+  calcCartTotal();
+}
+```
+
+> 不可變性(Immutability)的實作方法之ㄧ是，寫入時複製(Copy-on-write)，這邊的寫入時指的是函式內的寫入，而不是全域的寫入。
+
+### 測試上述的 Calculations
+
+```js
+function calcTotal(cart) {
+  let total = 0;
+  for (let i = 0; i < cart.length; i++) {
+    const item = cart[i];
+    total += item.price;
+  }
+  return total;
+}
+
+console.log(calcTotal([{ price: 10 }, { price: 20 }])); // 永遠回傳相同的結果 30
+console.log(calcTotal([{ price: 10 }, { price: 20 }, { price: 30 }])); // 永遠回傳相同的結果 60
+
+function addItem(cart, name, price) {
+  cart.push({
+    name,
+    price,
+  });
+}
+
+console.log(addItem([{ price: 10 }, { price: 20 }], 'apple', 10)); // 永遠回傳相同的結果 [{ price: 10 }, { price: 20 }, { name: 'apple', price: 10 }]
+console.log(addItem([{ price: 10 }, { price: 20 }], 'banana', 20)); // 永遠回傳相同的結果 [{ price: 10 }, { price: 20 }, { name: 'banana', price: 20 }]
+```
+
+### 從 Actions 中擷取 Calculations 的步驟：
+
+- 找出並分離跟計算有關的程式碼
+- 找出函式內顯性跟隱性的輸出跟輸入
+- 講隱性輸入換成引數輸入，隱性輸出轉換為回傳值

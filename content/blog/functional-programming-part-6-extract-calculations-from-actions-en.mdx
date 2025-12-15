@@ -1,0 +1,289 @@
+---
+title: "Functional Programming Part 6 - Extract Calculations from Actions"
+description: Identifying Actions and calculations within functions, and attempting refactoring...
+date: 2025-11-30
+tags: ["javascript", "fp", "functional programming", "reading note"]
+published: true
+language: "en"
+---
+
+In the previous article [Functional Programming Part 5 - Identify Actions](/en/blog/functional-programming-part-5-indentify-actions-en), we practiced identifying Actions through actual code. Now, let's take it a step further and extract Calculations from within Actions.
+
+The book demonstrates this through three code examples, showing how to identify which parts of a large function are Actions, which are Calculations, or Data, and then reasonably extract parts that can be pulled out as pure functions. Here is the original code:
+
+```js
+/**
+ * Code 1: This code demonstrates that when a user adds items to the shopping cart, they can simultaneously see the total amount change
+ */
+const shoppingCart = [];
+const shoppingCartTotal = 0;
+
+
+function addItemToCart(name, price) {
+  shoppingCart.push({
+    name,
+    price,
+  });
+
+  calcCartTotal();
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = 0;
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM(); // Update DOM to display total amount
+}
+
+/**
+ * Code 2: Calculate free shipping - if exceeding the free shipping threshold ($20), no shipping fee is charged
+ * If adding item A to the cart exceeds the threshold, item A will display a FREE logo, otherwise it won't
+*/
+
+function updateShippingIcons(){
+  const buyButtons = getBuyButtons();
+  for (let i = 0; i < buyButtons.length; i++) {
+    const button = buyButtons[i];
+    const item = button.item;
+    if (item.price + shoppingCartTotal > 20) {
+      button.showFreeShippingIcon();
+    } else {
+      button.hideFreeShippingIcon();
+    }
+  }
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = 0;
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+
+/**
+ * Code 3: Calculate tax
+*/
+
+function updateTaxDOM() {
+  setTaxDOM(shoppingCartTotal * 0.10);
+}
+```
+
+### First, Identify Actions, Calculations, and Data
+
+Let's review the definitions of Actions, Calculations, and Data:
+
+- Actions: Have side effects, most affected by time factors, least controllable
+- Calculations: Time-independent, more controllable
+- Data: Passive elements that need to be interpreted, factual records of various events
+
+
+```js
+const shoppingCart = []; // A -> will change at any time
+const shoppingCartTotal = 0; // A -> will change at any time
+
+
+function addItemToCart(name, price) {
+  shoppingCart.push({ // A -> modifies global variable
+    name,
+    price,
+  });
+
+  calcCartTotal();
+}
+
+function updateShippingIcons(){
+  const buyButtons = getBuyButtons(); // A -> gets DOM elements
+  for (let i = 0; i < buyButtons.length; i++) {
+    const button = buyButtons[i];
+    const item = button.item;
+    if (item.price + shoppingCartTotal > 20) {
+      button.showFreeShippingIcon(); // A -> modifies DOM
+    } else {
+      button.hideFreeShippingIcon(); // A -> modifies DOM
+    }
+  }
+}
+
+function updateTaxDOM() {
+  setTaxDOM(shoppingCartTotal * 0.10); // A -> modifies DOM
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = 0; // A -> modifies global variable
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+```
+
+Basically, all of these are Actions, because if there's even one Action within a function, the entire function becomes an Action 😅
+
+### Function Inputs and Outputs
+
+Function inputs and outputs can be **explicit (explicit input and output)** or **implicit (implicit input and output)**, also known as **side effects**. What's the difference between these implicit and explicit inputs and outputs?
+
+Explicit inputs and outputs refer to **passed arguments** and **return values**, while everything else is implicit input and output. For example:
+
+```js
+function addToTotal(amount) {
+  console.log(amount);
+  total += amount;
+  return total;
+}
+```
+
+In the above code, the argument is `amount` and the return value is `total` - these are the explicit inputs and outputs. Additionally, `console.log(amount)` and `total += amount` are implicit inputs and outputs because they're not explicit inputs and outputs, but rather additional behaviors.
+
+If a function only has explicit inputs and outputs, it's called a pure function. Otherwise, it's called an impure function.
+
+### Refactoring the Above Code
+
+```js
+/**
+ * Before Refactoring ========================================================
+*/
+function calcCartTotal() {
+  shoppingCartTotal = 0;
+  for (let i = 0; i < shoppingCart.length; i++) {
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price;
+  }
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+
+/**
+ * After Refactoring v1 ========================================================
+*/
+
+// Still an Action
+function calcTotal() {
+  shoppingCartTotal = 0; // output
+  for (let i = 0; i < shoppingCart.length; i++) { // shoppingCart.length input
+    const item = shoppingCart[i];
+    shoppingCartTotal += item.price; // output
+  }
+}
+
+function calcCartTotal() {
+  calcTotal();
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+
+/**
+ * After Refactoring v2 ========================================================
+*/
+
+function calcTotal(cart) {
+  let total = 0; // change global variable to local variable
+  for (let i = 0; i < cart.length; i++) { // pass cart as argument, don't use global variable
+    const item = cart[i];
+    total += item.price;
+  }
+  return total; // return local variable
+}
+
+function calcCartTotal() {
+  shoppingCartTotal = calcTotal(shoppingCart);
+  setCartTotalDOM();
+  updateShippingIcons();
+  updateTaxDOM();
+}
+```
+
+Refactoring of another code section:
+
+```js
+/**
+ * Before Refactoring ========================================================
+*/
+function addItemToCart(name, price) {
+  shoppingCart.push({
+    name,
+    price,
+  });
+  calcCartTotal();
+}
+
+/**
+ * After Refactoring v1 ========================================================
+*/
+
+function addItem (cart, name, price) {
+  cart.push({ // pass cart as argument, don't use global variable, but push here will modify the global array
+    name,
+    price,
+  });
+}
+
+function addItemToCart(name, price) {
+  addItem(shoppingCart, name, price); 
+  calcCartTotal();
+}
+
+/**
+ * After Refactoring v2 ========================================================
+*/
+
+function addItem (cart, name, price) {
+  const newCart = [...cart]; // or const newCart = cart.slice(); 
+  newCart.push({
+    name,
+    price,
+  });
+  return newCart;
+}
+
+function addItemToCart(name, price) {
+  shoppingCart = addItem(shoppingCart, name, price); 
+  calcCartTotal();
+}
+```
+
+> One way to implement Immutability is through Copy-on-write, where "write" refers to writes within the function, not global writes.
+
+### Testing the Above Calculations
+
+```js
+function calcTotal(cart) {
+  let total = 0;
+  for (let i = 0; i < cart.length; i++) {
+    const item = cart[i];
+    total += item.price;
+  }
+  return total;
+}
+
+console.log(calcTotal([{ price: 10 }, { price: 20 }])); // always returns the same result: 30
+console.log(calcTotal([{ price: 10 }, { price: 20 }, { price: 30 }])); // always returns the same result: 60
+
+function addItem(cart, name, price) {
+  cart.push({
+    name,
+    price,
+  });
+}
+
+console.log(addItem([{ price: 10 }, { price: 20 }], 'apple', 10)); // always returns the same result: [{ price: 10 }, { price: 20 }, { name: 'apple', price: 10 }]
+console.log(addItem([{ price: 10 }, { price: 20 }], 'banana', 20)); // always returns the same result: [{ price: 10 }, { price: 20 }, { name: 'banana', price: 20 }]
+```
+
+### Steps to Extract Calculations from Actions:
+
+- Identify and separate code related to calculations
+- Identify explicit and implicit inputs and outputs within the function
+- Convert implicit inputs to argument inputs, and implicit outputs to return values
