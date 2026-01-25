@@ -1,0 +1,112 @@
+---
+title: "Authentication System and Architecture Thinking Part 1"
+description: Recording some thoughts during learning and how to think about implementation from an architecture perspective
+date: 2026-1-25
+tags: ["system design", "authentication"]
+published: true
+language: "en"
+---
+
+Recently, I've been working on some small projects, so I'm thinking about whether to use a BaaS like Supabase or build my own backend. To be honest, I've barely written any backend code since finishing bootcamp. But I still remember what my first boss said: "Understanding the backend will help you write code that better matches the data structure returned by backend APIs." I've never really understood if this is true or not,
+since the backend writes business logic, which is often hard for frontend developers to truly understand. Unless both frontend and backend developers are equally clear about the project details and business logic throughout the entire workflow, communication between frontend and backend is naturally common, and both sides will need to compromise and clarify requirements.
+
+I think it would be interesting to record my process of revisiting backend development, so let's start with Authentication.
+
+### What is Auth supposed to do?
+
+Auth has three levels:
+
+1. Who wants to log in?
+2. Who is already logged in, and can they stay logged in?
+3. What can they do after logging in?
+
+
+### Different authentication systems
+
+So far, all the products I've worked on have been more public-facing. This year, I was fortunate to help a friend with an e-commerce admin panel, so I also got to work with internal-facing authentication.
+
+### Public-facing authentication systems
+
+The most common type is registration and login. For the frontend, a simpler registration or login might only require a few important pieces of data, such as: username, password, email. But it could also be complex enough to require more user data. Regardless, all of this is personal information that needs to be well protected.
+Frontend data is basically visible in the browser, so being attacked is common. Therefore, maintaining security from frontend to backend is crucial.
+
+However, this article won't go too deep into security. Let me refocus on how we can think about building an authentication system.
+
+As users, registration and login are just a moment - fill in the data, verify, enter the page and see our own data. But for engineers, it can be roughly broken down into:
+
+- Core
+  - Registration
+  - Login
+  - Get own data
+  - Login
+  - Access token expires, automatically refresh
+- Additional features
+  - Forgot / Reset / Change password
+  - Email verification or OTP, etc.
+  - Login management (multi-device management)
+  - Risk control (e.g., different IPs, login failure count, etc.)
+- Advanced features
+  - OAuth (interfaces provided by different service providers, e.g., Google, FB, Apple)
+  - 2FA (two-factor authentication)
+  - RBAC/ABAC (permission systems)
+  - SSO / SAML (B2B)
+
+For this type of authentication, when planning, we can make decisions based on the following key points:
+
+#### Build yourself or use a hosted service
+  - Survey of hosted services
+    - Advantages?
+    - Disadvantages?
+  - Survey of frameworks
+    - Advantages?
+    - Disadvantages?
+
+#### Core authentication mechanism
+  - Session (Stateful)
+    - Server controls login state, server stores session ID
+  - JWT (Stateless)
+    - Only verifies signature, doesn't check state, cannot revoke permissions, need to wait for token to expire
+  - Hybrid (Access JWT + Refresh Token)
+    - Access Token: Stateless, used for API verification
+    - Refresh Token: Stateful (stored in DB), used to exchange for Access Token
+    
+#### Token storage and transmission
+  - Where to put Access Token?
+    - LocalStorage vs. Memory
+  - Where to put Refresh Token?
+    - LocalStorage vs. HttpOnly Cookie
+  - Token Rotation
+    - What if the old Refresh Token is stolen?
+
+#### Credentials and registration strategy
+  - Login method
+    - With password or passwordless?
+  - How to store password?
+    - Which algorithm to use?
+    - Should we add pepper?
+  - Password strength rules
+
+#### Defense and risk control
+- Rate limiting
+  - Set strict limits on login or refresh token endpoints
+  - Record IP or failure count
+- Two-factor authentication
+  - Should it be enabled or built?
+
+#### Error handling and responses
+- Security and privacy
+  - What message should be returned if login fails?
+  - For registration verification, if already registered, should we send an email or display directly?
+- Frontend error messages and codes
+  - Besides HTTP Status, what else is needed?
+  - Are there clear error messages for the frontend to determine?
+
+Below is the authentication system flow diagram:
+<Image
+  src="/static/auth-flow.png"
+  alt="auth flow authentication process"
+  width={1000}
+  height={1000}
+/>
+
+The next article will record the problems and thoughts encountered when implementing the authentication system.
