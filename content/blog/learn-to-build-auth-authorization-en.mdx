@@ -1,0 +1,188 @@
+---
+title: "When the Frontend Thinks About Backend Architecture, Part 2"
+description: Notes on wrapping roles and permissions in admin systems and how to handle authorization
+date: 2026-2-4
+tags: ["system design", "authentication", "authorization", "rbac", "abac"]
+published: true
+language: "en"
+---
+
+In the [first part on auth and architecture](/blog/learn-to-build-auth-en), we talked about how to think about auth system design. When building things, we often run into permission issues in admin systems.
+A common case is needing to give different roles different permissions, for example:
+
+- Admin
+- User
+- Guest
+
+We need to give each role different permissions, for example:
+
+- Admin can manage all features
+- User can manage their own data
+- Guest can only view
+
+We can break it down further:
+
+- Marketing can manage marketing campaigns
+- Customer Service can manage support tickets
+- Finance can manage financial reports
+
+This post notes some things to think about when planning roles and permissions in admin systems.
+
+## RBAC vs. ABAC
+
+When planning roles and permissions, we usually use RBAC or ABAC. The two are not mutually exclusive; they can be used together.
+
+### RBAC (Role-Based Access Control)
+
+Role-based: in short, your role decides what you can do. For example: if you are an admin, you can manage all features; if you are a user, you can manage your own data.
+It answers “who” can do what.
+
+### ABAC (Attribute-Based Access Control)
+
+Attribute-based: for example, if you are in Finance, you can view financial reports but not marketing data.
+
+A case where we mix both:
+
+Say you are in Customer Service and can edit orders, but you are in the Greater Taipei team, so you can only edit orders in the Greater Taipei area. How do we plan roles and permissions for this?
+
+At first it might seem like we should use ABAC for everything, but should “customer service” be a role or an attribute? Or is a role really just one kind of attribute?
+
+If we write rules in ABAC style, we might write:
+
+```js
+if (user.role === "customerService") then do action "updateOrder" else do action "viewOrder"
+```
+
+Writing rules in RBAC style would look similar. So for fixed needs like “which job can do what,” we can use RBAC.
+
+But when we add “what can customer service in which region do,” that’s about data-level authorization. If we only use RBAC, we might end up creating many roles like “Greater Taipei Customer Service,” “Kaohsiung Customer Service,” and so on for each region. That leads to role explosion.
+We can fix this by adding a rule like:
+
+```js
+if (user.role === "customerService" && user.region === "taipei") then do action "updateOrder" else do action "viewOrder"
+```
+
+> Use role to define what to do (action); use attributes to define what can be seen (scope).
+
+### Is using `user.role === "some role"` good or bad?
+
+If the code is full of checks like `user.role === "some role"`, it becomes hard to maintain. If we change roles or add new ones later, we have to change a lot of code.
+For example, say only admin can delete orders at first. Later we add a new role — “Operation Manager” — who can also delete orders, but only orders they are responsible for. Then we have to change a lot of code from `user.role === "admin"` to `user.role === "admin" || user.role === "operationManager"`. That can mean many edits and we might miss some cases.
+
+> Design by permission, not by role.
+>
+> Treat a role as a set of permissions. The program should decide whether someone can do something based on “permission,” not on role.
+
+So the code should only check whether the user has permission to delete orders. When testing, we don’t need to create roles; we just assign the right permissions.
+
+#### How permissions are built: resource + action
+
+Permissions are usually made of resource + action, for example:
+
+- resource: order, user, product, etc.
+- action: delete, update, view, etc.
+
+Following the order-delete example, we can define a permission set with resource and actions:
+
+```js
+const orderPermissions = {
+  resource: "order",
+  actions: ["create", "delete", "update", "view"],
+} 
+```
+
+Then we create an Operation Manager role and add the order-delete permission set to that role, and the problem is solved.
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+} 
+```
+
+So we know clearly that the operation manager can delete orders. But that raises another question: which orders can they delete? All orders or only the ones they are responsible for?
+If we only say the operation manager can delete orders, we’ve handled role and action but not data-level permission. We can add an attribute — scope — for example:
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei"],
+} 
+```
+
+Then we know this operation manager can view and delete orders and only orders in Taipei and New Taipei.
+
+### Frontend in practice
+
+Does the frontend need to know about roles? For the UI, we should focus on permission checks, because every CRUD operation is an action — that decides whether a part of the interface shows up or can be used. Data permission (scope) decides whether to show a given record.
+That doesn’t mean the frontend never needs roles. In admin systems, roles can be a way to group people; in routing, they can send different roles to different pages.
+
+Using the operation manager example:
+
+```js
+// permissions
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei", "kaohsiung"],
+} 
+```
+
+On the front end we can turn this into a check function and wrap it:
+
+```js
+const checkPermission = (permission, action, targetStore) => {
+  const isActionAllowed = permission.actions.includes(action);
+  const isWithinScope = permission.scope.includes(targetStore);
+  return isActionAllowed && isWithinScope;
+}
+
+const orderAccess = {
+  canView: checkPermission(operationManagerPermissions, "view", order.store),
+  canDelete: checkPermission(operationManagerPermissions, "delete", order.store),
+}
+```
+
+A frontend component might look like:
+
+```js
+// say we have an order in Taoyuan
+const order = {
+  id: 1,
+  store: "taoyuan",
+  status: "pending",
+  amount: 100,
+  createdAt: "2026-01-01",
+  updatedAt: "2026-01-01",
+  price: 100,
+}
+
+return (
+  <>
+    {orderAccess.canView && (
+      <div>
+        Order details...
+        {orderAccess.canDelete && <button>Delete</button>}
+      </div>
+    )}
+  </>
+);
+```
+
+Because the order is in Taoyuan, which is not in the operation manager’s scope, the UI will not show the order details or the delete button.
+
+This is also about **decoupling**, originally we depend on role checks, now we depend on permission checks. If we need to change permissions or add new permissions, we only need to change the permission definition, without changing the frontend code.
+If we need to add a new role, we only need to add the corresponding role to the permission definition, for example:
+
+```js
+const seniorAuditorPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"],
+} 
+```
+
+This way the senior auditor can view and delete orders in Taipei, New Taipei, Kaohsiung, and Taoyuan. The check function doesn't need to be changed, we don't need to write anything like `user.role === "seniorAuditor"` or `user.role === "operationManager"`.
+
+Ps. In real world, an auditor will never have permission to delete orders, this is just an example :)

@@ -1,0 +1,197 @@
+---
+title: "當前端開始思考後端架構第二篇"
+description: 記錄在管理系統中常見的，將角色跟權限封裝以及如何處理權限的問題
+date: 2026-2-4
+tags: ["system design", "authentication", "authorization", "rbac", "abac"]
+published: true
+language: "zh_tw"
+---
+
+上一篇[認證系統以及架構思考第一篇](/zh_tw/blog/learn-to-build-auth-zh_tw)，我們討論了認證系統的架構思考，在實作中，我們也常會遇到管理系統的權限問題。
+常見的情境可能是，我們需要將不同的角色分配不同的權限，例如：
+
+- 管理員 (Admin)
+- 使用者 (User)
+- 訪客 (Guest)
+
+我們需要將不同的角色分配不同的權限，例如：
+
+- 管理員 (Admin) 可以管理所有功能
+- 使用者 (User) 可以管理自己的資料
+- 訪客 (Guest) 只能查看功能
+
+再細分一點可能可以分成：
+
+- 行銷人員 (Marketing) 可以管理行銷活動
+- 客服人員 (Customer Service) 可以管理客服工單
+- 財務人員 (Finance) 可以管理財務報表
+
+本篇紀錄一些管理系統中在規劃角色與權限的時候需要思考的問題。
+
+## RBAC vs. ABAC
+
+在思考規劃角色跟權限時，通常可以以 RBAC 或是 ABAC 來進行規劃，兩者不是互相排斥的，而是可以互相結合使用。
+
+### RBAC (Role-Based Access Control)
+
+「角色」導向，簡單來說就是你是什麼角色，就可以做什麼事情，例如：你是管理員，就可以管理所有功能；你是使用者，就可以管理自己的資料。
+解決了「誰」可以做什麼事情。
+
+
+### ABAC (Attribute-Based Access Control)
+
+「屬性」導向，假設你是財務管理人員，你就可以查看財務報表，但是不能查看行銷活動資料。
+
+兩者混用的情境可能是：
+
+假設你是一名客服人員，你可以修改訂單，但是你是大台北組的客服人員，因此只能修改大台北地區的訂單，類似這樣的角色跟權限該怎麼規劃呢？
+
+一開始我覺得應該都是以 ABAC 為主，但是應該視「客服人員」為一個角色還是一種屬性呢？還是說角色其實也是一種屬性呢？
+
+如果以 ABAC 來寫規則，我們可能會這樣寫：
+
+```js
+if (user.role === "customerService") then do action "updateOrder" else do action "viewOrder"
+```
+
+以 RBAC 來寫規則也會是差不多的，所以如果針對「什麼職位能做什麼事情」，這種固定的需求，可以用 RBAC 來寫規則。
+
+但若是加上「什麼地區的客服人員能做什麼事情」，這種數據授權的面向，如果以 RBAC 管理的話，可能會需要建立「大台北客服」、「高雄客服」等一堆根據地區建立的角色，這樣會陷入角色爆炸(Role Explosion) 的問題。
+此時只要加上下面的規則，就可以解決這個問題：
+
+```js
+if (user.role === "customerService" && user.region === "taipei") then do action "updateOrder" else do action "viewOrder"
+```
+
+> 用角色定義做什麼(action)，用屬性定義能看到什麼(scope)
+
+### 使用 `user.role === "某個角色"` 是好還是壞？
+
+如果程式碼內散落了很多 `user.role === "某個角色"` 的判斷，會讓程式碼變得難以維護，萬一哪一天角色需要修改，或者增加了新的角色，會導致需要修改大量的程式碼。
+舉例來說，假設今天只有 admin 可以刪除訂單，但後來加上了新的角色 - 「營運主管」，營運主管也可以刪除訂單，但只能刪除營運主管自己負責的訂單，此時需要修改大量的程式碼，
+將 `user.role === "admin"` 改成 `user.role === "admin" || user.role === "operationManager"`，這樣的修改可能會導致需要修改大量的程式碼，而且可能會漏掉一些情境沒有考慮到。
+
+> 依權限設計，不依角色設計
+>
+> 把角色視為一種權限的集合，程式應該要依照「權限」去判斷是否可以做某件事情，而不是依據角色去判斷。
+
+因此程式碼內只需要去檢查是否可以刪除訂單的權限即可，未來做測試也不需要去建立角色，只需要給予對應的權限即可。
+
+#### 權限的組成：resource + action
+
+權限的組成通常是 resource + action，例如：
+
+- resource: 訂單、使用者、產品等
+- action: 刪除、修改、查看等
+
+依上述訂單刪除的範例，我們可以建立一個權限集合，權限集合內包含 resource 和 actions：
+
+```js
+const orderPermissions = {
+  resource: "order",
+  actions: ["create", "delete", "update", "view"],
+} 
+```
+
+然後我們只要建立一個營運主管的角色後，把訂單刪除的權限集合加入到營運主管的角色中，就可以解決這個問題。
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+} 
+```
+
+這樣我們就可以很清楚的知道營運主管可以刪除訂單，但這又帶來另外一個問題，刪除訂單是刪除哪個層級的訂單呢？ 是刪除全部的訂單還是只刪除營運主管自己負責的訂單？
+如果只是營運主管可以刪除訂單，這裡解決了角色跟動作，但是沒有解決數據權限的問題，我們可以再增加一個屬性 - scope，例如：
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei"],
+} 
+```
+
+這樣我們就更清楚這個營運主管可以查看並刪除台北跟新北的訂單。
+
+### 前端實務
+
+前端需不需要知道角色呢？以前端來說，功能呈現上應該只要著重在權限的檢查，因為任何的 CRUD 操作都是 action，這些決定介面是否要出現或者是否可操作；而數據權限 scope 則是決定是否要顯示該筆資料。
+但這不是說前端不需要知道角色，在管理系統中，角色可以是歸納群組的工具；在路由管理中，則是扮演著引導不同角色到不同頁面。
+
+以上面營運主管的範例來說：
+
+```js
+// 權限
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei", "kaohsiung"],
+} 
+```
+
+前端這邊可以將規則歸納成一個檢查的函式以及封裝：
+
+```js
+const checkPermission = (permission, action, targetStore) => {
+  const isActionAllowed = permission.actions.includes(action);
+  const isWithinScope = permission.scope.includes(targetStore);
+  return isActionAllowed && isWithinScope;
+}
+
+const orderAccess = {
+  canView: checkPermission(operationManagerPermissions, "view", order.store),
+  canDelete: checkPermission(operationManagerPermissions, "delete", order.store),
+}
+```
+
+前端組件可能是：
+
+```js
+// 假設有一筆訂單是桃園的
+const order = {
+  id: 1,
+  store: "taoyuan",
+  status: "pending",
+  amount: 100,
+  createdAt: "2026-01-01",
+  updatedAt: "2026-01-01",
+  price: 100,
+}
+
+return (
+  <>
+    {orderAccess.canView && (
+      <div>
+        訂單詳情...
+        {orderAccess.canDelete && <button>刪除按鈕</button>}
+      </div>
+    )}
+  </>
+);
+```
+
+因為是在桃園，不在營運主管的 scope 內，所以 UI 上不會顯示訂單詳情，也不會顯示刪除按鈕。如果要讓營運主管也能查看並有刪除桃園訂單的權利，只要在 scope 內加上桃園即可。
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"],
+} 
+```
+
+以上也是 **解耦 (Decoupling)** 的概念，原本是依賴角色的判斷，現在變成依權限的判斷，如果要變更權限或是新增權限，只需要修改權限的定義，不需要修改前端的程式碼。
+新增角色的話，只需要在權限的定義中新增對應的角色即可，例如：
+
+```js
+const seniorAuditorPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"],
+} 
+```
+
+這樣資深稽核就可以查看並刪除台北、新北、高雄、桃園的訂單了；判斷的函式完全不需要動，也不需要寫什麼 `user.role === "seniorAuditor"` 或 `user.role === "operationManager"` 的判斷。
+
+Ps. 在現實世界中，稽核是不可能有權限刪除訂單的，以上只是範例 :)
