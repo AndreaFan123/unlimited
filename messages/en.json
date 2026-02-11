@@ -3,7 +3,7 @@
   "profile": {
     "name": "Shan Le Fan (Andrea Fan)",
     "title": "Frontend Developer && Marketer",
-    "content1": "Frontend Developer and Community Manager with over 3 years of experience building web applications using Next.js, React, and TypeScript, excelling in adaptable environments and cross-departmental collaboration.",
+    "content1": "Frontend Developer with 3+ years of experience in the React ecosystem, specializing in building functional and user-centric web applications. With a background in Community Management and Marketing, I approach development with a strong focus on how technical solutions impact user experience and business goals. Proven ability to improve system efficiency—such as optimizing check-in workflows—and experienced in integrating IoT devices with modern web frameworks.",
     "content2": "Successfully led gamer community engagement, boosting interaction rates by over 10%, and leveraged automation tools and marketing strategies to streamline processes by 30%, driving $1M in seasonal revenue growth. Passionate about optimizing workflows with innovative tools to enhance user experience and business value.",
     "latestPosts": "Latest Posts"
   },
@@ -41,7 +41,7 @@
       "company": "Shalom (Taiwan's top PMS platform)",
       "title": "Frontend Developer",
       "duration": "2025-04-01 ~ 2025-07-01",
-      "description": "Used React.js、Next.js、TailwindCSS、TypeScript to revamp and develop cloud-based self check-in system and IOT."
+      "description": "Used React.js、Next.js、TailwindCSS、TypeScript to revamp and develop cloud-based self check-in system and IoT."
     },
     "ringus": {
       "company": "Ringus-solution",
