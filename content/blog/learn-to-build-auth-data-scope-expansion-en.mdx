@@ -1,0 +1,166 @@
+---
+title: "When the Frontend Thinks About Backend Architecture, Part 3"
+description: Notes on a common problem in admin systems — expanding the scope of data permissions
+date: 2026-2-11
+tags: ["system design", "authentication", "authorization"]
+published: true
+language: "en"
+---
+
+In the previous article [When the Frontend Thinks About Backend Architecture, Part 2](/en/blog/learn-to-build-auth-authorization-en), we talked about wrapping roles and permissions and how to handle authorization. In this article, I want to talk about "Data Scope Expansion".
+
+The example from the end of Part 2: an operation manager can view and delete orders from Taipei and New Taipei. But this manager performed so well that he got promoted. Now he can view orders from all cities in Taiwan, but for security reasons, we still only allow the operation manager to view and delete orders from Taipei and New Taipei.
+
+Based on the previous article, the original object was:
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei"],
+} 
+```
+
+If we only expand the scope, like `scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"]`, this means he also has the permission to view and delete orders from Kaohsiung and Taoyuan. This doesn't meet security and audit requirements.
+
+### Data Scope Expansion
+
+From the example in the introduction, it's easy to see what "Data Scope Expansion" means. The original `scope: ["taipei", "newTaipei"]` grew to `scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"]`, or even more.
+Its definition is: for different actions, precisely define the data boundary that each action can reach.
+
+Below is the example from the previous article. We bundled all actions together. In this example, actions and scope have a **many-to-one** relationship. This stage is called **"Coarse-grained"**, which is suitable for early-stage architecture planning — one permission shares one scope.
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"], // view and delete are bundled together
+  scope: ["taipei", "newTaipei"], // Taipei and New Taipei share the same view and delete permissions
+} 
+```
+
+But as the project grows, we need to define things more precisely — one action with one scope. This stage is called **"Fine-grained"**. If we rewrite the example:
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  rules: [
+    { 
+      action: "view", 
+      scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"] // view scope: all cities
+    },
+    { 
+      action: "delete", 
+      scope: ["taipei", "newTaipei"] // delete scope: only Taipei and New Taipei
+    }
+  ]
+}
+```
+
+With this change, the operation manager can view orders from all cities, but the delete permission is limited to Taipei and New Taipei. This also meets security and audit requirements. In security, this follows the **"Principle of Least Privilege"**.
+
+Since we're no longer just checking actions, we need to update the check function — from checking actions directly to finding a specific action from `rules`.
+
+```js
+// Original check function
+const checkPermission = (permission, action, targetStore) => {
+  const isActionAllowed = permission.actions.includes(action);
+  const isWithinScope = permission.scope.includes(targetStore);
+  return isActionAllowed && isWithinScope;
+}
+ 
+const orderAccess = {
+  canView: checkPermission(operationManagerPermissions, "view", order.store),
+  canDelete: checkPermission(operationManagerPermissions, "delete", order.store),
+}
+```
+
+After the change:
+
+```js
+const checkPermission = (permission, action, targetStore) => {
+  const rule = permission.rules.find(r => r.action === action);
+
+  if(!rule) {
+    return false;
+  }
+
+  const isGlobal = rule.scope === "all";
+  const isWithinScope = rule.scope.includes(targetStore);
+
+  return isGlobal || isWithinScope;
+}
+
+// unchanged
+const orderAccess = {
+  canView: checkPermission(operationManagerPermissions, "view", order.store),
+  canDelete: checkPermission(operationManagerPermissions, "delete", order.store),
+}
+```
+
+### Horizontal and Vertical Expansion
+
+Sometimes in practice, different scopes may have additional conditions. Let's extend the operation manager example. Here are the three stages of the operation manager's permissions:
+
+#### Stage 1
+
+Has the permission to view and delete orders from Taipei and New Taipei. This stage was mentioned above — the "Coarse-grained" stage.
+
+#### Stage 2
+
+Changed from many-to-one to one-to-one — one action, one scope. This is the "Fine-grained" stage.
+
+#### Stage 3
+
+Let's say the operation manager can now delete all orders across Taiwan that are under 1000 TWD. How should we change the structure?
+
+Here we can add conditions to the `delete` action's `scope`, which makes it easier for further filtering:
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  rules: [
+    { 
+      action: "view", 
+      scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"] // view scope: all cities
+    },
+    { 
+      action: "delete", 
+      scope: {
+        location:"all",
+        maxAmount: 1000,
+        allowedStatus: ["pending"] // can only delete pending orders
+      }
+    }
+  ]
+}
+
+// checkPermission function
+const checkPermission = (permission, action, order) => {
+  const rule = permission.rules.find(r => r.action === action);
+  if (!rule) return false;
+
+  const { scope } = rule;
+
+  // 1. Location Check
+  const isLocationOk = scope.locations === "all" || scope.locations.includes(order.store);
+
+  // 2. Amount Check
+  const isAmountOk = order.amount <= scope.maxAmount;
+
+  // 3. Status Check
+  const isStatusOk = scope.allowedStatus.includes(order.status);
+
+  return isLocationOk && isAmountOk && isStatusOk;
+}
+```
+
+From Stage 1 to Stage 2, we went through **Horizontal Expansion** — the `scope` grew from just Taipei and New Taipei to include more cities.
+At this point, it can only answer questions related to location.
+
+But from Stage 2 to Stage 3, we added conditions to the action's `scope`. It changed from an array to an object, adding new dimensions beyond just location.
+The things we can check expanded from just location to also include amount and order status. This shift from horizontal to vertical is called **"Vertical Expansion"**.
+
+### Conclusion
+
+Data Scope Expansion is not just about letting permissions reach more data — it's about giving permissions the ability to "filter precisely".
+However, as business logic gets more complex, permission checks will inevitably become harder to maintain. For the frontend, this is also a real challenge — and that's something we'll explore in the next article.
