@@ -17,16 +17,16 @@ import { Link } from "@/src/i18n/navigation";
 import { Locales } from "@/src/i18n/request";
 
 type PostPageProps = {
-  params: {
+  params: Promise<{
     slug: string[];
-    locale: Locales;
-  };
+    locale: string;
+  }>;
 };
 
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  const post = await getPostFromParams(params);
+  const post = await getPostFromParams(await params);
   return generatePageMetadata(
     singleBlogPageContent,
     post?.title,
@@ -34,14 +34,14 @@ export async function generateMetadata({
   );
 }
 
-const getPostFromParams = async (params: PostPageProps["params"]) => {
+const getPostFromParams = async (params: Awaited<PostPageProps["params"]>) => {
   const slug = params?.slug?.join("/");
   const post = posts.find((post) => post.slugAsParams === slug);
   return post;
 };
 
 export const generateStaticParams = async (): Promise<
-  PostPageProps["params"][]
+  { slug: string[]; locale: string }[]
 > => {
   return posts.map((post) => ({
     slug: post.slugAsParams.split("/"),
@@ -50,8 +50,9 @@ export const generateStaticParams = async (): Promise<
 };
 
 export default async function BlogPostPage({ params }: PostPageProps) {
-  const post = await getPostFromParams(params);
-  const { locale } = await params;
+  const resolvedParams = await params;
+  const post = await getPostFromParams(resolvedParams);
+  const locale = resolvedParams.locale as Locales;
   if (!post || !post.published) {
     notFound();
   }

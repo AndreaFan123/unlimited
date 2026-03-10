@@ -3,8 +3,7 @@
   "profile": {
     "name": "范珊樂 (Andrea Fan)",
     "title": "前端工程師 && 行銷",
-    "content1": "擁有 3+ 年 React 生態系統的開發經驗，專注於構建功能性和以使用者為中心的網頁應用程式。擁有社群管理與行銷背景，注重技術解決方案如何影響使用者體驗和商業目標。能夠改善系統效率，例如最佳化流程，並在現代網頁框架中整合物聯網設備。",
-    "content2": "成功領導遊戲玩家社群互動，提升互動率超過10%，並利用自動化工具和行銷策略最佳化流程達30%，推動季節性收入增長 100 萬美元。熱衷於思考最佳化工作流程，提升使用者體驗與商業價值。",
+    "content1": "熱衷於思考資源整合與分貝，最佳化工作流程，提升使用者體驗與商業價值。",
     "latestPosts": "最新文章"
   },
   "techStack": {
@@ -21,7 +20,13 @@
     "mdn": "MDN (Mozilla 開發者網路)",
     "mdnDescription": "MDN Web Docs 繁體中文翻譯者",
     "coseeing": "Coseeing 推廣無障礙協會",
-    "coseeingDescription": "無障礙推廣者"
+    "coseeingDescription": "無障礙推廣者",
+    "visitCourse": "課程連結",
+    "visitRepo": "Repo 連結",
+    "missingSemester": "Missing Semester (MIT)",
+    "missingSemesterDescription": "Missing Semester 繁體中文翻譯者",
+    "missingSemesterLink": "https://missing-semester-tw.github.io/",
+    "missingSemesterRepo": "https://github.com/missing-semester-tw"
   },
   "socials": {
     "linkedin": "前往 Linkedin",

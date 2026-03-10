@@ -10,7 +10,6 @@ export default function ProfileContainer() {
         name={tProfile("name")}
         title={tProfile("title")}
         content_1={tProfile("content1")}
-        content_2={tProfile("content2")}
       />
     </div>
   );

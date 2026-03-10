@@ -4,6 +4,7 @@ import { getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/src/components/theme-provider";
 import "./globals.css";
 import { Locales } from "@/src/i18n/request";
+import { routing } from "@/src/i18n/routing";
 import Header from "@/src/components/normal-components/Header";
 import Footer from "@/src/components/normal-components/Footer";
 
@@ -22,15 +23,18 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: Locales };
+  params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
+  const resolvedLocale = routing.locales.includes(locale as Locales)
+    ? (locale as Locales)
+    : routing.defaultLocale;
   const messages = await getMessages();
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={resolvedLocale} suppressHydrationWarning>
       <body
         className={`${
-          locale === "en" ? inter.className : notoSansTC.className
+          resolvedLocale === "en" ? inter.className : notoSansTC.className
         }`}
       >
         <ThemeProvider
@@ -40,7 +44,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            <Header lang={locale} />
+            <Header lang={resolvedLocale} />
             {children}
             <Footer />
           </NextIntlClientProvider>

@@ -1,4 +1,6 @@
 import { useTranslations } from "next-intl";
+import { Globe, Github } from "lucide-react";
+import Link from "next/link";
 
 export default function VolunteerProject() {
   const t = useTranslations("projects");
@@ -6,6 +8,14 @@ export default function VolunteerProject() {
     {
       name: t("pyladies"),
       description: t("pyladiesDescription"),
+    },
+    {
+      name: t("missingSemester"),
+      description: t("missingSemesterDescription"),
+      link: t("missingSemesterLink"),
+      repo: t("missingSemesterRepo"),
+      target: "_blank",
+      ariaLabel: t("missingSemesterRepo"),
     },
   ];
   return (
@@ -25,6 +35,32 @@ export default function VolunteerProject() {
               <p className="text-gray-600 dark:text-white block">
                 {project.description}
               </p>
+              <div className="flex flex-col mt-2">
+                {project.link && (
+                  <div className="w-fit">
+                    <Link
+                      href={project.link}
+                      target="_blank"
+                      className="flex items-center gap-2 underline"
+                    >
+                      <Globe size={18} />
+                      {t("visitCourse")}
+                    </Link>
+                  </div>
+                )}
+                {project.repo && (
+                  <div className="w-fit">
+                    <Link
+                      href={project.repo}
+                      target="_blank"
+                      className=" flex items-center gap-2 underline"
+                    >
+                      <Github size={18} />
+                      {t("visitRepo")}
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}
