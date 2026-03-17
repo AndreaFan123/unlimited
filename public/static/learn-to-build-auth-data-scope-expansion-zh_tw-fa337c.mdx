@@ -1,0 +1,167 @@
+---
+title: "當前端開始思考後端架構第三篇"
+description: 記錄在管理系統中常見的，將數據權限的 scope 擴展的問題
+date: 2026-2-11
+tags: ["system design", "authentication", "authorization"]
+published: true
+language: "zh_tw"
+---
+
+上一篇[當前端開始思考後端架構第二篇](/zh_tw/blog/learn-to-build-auth-authorization-zh_tw)，記錄了角色跟權限封裝以及如何處理權限的問題，這篇我想來記錄關於「數據範圍擴張」(data scope expansion)的問題。
+
+第二篇最後的範例：營運主管可以看到以及刪除台北市跟新北市的訂單，但是這個主管表現太好而獲得升遷，現在他可以看到全台的訂單，但是為了安全，我們依舊只能讓營運主管查看和刪除台北市以及新北市的訂單。
+
+按照上一篇，原本的物件是：
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"],
+  scope: ["taipei", "newTaipei"],
+} 
+```
+
+如果我們只擴增 scope，例如 `scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"]`，這表示他有查看以及刪除高雄和桃園的權限，這並不符合資安和審計考量。
+
+### 數據範圍擴張 (Data Scope Expansion)
+
+從引言的範例可以一目瞭然何謂「數據範圍擴張」，原本的 `scope: ["taipei", "newTaipei"]` 因為需求而增加到 `scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"]`，甚至更多，
+它的定義是針對不同的操作動作 (Action)，精確地定義其可觸及的數據邊界 (Boundary)。
+
+下面是上一篇的範例，我們把所有的操作動作都綁在一起，在這個範例中動作與範圍呈現**多對一**，這個階段稱為 **「粗粒度階段」(Coarse-grained)**，適合初期規劃架構時，
+一個權限共用一個範圍。
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  actions: ["view", "delete"], // 查看和刪除權限被綁在一起
+  scope: ["taipei", "newTaipei"], // 台北和新北都共用查看和刪除的權限
+} 
+```
+
+但隨著專案越來越大，我們就必須要更精確地去定義，讓一個動作適用一個範圍，這個階段稱為 **「細粒度階段」(Fine-grained)**，若拿範例來改寫:
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  rules: [
+    { 
+      action: "view", 
+      scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"] // 查看範圍：全台
+    },
+    { 
+      action: "delete", 
+      scope: ["taipei", "newTaipei"] // 刪除範圍：僅限雙北
+    }
+  ]
+}
+```
+
+改成上面的話，營運主管就可以查看全台訂單，但在刪除訂單的權限上被限制在台北跟新北，這樣也符合了資安和審計的需求，在資安上即追求 **「最小權限原則」(Principle of Least Privilege)**。
+
+由於不再是檢查動作，我們需要修改檢查的函式，從原本檢查動作到從`rules`找特定的動作。
+
+```js
+// 原本的檢查函式
+const checkPermission = (permission, action, targetStore) => {
+  const isActionAllowed = permission.actions.includes(action);
+  const isWithinScope = permission.scope.includes(targetStore);
+  return isActionAllowed && isWithinScope;
+}
+ 
+const orderAccess = {
+  canView: checkPermission(operationManagerPermissions, "view", order.store),
+  canDelete: checkPermission(operationManagerPermissions, "delete", order.store),
+}
+```
+
+改動後：
+
+```js
+const checkPermission = (permission, action, targetStore) => {
+  const rule = permission.rules.find(r => r.action === action);
+
+  if(!rule) {
+    return false;
+  }
+
+  const isGlobal = rule.scope === "all";
+  const isWithinScope = rule.scope.includes(targetStore);
+
+  return isGlobal || isWithinScope;
+}
+
+// 不變
+const orderAccess = {
+  canView: checkPermission(operationManagerPermissions, "view", order.store),
+  canDelete: checkPermission(operationManagerPermissions, "delete", order.store),
+}
+```
+
+### 水平跟垂直擴張
+
+有時候實務上可能會在不同的 scope 上有其他的條件，以營運主管這個範圍來延伸的話，以下是營運主管權限的三階段：
+
+#### 第一階段
+
+擁有查看跟刪除雙北的權限，此階段在上述有提過，即「粗粒度階段」(Coarse-grained)
+
+#### 第二階段
+
+把多對一改成一對一，一個動作一種權限，此階段即「細粒度階段」(Fine-grained)
+
+#### 第三階段
+
+假設今天營運主管可以刪除全台所有低於台幣 1000 元的訂單，此時的結構要如何改呢？
+
+這裡我們可以將 `delete` 的 `scope` 加上條件，這樣就有利於後續的篩選
+
+```js
+const operationManagerPermissions = {
+  resource: "order",
+  rules: [
+    { 
+      action: "view", 
+      scope: ["taipei", "newTaipei", "kaohsiung", "taoyuan"] // 查看範圍：全台
+    },
+    { 
+      action: "delete", 
+      scope: {
+        location:"all",
+        maxAmount: 1000,
+        allowedStatus: ["pending"] // 只能刪除待處理的訂單
+      }
+    }
+  ]
+}
+
+// checkPermission 函式
+const checkPermission = (permission, action, order) => {
+  const rule = permission.rules.find(r => r.action === action);
+  if (!rule) return false;
+
+  const { scope } = rule;
+
+  // 1. 檢查地區 (Location Check)
+  const isLocationOk = scope.locations === "all" || scope.locations.includes(order.store);
+
+  // 2. 檢查金額 (Amount Check)
+  const isAmountOk = order.amount <= scope.maxAmount;
+
+  // 3. 檢查訂單狀態 (Status Check)
+  const isStatusOk = scope.allowedStatus.includes(order.status);
+
+  return isLocationOk && isAmountOk && isStatusOk;
+}
+```
+
+從第一階段到第二階段，我們經歷了 **水平擴張(Horizontal Expansion)**，把 `scope` 從原本的雙北增加了新的城市。
+此時可以回答的只有攸關地點的內容。
+
+但從第二階段到第三階段，把動作的 `scope` 增加了條件，從原本的陣列變成物件，新增了除了地點外的維度，把可判斷的事物從除了地點外，
+增加到了金額跟訂單狀態，由水平轉為垂直，又稱 **「垂直擴張 (Vertical Expansion)」**
+
+### 結論
+
+「數據範圍擴張 (Data Scope Expansion) 不僅僅是讓權限能觸及更多資料，更是讓權限具備 『精確過濾』 的能力。
+不過隨著業務邏輯的複雜，權限的檢查勢必是會更難維護，以前端來說，也無疑也是一項挑戰，就留給下一篇來研究了。
