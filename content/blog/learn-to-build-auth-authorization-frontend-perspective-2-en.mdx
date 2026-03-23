@@ -1,0 +1,516 @@
+---
+title: "When the frontend thinks about the backend, part 5: New requirements—what should the frontend do?"
+description: Notes on the frontend’s first pass at planning permissions
+date: 2026-3-6
+tags: ["system design", "authentication", "authorization", "frontend-architecture"]
+published: true
+language: "en"
+---
+
+At the end of [When Frontend Starts Thinking About Backend Architecture Part 4](./learn-to-build-auth-authorization-frontend-perspective-1-en.mdx), 🐻 PM had another surprise.
+
+🐻: “We need to change how permissions work. Every client has different rules, and before deleting an order we have to check whether there are linked refunds…”
+
+Let’s recap part 4, then think about how the frontend can handle this new requirement.
+
+### Recap of the architecture from part 4
+
+```markdown
+Data Layer      AuthRepository, PermissionMapper
+Domain Layer    PermissionService, Permission entity  
+Presentation    OrderPage
+```
+
+PM’s two asks are:
+
+1. Different clients, different rules → this grows how we model data permissions.
+2. Before deleting an order, check for related refunds → a cross-resource check (we need both order and refund data to decide if delete is allowed).
+
+The data shape from the last article looked like this:
+
+```json
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"]
+    }
+  ]
+}
+```
+
+When PM says each client has different rules, the API might add fields that describe those conditions. For example:
+
+User `user123` can “delete orders under 1000 dollars, only in Taipei and New Taipei, and only when the order is pending.” The response might look like:
+
+```json
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"]
+    }
+  ],
+  "conditions": [
+    {
+      "field": "maxAmount",
+      "value": 1000,
+      "operator": "lessThan"
+    },
+    {
+      "field": "status",
+      "value": "pending",
+      "operator": "equal"
+    }
+  ]
+}
+```
+
+Another user `user456` might be “delete under 2000 dollars, only in Kaohsiung and Pingtung, pending only.” The response could be:
+
+```json
+{
+  "user_id": "user456",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["kaohsiung", "pingtung"]
+    }
+  ],
+  "conditions": [
+    {
+      "field": "maxAmount",
+      "value": 2000,
+      "operator": "lessThan"
+    },
+    {
+      "field": "status",
+      "value": "pending",
+      "operator": "equal"
+    }
+  ]
+}
+```
+
+### Designing `conditions`
+
+With dynamic rules, the original `Mapper` must change—otherwise it won’t know about `conditions`. The `Entity` changes too. First we need to decide where `conditions` live.
+
+Putting `conditions` next to `permissions` means those `conditions` apply to every permission entry. 🐻 PM didn’t say each permission has different conditions, so you could share one `conditions` list across all permissions—but in real apps each permission often has its own rules. Check with PM; otherwise you’ll refactor again.
+
+If each permission has different conditions, put `conditions` inside each permission. That means conditions apply only to that permission. Below, the entity shows both “sibling” and “nested” shapes.
+
+#### Updating the `Entity`
+
+```ts
+// shared/entities/Permission.ts
+
+export type ConditionOperator =
+  | "equal" 
+  | "notEqual"
+  | "lessThan" 
+  | "greaterThan"
+  | "in"
+  | "notIn"
+
+export type ConditionValue = string | number | boolean | string[] | number[] | boolean[]
+
+export interface Condition {
+  field: string
+  value: ConditionValue
+  operator: ConditionOperator
+}
+
+// =========== conditions next to permissions (same level) ===========
+// export interface Permission {
+//   resource: string
+//   actions: string[]
+//   scope: string[] | "all"
+//   conditions: Condition[]
+// }
+
+// export interface UserPermission {
+//   userId: string
+//   role: string
+//   permissions: Permission[]
+//   conditions: Condition[]
+// }
+
+// =========== conditions inside each permission ===========
+// This article mainly uses this shape
+
+export interface Permission {
+  resource: string
+  actions: string[]
+  scope: string[] | "all"
+  conditions: Condition[]
+}
+
+export interface UserPermission {
+  userId: string
+  role: string
+  permissions: Permission[]
+}
+```
+
+Two response shapes:
+
+```json
+// =========== conditions next to permissions (same level) ===========
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"]
+    }
+  ],
+  "conditions": [
+    {
+      "field": "maxAmount",
+      "value": 1000,
+      "operator": "lessThan"
+    },
+    {
+      "field": "status",
+      "value": "pending",
+      "operator": "equal"
+    }
+  ]
+}
+
+// =========== conditions inside each permission ===========
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"],
+      "conditions": [
+        {
+          "field": "maxAmount",
+          "value": 1000,
+          "operator": "lessThan"
+        },
+        {
+          "field": "status",
+          "value": "pending",
+          "operator": "equal"
+        }
+      ]
+    },
+    {
+      "resource": "report",
+      "actions": ["view"],
+      "scope": "all",
+      "conditions": [
+        {
+          "field": "createdAt",
+          "value": "2026-01-01",
+          "operator": "greaterThan"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Nesting under `permissions` means:
+
+- `order` → Taipei/New Taipei only, amount under 1000, status pending.
+- `report` → view everywhere, but only reports created after 2026.
+
+You can also mix: pull shared rules into global conditions, for example:
+
+```json
+{
+  "user_id": "user123",
+  "globalConditions": [
+    { "field": "isActive", "operator": "equal", "value": true }
+  ],
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["delete"],
+      "scope": ["taipei"],
+      "conditions": [
+        { "field": "maxAmount", "operator": "lessThan", "value": 1000 }
+      ]
+    }
+  ]
+}
+```
+
+That design means:
+
+- Every action requires an active account: `globalConditions`.
+- Deleting an order also requires amount under 1000: `conditions` on that permission.
+
+#### Updating the `Mapper`
+
+```ts
+// features/auth/mappers/PermissionMapper.ts
+
+// =========== conditions next to permissions (same level) ===========
+// const toPermissions = (p:any): Permission => ({
+//   resource: p.resource,
+//   actions: p.actions,
+//   scope: p.scope
+// })
+// const toConditions = (c:any): Condition => ({
+//   field: c.field,
+//   value: c.value,
+//   operator: c.operator
+// })
+
+// const toDomainData = (apiResponse: any): UserPermission => ({
+//   userId: apiResponse.user_id,
+//   role: apiResponse.role,
+//   permissions: apiResponse.permissions.map(toPermissions),
+//   conditions: apiResponse.conditions.map(toConditions)
+// })
+
+
+// =========== conditions inside each permission ===========
+// This article mainly uses this shape
+const toConditions = (c:any): Condition => ({
+  field: c.field,
+  value: c.value,
+  operator: c.operator
+})
+
+const toPermissions = (p:any): Permission => ({
+  resource: p.resource,
+  actions: p.actions,
+  scope: p.scope,
+  conditions: p.conditions?.map(toConditions) ?? [] // if no conditions, return an empty array
+})
+
+const toDomainData = (apiResponse: any): UserPermission => ({
+  userId: apiResponse.user_id,
+  role: apiResponse.role,
+  permissions: apiResponse.permissions.map(toPermissions)
+})
+
+export { toDomainData }
+```
+
+### Principle of least privilege
+
+Putting `conditions` inside each permission helps because:
+
+- It fits least privilege: rules apply to specific permissions, not every permission at once.
+- Each permission can have its own conditions, so control is tighter—less “too much” or “too little” access.
+- Readability: per-resource rules are easier to scan than mixing global conditions into every permission.
+
+Global `conditions` affect every permission—you must check whether each permission still makes sense. That’s more work. Sometimes a global rule is right: if every action must satisfy one condition, putting it at the global level is reasonable.
+
+This article sticks with conditions inside each permission.
+
+#### Updating the `Service`
+
+The `Service` from the last article should follow the new `conditions` field. In `hasPermission`, add checks against `conditions`.
+
+```ts
+// shared/services/PermissionService.ts
+
+// Assume we already have an Order entity defined
+import { Order } from 'order/entities/Order'
+
+type OrderContext = Pick<Order, "amount" | "status" | "store">
+
+const checkConditions = (conditions: Condition[], context: OrderContext) => {
+  return conditions.every(({ field, value, operator }) => {
+    const contextValue = context[field as keyof OrderContext];
+
+    switch (operator) {
+      case "equal":
+        return contextValue === value;
+      case "notEqual":
+        return contextValue !== value;
+      case "lessThan":
+        return contextValue < (value as number);
+      case "greaterThan":
+        return contextValue > (value as number);
+      case "in":
+        return (value as string[]).includes(contextValue as string);
+      case "notIn":
+        return !(value as string[]).includes(contextValue as string);
+      default:
+        return false;
+    }
+  });
+};
+
+const createPermissionService = (userPermission: UserPermission) => {
+
+  const hasPermission = (
+    action: string,
+    resource: string,
+    scope?: string,
+    context?: OrderContext
+  ): boolean => {
+    const permission = userPermission.permissions
+      .find(p => p.resource === resource)
+
+    if (!permission) return false
+
+    const isActionAllowed = permission.actions.includes(action)
+
+    const isWithinScope =
+      permission.scope === "all" ||
+      (scope ? permission.scope.includes(scope) : true)
+
+    const isConditionSatisfied =
+      permission.conditions.length === 0 ||
+      (context ? checkConditions(permission.conditions, context) : true)
+
+    return isActionAllowed && isWithinScope && isConditionSatisfied
+  }
+
+  // Cross-resource business rules go here
+  const canDeleteOrder = (order: Order, refunds: Refund[]): boolean => {
+    const canDelete = hasPermission(
+      "delete",
+      "order",
+      order.store,
+      { amount: order.amount, status: order.status, store: order.store }
+    )
+    const hasNoRefund = !refunds.some(r => r.orderId === order.id)
+
+    return canDelete && hasNoRefund
+  }
+
+  return {
+    hasPermission,
+    canDeleteOrder
+  }
+}
+
+export { createPermissionService }
+```
+
+#### Presentation layer
+
+The UI only uses the booleans from `Service` to decide what to show.
+
+```ts
+import { useEffect, useState } from 'react'
+import { createAuthRepository } from 'auth/repositories/AuthRepository'
+import { createOrderRepository } from 'order/repository/OrderRepository'
+// Assume we already have a Refund repository
+import { createRefundRepository } from 'refund/repository/RefundRepository'
+import { createPermissionService } from '../services/PermissionService'
+import { OrderDetail } from './OrderDetail'
+// Assume Order and Refund entities exist
+import type { Order, Refund } from 'order/entities/Order'
+
+const authRepo = createAuthRepository(window.fetch)
+const orderRepo = createOrderRepository(window.fetch)
+const refundRepo = createRefundRepository(window.fetch)
+
+export default function OrderPage({ orderId }: { orderId: number }) {
+  const [permissionService, setPermissionService] = useState<ReturnType<typeof createPermissionService> | null>(null)
+  const [myOrder, setMyOrder] = useState<Order | null>(null)
+  const [refunds, setRefunds] = useState<Refund[]>([])
+
+  useEffect(() => {
+    const init = async() => {
+      try {
+        const [authData, orderData, refundData] = await Promise.all([
+          authRepo.getMe(),
+          orderRepo.getOrderById(orderId),
+          refundRepo.getRefundsByOrderId(orderId) // load refunds
+        ])
+
+        setPermissionService(createPermissionService(authData));
+        setMyOrder(orderData);
+        setRefunds(refundData);
+      } catch (error) {
+        console.error(error.message)
+      }
+    }
+    init()
+    // Depends on orderId: refetch auth and order when entering the page
+  }, [orderId])
+
+  if (!permissionService || !myOrder) {
+    return (
+      <div>Loading...</div>
+    )
+  }
+
+  return (
+    <OrderDetail 
+      order={myOrder}
+      refunds={refunds}
+      permissionService={permissionService} 
+    />
+  )
+}
+```
+
+```tsx
+import type { Order, Refund } from '@/shared/entities'
+import type { createPermissionService } from '@/shared/services/PermissionService'
+
+type OrderDetailProps = {
+  order: Order
+  refunds: Refund[]
+  permissionService: ReturnType<typeof createPermissionService>
+}
+
+export default function OrderDetail({ order, refunds, permissionService }: OrderDetailProps) {
+  const canDelete = permissionService.canDeleteOrder(order, refunds)
+  const canView = permissionService.hasPermission("view", "order", order.store)
+
+  const handleDelete = () => {
+    // Delete order: call deleteOrder on OrderRepository
+  }
+
+  if (!canView) {
+    return (
+      <div>You don’t have permission to view this order.</div>
+    )
+  }
+
+  return (
+      <div>
+      <h2>Order details</h2>
+
+      <div>
+        <p>Order ID: {order.id}</p>
+        <p>Region: {order.store}</p>
+        <p>Amount: {order.amount}</p>
+        <p>Status: {order.status}</p>
+      </div>
+
+      {canDelete && (
+        <button onClick={handleDelete}>
+          Delete order
+        </button>
+      )}
+    </div>
+  )
+}
+```
+
+> 🧐 Think about whether `Refund` belongs under `OrderRepository`, or whether you need a separate `RefundRepository`.
+>
+> What does putting it under `OrderRepository` mean? What does a separate `RefundRepository` mean?
+
+Putting `Refund` under `OrderRepository` means refunds are treated as a child of `Order`—they only show up in order-related flows. Admins working on an order can handle refunds in the same place. A separate `RefundRepository` makes sense if refunds will be searched on their own later, with their own list or basic CRUD.
+
+A quick way to choose: if the backend has dedicated refund APIs, add a `RefundRepository`. If not, keep it on `OrderRepository`. If you’re unsure, start under `OrderRepository` and split later when things are clear.
