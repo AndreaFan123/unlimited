@@ -1,0 +1,518 @@
+---
+title: "當前端開始思考後端架構第五篇：新增需求，前端這邊要怎麼辦？"
+description: 記錄前端針對權限的初步架構規劃
+date: 2026-3-6
+tags: ["system design", "authentication", "authorization", "frontend-architecture"]
+published: true
+language: "zh_tw"
+---
+
+上一篇[當前端開始思考後端架構第四篇](./learn-to-build-auth-authorization-frontend-perspective-1-zh_tw.mdx) 的最後，🐻 PM 又給了驚喜。
+
+🐻：「我們需要調整權限，不同客戶的規則都不一樣，而且刪除訂單之前還要檢查有沒有關聯的退款單...」
+
+讓我們先回顧第四篇的內容，再來思考這個新需求，前端可以怎麼處理。
+
+### 回顧第四篇的架構
+
+```markdown
+Data Layer      AuthRepository、PermissionMapper
+Domain Layer    PermissionService、Permission Entity  
+Presentation    OrderPage
+```
+
+PM 提出的兩個需求是：
+1. 不同客戶的規則都不一樣 -> 這個牽扯到資料權限的擴張
+2. 刪除訂單前要確認是否有相關的退款，也就是跨資源的判斷(需要檢查訂單以及退款資料，才能決定是否可以刪除訂單)
+
+上一篇原本設計的資料結構是：
+
+```json
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"]
+    }
+  ]
+}
+```
+
+而 PM 說的不同客戶規則不同，這樣回傳的資料結構可能就會多出一些描述條件等的欄位，例如：
+使用者 `user123` 的規則是「可以刪除金額小於 1000 元的訂單，且只能在台北跟新北進行刪除，且只能刪除待處理的訂單」，那麼回傳的資料結構可能就會是：
+
+```json
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"]
+    }
+  ],
+  "conditions": [
+    {
+      "field": "maxAmount",
+      "value": 1000,
+      "operator": "lessThan"
+    },
+    {
+      "field": "status",
+      "value": "pending",
+      "operator": "equal"
+    }
+  ]
+}
+```
+
+或者有另外一個使用者 `user456` 的規則是「可以刪除金額小於 2000 元的訂單，且只能在高雄跟屏東進行刪除，且只能刪除待處理的訂單」，那麼回傳的資料結構可能就會是：
+
+```json
+{
+  "user_id": "user456",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["kaohsiung", "pingtung"]
+    }
+  ],
+  "conditions": [
+    {
+      "field": "maxAmount",
+      "value": 2000,
+      "operator": "lessThan"
+    },
+    {
+      "field": "status",
+      "value": "pending",
+      "operator": "equal"
+    }
+  ]
+}
+```
+
+### `Conditions` 的設計
+
+加上動態規則後，原本的 `Mapper` 就需要修改，否則它根本不認識 `conditions` 欄位，除了 `Mapper` 之外，還有 `Entity`
+也需要修改，但等一下，我們需要先確認 `conditions` 的位置。
+
+將 `conditions` 置於與 `permissions` 同層級，這種設計說明了 `conditions` 適用於所有的 `permissions`。
+因為 🐻 PM 沒有說不同 `permissions` 的條件不同，那麼就可以讓所有 `permissions` 共用同一組 `conditions`，只是實務上不同的 `permissions` 可能會有不同的條件，
+所以可以向 PM 再確認，否則之後又得要修正了。
+
+假設不同 `permissions` 的條件不同，那麼可以將 `conditions` 置於 `permissions` 內部，這種設計說明了 `conditions` 適用於特定的 `permissions`，以下的 `Entity` 分別有同層級以及
+內部的設計。
+
+
+#### 更新 `Entity`
+
+```ts
+// shared/entities/Permission.ts
+
+export type ConditionOperator =
+  | "equal" 
+  | "notEqual"
+  | "lessThan" 
+  | "greaterThan"
+  | "in"
+  | "notIn"
+
+export type ConditionValue = string | number | boolean | string[] | number[] | boolean[]
+
+export interface Condition {
+  field: string
+  value: ConditionValue
+  operator: ConditionOperator
+}
+
+// =========== 條件置於 permissions 同層級 ===========
+// export interface Permission {
+//   resource: string
+//   actions: string[]
+//   scope: string[] | "all"
+//   conditions: Condition[]
+// }
+
+// export interface UserPermission {
+//   userId: string
+//   role: string
+//   permissions: Permission[]
+//   conditions: Condition[]
+// }
+
+// =========== 條件置於 permissions 內部 ===========
+// 這篇以這個方式為主
+
+export interface Permission {
+  resource: string
+  actions: string[]
+  scope: string[] | "all"
+  conditions: Condition[]
+}
+
+export interface UserPermission {
+  userId: string
+  role: string
+  permissions: Permission[]
+}
+```
+
+兩種不同的回傳結構：
+
+```json
+// =========== 條件置於 permissions 同層級 ===========
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"]
+    }
+  ],
+  "conditions": [
+    {
+      "field": "maxAmount",
+      "value": 1000,
+      "operator": "lessThan"
+    },
+    {
+      "field": "status",
+      "value": "pending",
+      "operator": "equal"
+    }
+  ]
+}
+
+// =========== 條件置於 permissions 內部 ===========
+{
+  "user_id": "user123",
+  "role": "operation_manager",
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["view", "delete"],
+      "scope": ["taipei", "newTaipei"],
+      "conditions": [
+        {
+          "field": "maxAmount",
+          "value": 1000,
+          "operator": "lessThan"
+        },
+        {
+          "field": "status",
+          "value": "pending",
+          "operator": "equal"
+        }
+      ]
+    },
+    {
+      "resource": "report",
+      "actions": ["view"],
+      "scope": "all",
+      "conditions": [
+        {
+          "field": "createdAt",
+          "value": "2026-01-01",
+          "operator": "greaterThan"
+        }
+      ]
+    }
+  ]
+}
+```
+
+置於 `permissions` 內部的設計說明了：
+- `order` → 只限雙北、金額小於 1000、狀態 pending 的訂單
+- `report` → 全部都可以看、但只能看 2026 年以後的報表
+
+我們也可以用混合式的，把一些共用規則抽出來作為全域的條件，例如：
+
+```json
+{
+  "user_id": "user123",
+  "globalConditions": [
+    { "field": "isActive", "operator": "equal", "value": true }
+  ],
+  "permissions": [
+    {
+      "resource": "order",
+      "actions": ["delete"],
+      "scope": ["taipei"],
+      "conditions": [
+        { "field": "maxAmount", "operator": "lessThan", "value": 1000 }
+      ]
+    }
+  ]
+}
+```
+
+上述的設計說明了：
+- 所有操作都要求帳號是啟用狀態: `globalConditions`
+- 刪除訂單額外要求金額小於 1000: `permission` 內的 `conditions`
+
+
+#### 更新 `Mapper`
+
+```ts
+// features/auth/mappers/PermissionMapper.ts
+
+// =========== 條件置於 permissions 同層級 ===========
+// const toPermissions = (p:any): Permission => ({
+//   resource: p.resource,
+//   actions: p.actions,
+//   scope: p.scope
+// })
+// const toConditions = (c:any): Condition => ({
+//   field: c.field,
+//   value: c.value,
+//   operator: c.operator
+// })
+
+// const toDomainData = (apiResponse: any): UserPermission => ({
+//   userId: apiResponse.user_id,
+//   role: apiResponse.role,
+//   permissions: apiResponse.permissions.map(toPermissions),
+//   conditions: apiResponse.conditions.map(toConditions)
+// })
+
+
+// =========== 條件置於 permissions 內部 ===========
+// 這篇以這個方式為主
+const toConditions = (c:any): Condition => ({
+  field: c.field,
+  value: c.value,
+  operator: c.operator
+})
+
+const toPermissions = (p:any): Permission => ({
+  resource: p.resource,
+  actions: p.actions,
+  scope: p.scope,
+  conditions: p.conditions?.map(toConditions) ?? [] // 如果沒有條件，則返回空陣列
+})
+
+const toDomainData = (apiResponse: any): UserPermission => ({
+  userId: apiResponse.user_id,
+  role: apiResponse.role,
+  permissions: apiResponse.permissions.map(toPermissions)
+})
+
+export { toDomainData }
+```
+
+### 最小權限原則 (Principle of Least Privilege)
+
+將 `conditions` 置於 `permissions` 內部，有幾個好處：
+- 可以更符合最小權限原則，因為它只適用於特定的 `permissions`，而不是所有的 `permissions`。
+- 每一個 `permissions` 都有自己的條件，這樣可以更精確地控制權限，避免權限過大或過小。
+- 可讀性，不同資源的條件可以更容易閱讀，不需要在每一個 `permissions` 中都查看全域的條件。
+
+全域的 `conditions` 會影響每一個 `permissions`，需要確認每一個 `permissions` 是否都符合條件，這樣會比較麻煩。但是也要看需求而定，假設已經確認某個操作都必須滿足一個條件，那麼把這個條件置於全域就是合理的。
+
+本篇就先採用置於 `permissions` 內部的設計。
+
+#### 更新 `Service`
+
+上一篇的 `Service` 也需要根據新的欄位 `conditions` 進行更新，主要是在 `hasPermission` 方法中，需要新增對 `conditions` 的檢查。
+
+```ts
+// shared/services/PermissionService.ts
+
+// 假設我們已經定義好 Order 的 entity
+import { Order } from 'order/entities/Order'
+
+type OrderContext = Pick<Order, "amount" | "status" | "store">
+
+const checkConditions = (conditions: Condition[], context: OrderContext) => {
+  return conditions.every(({ field, value, operator }) => {
+    const contextValue = context[field as keyof OrderContext];
+
+    switch (operator) {
+      case "equal":
+        return contextValue === value;
+      case "notEqual":
+        return contextValue !== value;
+      case "lessThan":
+        return contextValue < (value as number);
+      case "greaterThan":
+        return contextValue > (value as number);
+      case "in":
+        return (value as string[]).includes(contextValue as string);
+      case "notIn":
+        return !(value as string[]).includes(contextValue as string);
+      default:
+        return false;
+    }
+  });
+};
+
+const createPermissionService = (userPermission: UserPermission) => {
+
+  const hasPermission = (
+    action: string,
+    resource: string,
+    scope?: string,
+    context?: OrderContext
+  ): boolean => {
+    const permission = userPermission.permissions
+      .find(p => p.resource === resource)
+
+    if (!permission) return false
+
+    const isActionAllowed = permission.actions.includes(action)
+
+    const isWithinScope =
+      permission.scope === "all" ||
+      (scope ? permission.scope.includes(scope) : true)
+
+    const isConditionSatisfied =
+      permission.conditions.length === 0 ||
+      (context ? checkConditions(permission.conditions, context) : true)
+
+    return isActionAllowed && isWithinScope && isConditionSatisfied
+  }
+
+  // 這裡新增的需要跨資源的業務邏輯判斷
+  const canDeleteOrder = (order: Order, refunds: Refund[]): boolean => {
+    const canDelete = hasPermission(
+      "delete",
+      "order",
+      order.store,
+      { amount: order.amount, status: order.status, store: order.store }
+    )
+    const hasNoRefund = !refunds.some(r => r.orderId === order.id)
+
+    return canDelete && hasNoRefund
+  }
+
+  return {
+    hasPermission,
+    canDeleteOrder
+  }
+}
+
+export { createPermissionService }
+```
+
+#### 展示層更新
+
+UI 只會接收到從 `Service` 傳來的判斷結果，來決定畫面要怎麼呈現。
+
+```ts
+import { useEffect, useState } from 'react'
+import { createAuthRepository } from 'auth/repositories/AuthRepository'
+import { createOrderRepository } from 'order/repository/OrderRepository'
+// 假設我們已經定義好 Refund 的 repository
+import { createRefundRepository } from 'refund/repository/RefundRepository'
+import { createPermissionService } from '../services/PermissionService'
+import { OrderDetail } from './OrderDetail'
+// 假設我們已經定義好 Order 和 Refund 的 entity
+import type { Order, Refund } from 'order/entities/Order'
+
+const authRepo = createAuthRepository(window.fetch)
+const orderRepo = createOrderRepository(window.fetch)
+const refundRepo = createRefundRepository(window.fetch)
+
+export default function OrderPage({ orderId }: { orderId: number }) {
+  const [permissionService, setPermissionService] = useState<ReturnType<typeof createPermissionService> | null>(null)
+  const [myOrder, setMyOrder] = useState<Order | null>(null)
+  const [refunds, setRefunds] = useState<Refund[]>([])
+
+  useEffect(() => {
+    const init = async() => {
+      try {
+        const [authData, orderData, refundData] = await Promise.all([
+          authRepo.getMe(),
+          orderRepo.getOrderById(orderId),
+          refundRepo.getRefundsByOrderId(orderId) // 拿退款資料
+        ])
+
+        setPermissionService(createPermissionService(authData));
+        setMyOrder(orderData);
+        setRefunds(refundData);
+      } catch (error) {
+        console.error(error.message)
+      }
+    }
+    init()
+    // 這裡需要依賴 orderId，因為每次進入頁面時，都需要重新獲取權限以及訂單資料
+  }, [orderId])
+
+  if (!permissionService || !myOrder) {
+    return (
+      <div>載入中...</div>
+    )
+  }
+
+  return (
+    <OrderDetail 
+      order={myOrder}
+      refunds={refunds}
+      permissionService={permissionService} 
+    />
+  )
+}
+```
+
+```tsx
+import type { Order, Refund } from '@/shared/entities'
+import type { createPermissionService } from '@/shared/services/PermissionService'
+
+type OrderDetailProps = {
+  order: Order
+  refunds: Refund[]
+  permissionService: ReturnType<typeof createPermissionService>
+}
+
+export default function OrderDetail({ order, refunds, permissionService }: OrderDetailProps) {
+  const canDelete = permissionService.canDeleteOrder(order, refunds)
+  const canView = permissionService.hasPermission("view", "order", order.store)
+
+  const handleDelete = () => {
+    // 刪除訂單的邏輯，這裡需要呼叫 OrderRepository 內的 deleteOrder 方法來刪除訂單
+  }
+
+  if (!canView) {
+    return (
+      <div>您沒有查看訂單的權限</div>
+    )
+  }
+
+  return (
+      <div>
+      <h2>訂單詳情</h2>
+
+      <div>
+        <p>訂單編號：{order.id}</p>
+        <p>地區：{order.store}</p>
+        <p>金額：{order.amount}</p>
+        <p>狀態：{order.status}</p>
+      </div>
+
+      {canDelete && (
+        <button onClick={handleDelete}>
+          刪除訂單
+        </button>
+      )}
+    </div>
+  )
+}
+```
+
+> 🧐 這邊可以思考一下 `Refund` 是歸屬在 `OrderRepository` 內嗎？還是說需要另外建立一個 `RefundRepository`？
+>
+> 歸屬在 `OrderRepository` 的意義是？ 另外建立一個 `RefundRepository` 的意義是？
+
+把 `Refund` 歸屬在 `OrderRepository` 內的意義是，`Refund` 是 `Order` 的附屬資源，會永遠只出現在與訂單相關的脈絡下。管理者在操作訂單時，也可以順便操作退款；另外建立一個 `RefundRepository` 的意義是：
+如果退款未來希望被獨立查詢，有自己的列表或基本操作，那麼獨立出來就很合理。
+
+至於要採用哪種，比較快辨識的方法就是，假設後端有專門針對退款 API，如果有，就建立一個 `RefundRepository`，否則可以歸屬在 `OrderRepository` 內，若不確定的話，就先放在 `OrderRepository` 內，等到確定後再移動。
