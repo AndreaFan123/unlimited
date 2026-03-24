@@ -27,7 +27,9 @@ class VeliteWebpackPlugin {
       VeliteWebpackPlugin.started = true;
       const dev = compiler.options.mode === "development";
       this.options.watch = this.options.watch ?? dev;
-      this.options.clean = this.options.clean ?? !dev;
+      // Do not clean during production builds: output.assets is public/static and also
+      // holds manually added images; velite clean would delete them before Next copies public/.
+      this.options.clean = false;
       await build(this.options); // start velite
     });
   }
