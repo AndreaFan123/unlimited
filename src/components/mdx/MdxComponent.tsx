@@ -1,11 +1,12 @@
 import * as runtime from "react/jsx-runtime";
-import Image from "next/image";
+import ZoomableImage from "@/src/components/mdx/ZoomableImage";
 
 type ImageProps = {
   src: string;
-  alt: string;
-  width: number;
-  height: number;
+  alt?: string;
+  width?: number;
+  height?: number;
+  className?: string;
 };
 
 function useMdxComponent(code: string) {
@@ -17,13 +18,12 @@ function useMdxComponent(code: string) {
 
 const components = {
   Image: ({ src, alt, width = 300, height = 300, ...props }: ImageProps) => (
-    <Image
+    <ZoomableImage
       src={src}
       alt={alt || ""}
       width={width}
       height={height}
       {...props}
-      className="object-contain"
     />
   ),
   h2: ({ children }: { children: React.ReactNode }) => (

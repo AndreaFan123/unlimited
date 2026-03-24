@@ -37,3 +37,6 @@ next-env.d.ts
 
 # velite
 .velite
+
+# velite generated mdx assets in static folder
+public/static/*-*.mdx
