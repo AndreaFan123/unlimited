@@ -20,17 +20,13 @@ class VeliteWebpackPlugin {
     this.options = options;
   }
   apply(/** @type {import('webpack').Compiler} */ compiler) {
-    // executed three times in nextjs !!!
-    // twice for the server (nodejs / edge runtime) and once for the client
     compiler.hooks.beforeCompile.tapPromise("VeliteWebpackPlugin", async () => {
       if (VeliteWebpackPlugin.started) return;
       VeliteWebpackPlugin.started = true;
       const dev = compiler.options.mode === "development";
       this.options.watch = this.options.watch ?? dev;
-      // Do not clean during production builds: output.assets is public/static and also
-      // holds manually added images; velite clean would delete them before Next copies public/.
       this.options.clean = false;
-      await build(this.options); // start velite
+      await build(this.options);
     });
   }
 }

@@ -2,8 +2,11 @@
   "logo": "Unlimited",
   "profile": {
     "name": "Shan Le Fan (Andrea Fan)",
-    "title": "Frontend Developer && Marketer",
-    "content1": "Passionate about optimizing workflows with innovative tools to enhance user experience and business value.",
+    "title": "Frontend Developer & Project Management & Marketing-minded Collaborator",
+    "content1": "Frontend engineer, project manager, and marketing-minded collaborator — I make sure every detail is discussed and the delivered result is what you need, on time, no surprises.",
+    "content2": "Passionate about optimizing workflows with innovative tools to enhance user experience and business value.",
+    "contactText": "Have a project in mind? Whether it's frontend development, system integration, or optimizing your company's workflow, feel free to reach out even if you're not sure where to start.",
+    "contactEmailLabel": "Send email to Shan Le Fan",
     "latestPosts": "Latest Posts"
   },
   "techStack": {

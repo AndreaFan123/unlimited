@@ -16,6 +16,7 @@ export default function PersonInfo({
   name,
   title,
   content_1,
+  content_2,
 }: PersonInfoProps) {
   const tSocials = useTranslations("socials");
   const SOCIALS = [
@@ -71,6 +72,7 @@ export default function PersonInfo({
       </div>
       <article className="text-base leading-relaxed font-light flex flex-col gap-3">
         <p>{content_1}</p>
+        <p>{content_2}</p>
       </article>
     </div>
   );
