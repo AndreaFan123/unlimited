@@ -19,12 +19,13 @@
     "unlimitedBlog": "個人作品集和部落格",
     "pyladies": "PyLadies (國際 Python 社群)",
     "pyladiesDescription": "PyLadies Taiwan 網站維護者及組長",
+    "pyladiesLink": "https://tw.pyladies.com/",
     "mdn": "MDN (Mozilla 開發者網路)",
     "mdnDescription": "MDN Web Docs 繁體中文翻譯者",
     "coseeing": "Coseeing 推廣無障礙協會",
     "coseeingDescription": "無障礙推廣者",
-    "visitCourse": "課程連結",
-    "visitRepo": "Repo 連結",
+    "visitWebsite": "前往網站",
+    "visitRepo": "前往 Repo",
     "missingSemester": "Missing Semester (MIT)",
     "missingSemesterDescription": "Missing Semester 繁體中文翻譯者",
     "missingSemesterLink": "https://missing-semester-tw.github.io/",
@@ -70,9 +71,9 @@
     },
     "wargaming": {
       "company": "Wargaming.net (白俄羅斯知名遊戲製作及發行商)",
-      "title": "銷售優化（團隊主管）",
+      "title": "銷售最佳化（團隊主管）",
       "duration": "2018-12-01 ~ 2020-03-01",
-      "description": "優化銷售流程，提高銷售效率。"
+      "description": "規劃遊戲內活動，透過數據分析最佳化銷售流程，提高銷售效率。"
     }
   },
   "notFound": {

@@ -8,6 +8,9 @@ export default function VolunteerProject() {
     {
       name: t("pyladies"),
       description: t("pyladiesDescription"),
+      link: t("pyladiesLink"),
+      target: "_blank",
+      ariaLabel: t("pyladies"),
     },
     {
       name: t("missingSemester"),
@@ -41,10 +44,10 @@ export default function VolunteerProject() {
                     <Link
                       href={project.link}
                       target="_blank"
-                      className="flex items-center gap-2 underline"
+                      className="flex items-center gap-2 underline hover:text-orange-500 transition-all duration-300"
                     >
                       <Globe size={18} />
-                      {t("visitCourse")}
+                      {t("visitWebsite")}
                     </Link>
                   </div>
                 )}
@@ -53,7 +56,7 @@ export default function VolunteerProject() {
                     <Link
                       href={project.repo}
                       target="_blank"
-                      className=" flex items-center gap-2 underline"
+                      className=" flex items-center gap-2 underline hover:text-orange-500 transition-all duration-300"
                     >
                       <Github size={18} />
                       {t("visitRepo")}
