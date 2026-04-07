@@ -12,7 +12,7 @@ export default function ProfileContainer() {
           name={tProfile("name")}
           title={tProfile("title")}
           content_1={tProfile("content1")}
-          content_2={tProfile("content2")}
+          // content_2={tProfile("content2")}
         />
 
         <aside className="w-full lg:max-w-[320px]">
@@ -43,7 +43,7 @@ export default function ProfileContainer() {
               <Mail size={18} aria-hidden />
               <a
                 href="mailto:shanlefan.tw@gmail.com"
-                className="break-all hover:underline"
+                className="break-all hover:text-orange-500 w-fit flex items-baseline gap-3 transition-all duration-300"
                 aria-label={tProfile("contactEmailLabel")}
               >
                 shanlefan.tw@gmail.com
