@@ -40,7 +40,7 @@
   "workExperience": {
     "workExperience": "Work Experience",
     "freelance": {
-      "company": "Dezctop (Taiwan's leading computer desk and equipment supplier)",
+      "company": "Dezctop (Taiwan's leading standing desk and equipment supplier)",
       "title": "Frontend Developer (Freelance)",
       "duration": "2025-08-01 ~ Present",
       "description": "Used Nuxt.js、scss、TypeScript to maintain e-commerce website UI/frontend logic and its management system, handling AWS deployment and security-related matters."

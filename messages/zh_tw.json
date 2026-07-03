@@ -40,7 +40,7 @@
   "workExperience": {
     "workExperience": "工作經驗",
     "freelance": {
-      "company": "Dezctop (台灣頂尖電腦桌及配備供應商)",
+      "company": "Dezctop (台灣升降桌及配備供應商)",
       "title": "前端工程師 (Freelance)",
       "duration": "2025-08-01 ~ 現在",
       "description": "使用 Nuxt.js、scss、TypeScript 維護電商網站 UI/前端邏輯及其管理後台系統，處理 AWS 部署及安全相關事項。"

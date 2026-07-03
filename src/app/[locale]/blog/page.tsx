@@ -5,7 +5,7 @@ import { blogPageContent, generatePageMetadata } from "@/src/config/metadata";
 import { posts } from "#site/content";
 import { sortPosts } from "@/src/lib/utils";
 import { getTranslations } from "next-intl/server";
-import { Locales } from "@/src/i18n/request";
+import { Locales, toContentLanguage } from "@/src/i18n/request";
 import { routing } from "@/src/i18n/routing";
 
 type BlogPageProps = {
@@ -30,7 +30,9 @@ export default async function BlogPage({ searchParams, params }: BlogPageProps) 
   const postsPerPage = 5;
   const currentPage = Number(resolvedSearchParams?.page) || 1;
   const sortedPosts = sortPosts(
-    posts.filter((post) => post.published && post.language === locale)
+    posts.filter(
+      (post) => post.published && post.language === toContentLanguage(locale)
+    )
   );
   const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
   const displayPosts = sortedPosts.slice(

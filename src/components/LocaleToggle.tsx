@@ -14,17 +14,17 @@ export default function LocaleToggle({ lang }: { lang: Locales }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="px-5">
         <Button variant="outline" size="icon">
-          {lang === "zh_tw" ? "中文" : "EN"}
+          {lang === "zh-TW" ? "中文" : "EN"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="center"
         className="flex flex-col items-center"
       >
-        {lang === "zh_tw" ? (
+        {lang === "zh-TW" ? (
           <Link href="/en">EN</Link>
         ) : (
-          <Link href="/zh_tw">中文</Link>
+          <Link href="/zh-TW">中文</Link>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

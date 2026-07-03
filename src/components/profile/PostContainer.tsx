@@ -2,13 +2,15 @@ import { useTranslations } from "next-intl";
 import Post from "@/src/components/profile/Post";
 import { posts } from "#site/content";
 import { sortPosts } from "@/src/lib/utils";
-import { Locales } from "@/src/i18n/request";
+import { Locales, toContentLanguage } from "@/src/i18n/request";
 
 export default function PostContainer({ lang }: { lang: Locales }) {
   const tProfile = useTranslations("profile");
 
   const sortedPosts = sortPosts(
-    posts.filter((post) => post.published && post.language === lang)
+    posts.filter(
+      (post) => post.published && post.language === toContentLanguage(lang)
+    )
   );
 
   const latestPosts = sortedPosts.slice(0, 6);

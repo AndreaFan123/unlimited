@@ -8,15 +8,11 @@ import { useTranslations } from "next-intl";
 type PersonInfoProps = {
   name: string;
   title: string;
-  content_1: string;
-  // content_2?: string;
 };
 
 export default function PersonInfo({
   name,
   title,
-  content_1,
-  // content_2,
 }: PersonInfoProps) {
   const tSocials = useTranslations("socials");
   const SOCIALS = [
@@ -70,9 +66,6 @@ export default function PersonInfo({
           ))}
         </div>
       </div>
-      <article className="text-base leading-relaxed font-light flex flex-col gap-3">
-        <p>{content_1}</p>
-      </article>
     </div>
   );
 }

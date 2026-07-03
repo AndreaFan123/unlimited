@@ -5,7 +5,7 @@ import { generatePageMetadata } from "@/src/config/metadata";
 import { tagPageContent } from "@/src/config/metadata";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Locales } from "@/src/i18n/request";
+import { Locales, toContentLanguage } from "@/src/i18n/request";
 import { routing } from "@/src/i18n/routing";
 
 type TagPageProps = {
@@ -35,7 +35,9 @@ export default async function TagPage({ params }: TagPageProps) {
   const t = await getTranslations("tag");
   const tag = resolvedParams.tag.toLowerCase();
   const filteredPosts = posts.filter(
-    (post) => post?.tags?.includes(tag) && post.language === locale
+    (post) =>
+      post?.tags?.includes(tag) &&
+      post.language === toContentLanguage(locale)
   );
 
   return (
