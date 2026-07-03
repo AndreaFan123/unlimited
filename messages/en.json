@@ -91,6 +91,28 @@
     "relatedPosts": "related Posts",
     "workingOnIt": "I am working on it"
   },
+  "metadata": {
+    "home": {
+      "title": "Andrea Fan | Frontend Developer Portfolio",
+      "description": "I'm Andrea Fan (Shan Le Fan), a Taiwan-based Frontend Developer with a marketing background. Explore my projects, work experience, and blog."
+    },
+    "blog": {
+      "title": "Blog | Andrea Fan",
+      "description": "Thoughts on frontend development, project management, and life by Andrea Fan."
+    },
+    "tags": {
+      "title": "Tags | Andrea Fan's Blog",
+      "description": "Browse the topics and tags I've written about."
+    },
+    "tag": {
+      "title": "{tag} | Andrea Fan's Blog",
+      "description": "Posts tagged {tag} on Andrea Fan's blog."
+    },
+    "post": {
+      "title": "Blog | Andrea Fan",
+      "description": "Thoughts on frontend development, project management, and life by Andrea Fan."
+    }
+  },
   "footer": {
     "allRightsReserved": "All Rights Reserved"
   }

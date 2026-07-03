@@ -1,12 +1,11 @@
 import Post from "@/src/components/post-list/Post";
 
 import { posts } from "#site/content";
-import { generatePageMetadata } from "@/src/config/metadata";
-import { tagPageContent } from "@/src/config/metadata";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Locales, toContentLanguage } from "@/src/i18n/request";
 import { routing } from "@/src/i18n/routing";
+import { getAlternates } from "@/src/config/site";
 
 type TagPageProps = {
   params: Promise<{
@@ -18,14 +17,14 @@ type TagPageProps = {
 export async function generateMetadata({
   params,
 }: TagPageProps): Promise<Metadata> {
-  const postTag = await getTagsFromParams(await params);
-  return generatePageMetadata(tagPageContent, postTag.toUpperCase());
+  const { locale, tag } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata.tag" });
+  return {
+    title: t("title", { tag: tag.toUpperCase() }),
+    description: t("description", { tag: tag.toUpperCase() }),
+    alternates: getAlternates(locale, `/blog/tags/${tag.toLowerCase()}`),
+  };
 }
-
-const getTagsFromParams = async (params: Awaited<TagPageProps["params"]>) => {
-  const tags = params.tag.toLowerCase();
-  return tags;
-};
 
 export default async function TagPage({ params }: TagPageProps) {
   const resolvedParams = await params;

@@ -1,12 +1,14 @@
 import { Metadata } from "next";
-import { singleBlogPageContent } from "@/src/config/metadata";
+import { getTranslations } from "next-intl/server";
+import { SITE_URL, contentLanguageToLocale } from "@/src/config/site";
+import { blogPostingSchema } from "@/src/lib/structured-data";
+import { JsonLd } from "@/src/components/seo/JsonLd";
 import { posts } from "#site/content";
 import { notFound } from "next/navigation";
 import { Separator } from "@/src/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
 import { formatDate } from "@/src/lib/utils";
 import { Calendar } from "lucide-react";
-import { generatePageMetadata } from "@/src/config/metadata";
 import { slug } from "github-slugger";
 import { Badge } from "@/src/components/ui/badge";
 import ROUTES from "@/src/constants/routes";
@@ -26,12 +28,20 @@ type PostPageProps = {
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  const post = await getPostFromParams(await params);
-  return generatePageMetadata(
-    singleBlogPageContent,
-    post?.title,
-    post?.description
-  );
+  const resolvedParams = await params;
+  const post = await getPostFromParams(resolvedParams);
+  const t = await getTranslations({
+    locale: resolvedParams.locale,
+    namespace: "metadata.post",
+  });
+  const fallbackTitle = t("title");
+  return {
+    title: post?.title ? `${post.title}｜${fallbackTitle}` : fallbackTitle,
+    description: post?.description ?? t("description"),
+    alternates: {
+      canonical: `${SITE_URL}/${resolvedParams.locale}/blog/${resolvedParams.slug.join("/")}`,
+    },
+  };
 }
 
 const getPostFromParams = async (params: Awaited<PostPageProps["params"]>) => {
@@ -45,7 +55,7 @@ export const generateStaticParams = async (): Promise<
 > => {
   return posts.map((post) => ({
     slug: post.slugAsParams.split("/"),
-    locale: "en",
+    locale: contentLanguageToLocale(post.language),
   }));
 };
 
@@ -58,8 +68,18 @@ export default async function BlogPostPage({ params }: PostPageProps) {
   }
 
   const formattedDate = formatDate(post.date);
+  const t = await getTranslations({ locale, namespace: "profile" });
+  const articleSchema = blogPostingSchema({
+    title: post.title,
+    description: post.description,
+    date: post.date,
+    url: `${SITE_URL}/${locale}/blog/${resolvedParams.slug.join("/")}`,
+    authorName: t("name"),
+    locale,
+  });
   return (
     <article className="flex w-full flex-col gap-4 items-start md:max-w-[1200px] prose">
+      <JsonLd data={articleSchema} />
       <div className="pb-5">
         <h1 className="text-gray-700 relative w-fit dark:text-gray-300">
           {post.title}

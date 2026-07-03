@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Inter, Noto_Sans_TC } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -5,8 +6,13 @@ import { ThemeProvider } from "@/src/components/theme-provider";
 import "./globals.css";
 import { Locales } from "@/src/i18n/request";
 import { routing } from "@/src/i18n/routing";
+import { SITE_URL } from "@/src/config/site";
 import Header from "@/src/components/normal-components/Header";
 import Footer from "@/src/components/normal-components/Footer";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+};
 
 const inter = Inter({
   subsets: ["latin"],

@@ -51,7 +51,7 @@ JavaScript 執行時期模型由以下組件組成：
 本質上，事件循環持續檢查呼叫堆疊是否為空。當呼叫堆疊清空後，它會先將微任務佇列中的所有任務依序移至呼叫堆疊執行——包含執行過程中新增的微任務——直到微任務佇列完全清空為止。接著才從宏任務佇列取出一個任務執行，執行完畢後再次重複上述流程。
 讓我們看一張圖表來了解事件循環如何運作，以及它如何處理宏任務。
 
-<Image src="/static/macro.png" alt="macro task" width={1000} height={1000} />
+<Image src="/static/macro.webp" alt="macro task" width={1000} height={1000} />
 
 1. JavaScript 執行環境開始讀取程式碼，建立全域執行環境，並將其推入呼叫堆疊，在這個階段，可以將 main() 視為正在執行的函式。
 2. 第一行程式碼是 console.log('Start')，這會被推入呼叫堆疊，並立即執行，完成後會從呼叫堆疊中彈出。
@@ -60,7 +60,7 @@ JavaScript 執行時期模型由以下組件組成：
 {" "}
 
 <Image
-  src="/static/register-timer.png"
+  src="/static/register-timer.webp"
   alt="register timer"
   width={1000}
   height={1000}
@@ -72,12 +72,12 @@ JavaScript 執行時期模型由以下組件組成：
 
 這是一個圖表，展示事件循環如何運作，以及它如何處理微任務。
 
-<Image src="/static/micro.png" alt="micro task" width={1000} height={1000} />
+<Image src="/static/micro.webp" alt="micro task" width={1000} height={1000} />
 
 當同時有微任務和宏任務時，事件循環總是先處理微任務，然後再處理宏任務。
 
 <Image
-  src="/static/micro-macro.png"
+  src="/static/micro-macro.webp"
   alt="micro and macro"
   width={1000}
   height={1000}

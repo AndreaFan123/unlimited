@@ -91,6 +91,28 @@
     "relatedPosts": "相關文章",
     "workingOnIt": "我正在努力中"
   },
+  "metadata": {
+    "home": {
+      "title": "范珊樂 Andrea Fan｜前端工程師作品集",
+      "description": "范珊樂（Andrea Fan），來自台灣、具行銷背景的前端工程師。這裡有我的作品、專案、工作經歷與技術部落格。"
+    },
+    "blog": {
+      "title": "部落格｜范珊樂 Andrea Fan",
+      "description": "范珊樂的技術部落格，分享前端開發、專案管理與生活的想法。"
+    },
+    "tags": {
+      "title": "文章標籤｜范珊樂的部落格",
+      "description": "瀏覽我寫過的文章主題與標籤。"
+    },
+    "tag": {
+      "title": "{tag}｜范珊樂的部落格",
+      "description": "范珊樂部落格中，標籤為 {tag} 的所有文章。"
+    },
+    "post": {
+      "title": "部落格｜范珊樂 Andrea Fan",
+      "description": "范珊樂的技術部落格，分享前端開發、專案管理與生活的想法。"
+    }
+  },
   "footer": {
     "allRightsReserved": "保留所有權利"
   }
