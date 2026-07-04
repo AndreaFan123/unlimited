@@ -36,12 +36,12 @@ export default async function Home({
   const person = personSchema({
     name: t("name"),
     jobTitle: t("title"),
-    description: t("content1"),
+    description: t("description"),
     locale: resolvedLocale,
   });
 
   return (
-    <main className="w-full min-h-screen sm:max-w-full md:max-w-[1200px] mx-auto">
+    <main className="w-full min-h-screen">
       <JsonLd data={person} />
       <HomePageContainer locale={resolvedLocale} />
     </main>

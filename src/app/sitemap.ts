@@ -3,7 +3,7 @@ import { posts } from "#site/content";
 import { SITE_URL, contentLanguageToLocale } from "@/src/config/site";
 
 /** Pages that exist in both locales — emitted with hreflang alternates. */
-const SHARED_PATHS = ["", "/blog", "/blog/tags"];
+const SHARED_PATHS = ["", "/blog", "/blog/tags", "/resume"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const shared: MetadataRoute.Sitemap = SHARED_PATHS.map((path) => ({

@@ -31,7 +31,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPage({ searchParams, params }: BlogPageProps) {
+export default async function BlogPage({
+  searchParams,
+  params,
+}: BlogPageProps) {
   const resolvedSearchParams = await searchParams;
   const resolvedParams = await params;
   const locale = routing.locales.includes(resolvedParams.locale as Locales)
@@ -43,25 +46,25 @@ export default async function BlogPage({ searchParams, params }: BlogPageProps) 
   const currentPage = Number(resolvedSearchParams?.page) || 1;
   const sortedPosts = sortPosts(
     posts.filter(
-      (post) => post.published && post.language === toContentLanguage(locale)
-    )
+      (post) => post.published && post.language === toContentLanguage(locale),
+    ),
   );
   const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
   const displayPosts = sortedPosts.slice(
     postsPerPage * (currentPage - 1),
-    postsPerPage * currentPage
+    postsPerPage * currentPage,
   );
 
   return (
-    <>
-      <section className="flex flex-col gap-4 pb-10">
+    <section className="w-full max-w-[1000px] mx-auto px-5">
+      <div className="flex flex-col gap-4 py-10">
         <h1 className="text-4xl relative w-fit font-extrabold text-gray-700 dark:text-gray-300">
           {t("blog")}
           <span className="h-2 bg-yellow-400 dark:bg-orange-500 absolute top-8 left-0 -z-10 w-full"></span>
         </h1>
         <p>{t("description")} 🚀</p>
-      </section>
-      <section className="flex flex-col gap-4 my-4">
+      </div>
+      <div className="flex flex-col gap-4 ">
         {displayPosts?.length > 0 ? (
           <ul className="flex flex-col gap-10">
             {displayPosts.map((post) => (
@@ -71,8 +74,10 @@ export default async function BlogPage({ searchParams, params }: BlogPageProps) 
         ) : (
           <p>{t("workingOnIt")} 🚧</p>
         )}
-      </section>
-      <QueryPagination totalPages={totalPages} />
-    </>
+      </div>
+      <div className="py-7">
+        <QueryPagination totalPages={totalPages} />
+      </div>
+    </section>
   );
 }

@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getAlternates } from "@/src/config/site";
 import { posts } from "#site/content";
-import Tag from "@/src/components/tag-component/tag";
+import Tag from "@/src/components/tags/tag";
 
 export async function generateMetadata({
   params,

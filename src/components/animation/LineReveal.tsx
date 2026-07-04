@@ -8,7 +8,7 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
-export default function Copy({
+export default function LineReveal({
   children,
   animateOnScroll = true,
   delay = 0,
@@ -33,7 +33,7 @@ export default function Copy({
       linesRef.current = [];
 
       let elements = [];
-      if (containerRef.current.hasAttribute("data-copy-wrapper")) {
+      if (containerRef.current.hasAttribute("data-line-reveal-wrapper")) {
         elements = Array.from(containerRef.current.children);
       } else {
         elements = [containerRef.current];
@@ -104,7 +104,7 @@ export default function Copy({
   }
 
   return (
-    <div ref={containerRef} data-copy-wrapper="true">
+    <div ref={containerRef} data-line-reveal-wrapper="true">
       {children}
     </div>
   );

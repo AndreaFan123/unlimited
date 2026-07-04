@@ -1,83 +1,83 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import ExperienceTimeline, {
+  type TimelineGroup,
+} from "@/src/components/work-experience/ExperienceTimeline";
 
 export default function WorkExperience() {
   const t = useTranslations("workExperience");
-  const workExperience = [
+
+  const workExperience: TimelineGroup[] = [
     {
-      company: t("freelance.company"),
-      position: t("freelance.title"),
-      duration: t("freelance.duration"),
-      description: t("freelance.description"),
+      organization: t("freelance.company"),
+      roles: [
+        {
+          duration: t("freelance.duration"),
+          title: t("freelance.title"),
+          type: t("employmentTypes.freelance"),
+        },
+      ],
     },
     {
-      company: t("shalom.company"),
-      position: t("shalom.title"),
-      duration: t("shalom.duration"),
-      description: t("shalom.description"),
+      organization: t("shalom.company"),
+      roles: [
+        {
+          duration: t("shalom.duration"),
+          title: t("shalom.title"),
+          type: t("employmentTypes.fullTime"),
+        },
+      ],
     },
     {
-      company: t("ringus.company"),
-      position: t("ringus.title"),
-      duration: t("ringus.duration"),
-      description: t("ringus.description"),
+      organization: t("ringus.company"),
+      roles: [
+        {
+          duration: t("ringus.duration"),
+          title: t("ringus.title"),
+          type: t("employmentTypes.fullTime"),
+        },
+      ],
     },
     {
-      company: t("codapayment.company"),
-      position: t("codapayment.title"),
-      duration: t("codapayment.duration"),
-      description: t("codapayment.description"),
+      organization: t("codapayment.company"),
+      roles: [
+        {
+          duration: t("codapayment.duration"),
+          title: t("codapayment.title"),
+          type: t("employmentTypes.fullTime"),
+        },
+      ],
     },
     {
-      company: t("elex.company"),
-      position: t("elex.title"),
-      duration: t("elex.duration"),
-      description: t("elex.description"),
+      organization: t("elex.company"),
+      roles: [
+        {
+          duration: t("elex.duration"),
+          title: t("elex.title"),
+          type: t("employmentTypes.fullTime"),
+        },
+      ],
     },
     {
-      company: t("wargaming.company"),
-      position: t("wargaming.title"),
-      duration: t("wargaming.duration"),
-      description: t("wargaming.description"),
+      organization: t("wargaming.company"),
+      roles: [
+        {
+          duration: t("wargaming.duration"),
+          title: t("wargaming.title"),
+          type: t("employmentTypes.fullTime"),
+        },
+      ],
     },
   ];
+
+  const sortedGroups = [...workExperience].sort(
+    (a, b) =>
+      new Date(b.roles[0].duration.split(" ~ ")[0]).getTime() -
+      new Date(a.roles[0].duration.split(" ~ ")[0]).getTime()
+  );
+
   return (
-    <>
-      <h2 className="text-2xl w-fit relative mb-[20px] font-bold text-gray-700 dark:text-gray-300">
-        {t("workExperience")}
-        <span className="h-2 bg-indigo-300 dark:bg-indigo-600 absolute top-5 left-0 -z-10 w-full"></span>
-      </h2>
-      <div>
-        {workExperience
-          .sort(
-            (a, b) =>
-              new Date(b.duration.split(" ~ ")[0]).getTime() -
-              new Date(a.duration.split(" ~ ")[0]).getTime()
-          )
-          .map((experience, index) => (
-            <div
-              key={index}
-              className="mb-4 border-b border-gray-400 border-dashed pb-3 flex flex-col sm:flex-row sm:justify-between w-full"
-            >
-              <div className="flex flex-col md:flex-row">
-                <div>
-                  <div className="mb-3 relative">
-                    <h3 className="text-lg font-semibold">
-                      {experience.company} | {experience.position}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-300">
-                      {experience.duration}
-                    </p>
-                  </div>
-                  <p className="text-base text-gray-700 dark:text-gray-300">
-                    {experience.description}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-      </div>
-    </>
+    <ExperienceTimeline title={t("workExperience")} groups={sortedGroups} />
   );
 }

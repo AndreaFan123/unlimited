@@ -78,7 +78,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
     locale,
   });
   return (
-    <article className="flex w-full flex-col gap-4 items-start md:max-w-[1200px] prose">
+    <article className="w-full max-w-[1000px] mx-auto px-5 prose py-10">
       <JsonLd data={articleSchema} />
       <div className="pb-5">
         <h1 className="text-gray-700 relative w-fit dark:text-gray-300">

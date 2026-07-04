@@ -1,9 +1,9 @@
 {
   "logo": "Unlimited",
   "profile": {
-    "name": "范珊樂 (Andrea Fan)",
-    "title": "前端工程師 & 專案管理 & 行銷思維",
-    "content1": "熱衷於最佳化工作流程，使用創新工具提升使用者體驗與商業價值。",
+    "name": "我是 Andrea，目前是一名前端工程師。喜歡透過程式來滿足自己的好奇心，也喜歡其他不同領域帶來的知識",
+    "title": "前端工程師",
+    "description": "這是我的小小空間，用來紀錄生活觀察、分享興趣，以及那些正在發生的大小事。",
     "contactText": "歡迎來信聊聊。",
     "contactEmailLabel": "寄信給范珊樂",
     "latestPosts": "最新文章"
@@ -12,24 +12,65 @@
     "title": "我目前專注於..."
   },
   "projects": {
-    "title": "專案",
+    "title": "工作 | 興趣開發",
+    "description": "這裡包含工作開發以及利用空閒時間開發的小專案",
     "volunteer": "開源/志工",
-    "digitalCard": "數位名片平台",
-    "senryo": "日本壽司外送平台",
-    "unlimitedBlog": "個人作品集和部落格",
-    "pyladies": "PyLadies (國際 Python 社群)",
-    "pyladiesDescription": "PyLadies Taiwan 網站維護者及組長",
-    "pyladiesLink": "https://tw.pyladies.com/",
-    "mdn": "MDN (Mozilla 開發者網路)",
-    "mdnDescription": "MDN Web Docs 繁體中文翻譯者",
-    "coseeing": "Coseeing 推廣無障礙協會",
-    "coseeingDescription": "無障礙推廣者",
-    "visitWebsite": "前往網站",
-    "visitRepo": "前往 Repo",
-    "missingSemester": "Missing Semester (MIT)",
-    "missingSemesterDescription": "Missing Semester 繁體中文翻譯者",
-    "missingSemesterLink": "https://missing-semester-tw.github.io/",
-    "missingSemesterRepo": "https://github.com/missing-semester-tw"
+    "volunteerType": "志工",
+    "actions": {
+      "visitWebsite": "前往網站",
+      "visitRepo": "前往 Repo"
+    },
+    "dezctop": {
+      "name": "Dezctop 官方網站",
+      "description": "Dezctop 品牌官方電商網站",
+      "link": "https://dezctop.com/tw",
+      "duration": "2025-現在"
+    },
+    "senryo": {
+      "name": "千兩壽司訂購平台",
+      "description": "日式料理訂餐／外送平台",
+      "link": "https://order.sen-ryo.com.hk/tc",
+      "duration": "2023"
+    },
+    "findHelp": {
+      "name": "FindHelp（僅繁體中文）",
+      "description": "蒐集台灣各縣市福利政策，方便讓使用者搜尋",
+      "link": "https://find-help-andreafan123s-projects.vercel.app/",
+      "duration": "2026"
+    },
+    "hubOcean": {
+      "name": "HUB Ocean 重新設計",
+      "description": "HUB Ocean 平台視覺與介面重新設計概念",
+      "link": "https://hub-ocean-odp-concept.netlify.app/",
+      "duration": "2026"
+    },
+    "unlimitedBlog": {
+      "name": "Unlimited",
+      "description": "個人網站",
+      "link": "https://shanlefan.com/zh-TW",
+      "duration": "2025-2026"
+    },
+    "pyladies": {
+      "name": "PyLadies (國際 Python 社群)",
+      "description": "PyLadies Taiwan 網站維護者及組長",
+      "duration": "2020-01-01 ~ 現在",
+      "link": "https://tw.pyladies.com/"
+    },
+    "mdn": {
+      "name": "MDN (Mozilla 開發者網路)",
+      "description": "MDN Web Docs 繁體中文翻譯者"
+    },
+    "coseeing": {
+      "name": "Coseeing 推廣無障礙協會",
+      "description": "無障礙推廣者"
+    },
+    "missingSemester": {
+      "name": "Missing Semester (MIT)",
+      "description": "Missing Semester 繁體中文翻譯者",
+      "duration": "2019-01-01 ~ 現在",
+      "link": "https://missing-semester-tw.github.io/",
+      "repo": "https://github.com/missing-semester-tw"
+    }
   },
   "socials": {
     "linkedin": "前往 Linkedin",
@@ -39,14 +80,18 @@
   },
   "workExperience": {
     "workExperience": "工作經驗",
+    "employmentTypes": {
+      "fullTime": "全職",
+      "freelance": "Freelance"
+    },
     "freelance": {
-      "company": "Dezctop (台灣升降桌及配備供應商)",
-      "title": "前端工程師 (Freelance)",
+      "company": "Dezctop",
+      "title": "前端工程師",
       "duration": "2025-08-01 ~ 現在",
       "description": "使用 Nuxt.js、scss、TypeScript 維護電商網站 UI/前端邏輯及其管理後台系統，處理 AWS 部署及安全相關事項。"
     },
     "shalom": {
-      "company": "Shalom (台灣頂尖的 PMS 平台)",
+      "company": "Shalom",
       "title": "前端工程師",
       "duration": "2025-04-01 ~ 2025-07-01",
       "description": "使用 React.js、Next.js、TailwindCSS、TypeScript 重新設計並開發雲端自助入住系統和物聯網技術。"
@@ -58,19 +103,19 @@
       "description": "使用 React.js、Next.js、TailwindCSS、TypeScript 和其他前端技術開發網頁應用程式。"
     },
     "codapayment": {
-      "company": "Coda (知名東南亞線上遊戲金流平台)",
+      "company": "Coda",
       "title": "資深行銷",
       "duration": "2021-10-01 ~ 2022-12-01",
       "description": "負責台灣/香港市場，包括行銷策略、線上和線下活動、競爭對手分析、市場研究。"
     },
     "elex": {
-      "company": "elex (中國知名遊戲製作及發行商)",
+      "company": "elex",
       "title": "社群經理",
       "duration": "2020-05-01 ~ 2021-09-27",
       "description": "建立中文社群，舉辦線上和線下活動。"
     },
     "wargaming": {
-      "company": "Wargaming.net (白俄羅斯知名遊戲製作及發行商)",
+      "company": "Wargaming",
       "title": "銷售最佳化（團隊主管）",
       "duration": "2018-12-01 ~ 2020-03-01",
       "description": "規劃遊戲內活動，透過數據分析最佳化銷售流程，提高銷售效率。"
@@ -93,12 +138,12 @@
   },
   "metadata": {
     "home": {
-      "title": "范珊樂 Andrea Fan｜前端工程師作品集",
-      "description": "范珊樂（Andrea Fan），來自台灣、具行銷背景的前端工程師。這裡有我的作品、專案、工作經歷與技術部落格。"
+      "title": "范珊樂 Shan Le Fan｜ 我的個人小小空間",
+      "description": "范珊樂，或者你也可以叫我 Andrea。來自台灣、具行銷背景的前端工程師。這裡有我的作品、專案、工作經歷與技術部落格。"
     },
     "blog": {
-      "title": "部落格｜范珊樂 Andrea Fan",
-      "description": "范珊樂的技術部落格，分享前端開發、專案管理與生活的想法。"
+      "title": "部落格｜范珊樂 Shan Le Fan",
+      "description": "范珊樂的部落格，分享前端開發、專案管理與生活的想法。"
     },
     "tags": {
       "title": "文章標籤｜范珊樂的部落格",
@@ -110,7 +155,11 @@
     },
     "post": {
       "title": "部落格｜范珊樂 Andrea Fan",
-      "description": "范珊樂的技術部落格，分享前端開發、專案管理與生活的想法。"
+      "description": "范珊樂的部落格，分享前端開發、專案管理與生活的想法。"
+    },
+    "resume": {
+      "title": "履歷 | 范珊樂 Shan Le Fan",
+      "description": "范珊樂 Andrea 的前端工程師履歷，涵蓋工作經歷、專案與開源貢獻。"
     }
   },
   "footer": {

@@ -20,7 +20,7 @@ export default async function BlogLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="w-full mx-auto mt-10 mb-28 px-4 sm:max-w-full md:max-w-[900px]">
+    <main className="w-full min-h-screen">
       {children}
     </main>
   );

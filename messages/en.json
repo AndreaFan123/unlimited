@@ -1,9 +1,9 @@
 {
   "logo": "Unlimited",
   "profile": {
-    "name": "Shan Le Fan (Andrea Fan)",
-    "title": "Frontend Developer & Project Management & Marketing-minded Collaborator",
-    "content1": "Passionate about optimizing workflows with innovative tools to enhance user experience and business value.",
+    "name": "I am Andrea. A Frontend Engineer who enjoys using code to satisfy my curiosity and drawing inspiration from diverse fields of knowledge",
+    "title": "Frontend Developer",
+    "description": "This is my little space to share my interests, observations, and everything happening in my life.",
     "contactText": "Welcome to send me an email.",
     "contactEmailLabel": "Send email to Andrea Fan",
     "latestPosts": "Latest Posts"
@@ -12,24 +12,72 @@
     "title": "I am focusing on..."
   },
   "projects": {
-    "title": "Projects",
-    "volunteer": "Open Source/Volunteer",
-    "digitalCard": "Digital Business Card platform",
-    "senryo": "Food Delivery Platform",
-    "unlimitedBlog": "Personal Portfolio and Blog",
-    "pyladies": "PyLadies (International Python Community)",
-    "pyladiesDescription": "PyLadies Taiwan Website maintainer and team leader.",
-    "pyladiesLink": "https://tw.pyladies.com/",
-    "mdn": "MDN (Mozilla Developer Network)",
-    "mdnDescription": "MDN Web Docs zh_TW Translator",
-    "coseeing": "Taiwan Digital Accessibility Organization",
-    "coseeingDescription": "A11y evangelist",
-    "missingSemester": "Missing Semester (MIT)",
-    "missingSemesterDescription": "Maintained traditional Chinese translation of the Missing Semester course.",
-    "visitWebsite": "Visit Website",
-    "visitRepo": "Visit Repo",
-    "missingSemesterLink": "https://missing-semester-tw.github.io/",
-    "missingSemesterRepo": "https://github.com/missing-semester-tw"
+    "title": "Works | Side Projects",
+    "description": "A mix of projects built at work and small side experiments I've explored in my spare time.",
+    "volunteer": "Open Source | Volunteer",
+    "volunteerType": "Volunteer",
+    "actions": {
+      "visitWebsite": "Visit Website",
+      "visitRepo": "Visit Repo"
+    },
+    "dezctop": {
+      "name": "Dezctop Website",
+      "description":"Taiwan top standup deskt and computer gears provider",
+      "link":"https://dezctop.com/",
+      "duration":"2025-2026",
+      "type": "Work"
+    },
+    "senryo": {
+      "name": "Food Delivery Platform",
+      "description": "Japanese Food Ordering / Delivery platform",
+      "link": "https://order.sen-ryo.com.hk/en",
+      "duration": "2023",
+      "type": "Work"
+    },
+    "findHelp": {
+      "name": "FindHelp (ZH-TW Only)",
+      "description": "Aggregates welfare policies from cities and counties across Taiwan, making them easy to search.",
+      "link": "https://find-help-andreafan123s-projects.vercel.app/",
+      "duration":"2026",
+      "type": "Side Project"
+    },
+    "hubOcean": {
+      "name": "HUB Ocean Redesign",
+      "description":"Redesign UI for Norway startup Hub Ocean",
+      "link": "https://hub-ocean-odp-concept.netlify.app/",
+      "duration":"2026",
+      "type": "Side Project"
+    },
+    "unlimitedBlog": {
+      "name": "Unlimited",
+      "description": "Personal website",
+      "link": "http://shanlefan.com/en",
+      "duration":"2025-2026",
+      "type": "Side Project"
+    },
+    "pyladies": {
+      "name": "PyLadies Website",
+      "description": "Website maintainer and team leader.",
+      "duration": "2020-Present",
+      "link": "https://tw.pyladies.com/",
+      "type": "Side Project"
+    },
+    "mdn": {
+      "name": "MDN (Mozilla Developer Network)",
+      "description": "MDN Web Docs zh_TW Translator"
+    },
+    "coseeing": {
+      "name": "Taiwan Digital Accessibility Organization",
+      "description": "A11y evangelist"
+    },
+    "missingSemester": {
+      "name": "Missing Semester (MIT)",
+      "description": "Maintained Traditional Chinese translation of the Missing Semester course.",
+      "duration": "2026-Present",
+      "link": "https://missing-semester-tw.github.io/",
+      "repo": "https://github.com/missing-semester-tw",
+      "type": "Side Project"
+    }
   },
   "socials": {
     "linkedin": "Visit Linkedin",
@@ -38,15 +86,19 @@
     "blog": "Visit Blog"
   },
   "workExperience": {
-    "workExperience": "Work Experience",
+    "workExperience": "Experience",
+    "employmentTypes": {
+      "fullTime": "Full-time",
+      "freelance": "Freelance"
+    },
     "freelance": {
-      "company": "Dezctop (Taiwan's leading standing desk and equipment supplier)",
-      "title": "Frontend Developer (Freelance)",
+      "company": "Dezctop",
+      "title": "Frontend Developer",
       "duration": "2025-08-01 ~ Present",
       "description": "Used Nuxt.js、scss、TypeScript to maintain e-commerce website UI/frontend logic and its management system, handling AWS deployment and security-related matters."
     },
     "shalom": {
-      "company": "Shalom (Taiwan's top PMS platform)",
+      "company": "Shalom",
       "title": "Frontend Developer",
       "duration": "2025-04-01 ~ 2025-07-01",
       "description": "Used React.js、Next.js、TailwindCSS、TypeScript to revamp and develop cloud-based self check-in system and IoT."
@@ -58,19 +110,19 @@
       "description": "Developed web applications using React.js, Next.js, TailwindCSS, TypeScript and other frontend technologies."
     },
     "codapayment": {
-      "company": "Coda (No. 1 gaming payment in Southeast Asia)",
+      "company": "Coda",
       "title": "Senior Marketing",
       "duration": "2021-10-01 ~ 2022-12-01",
       "description": "Responsible for TW/HK/MO market, including marketing strategy, online and offline campaigns, competitor analysis, market research."
     },
     "elex": {
-      "company": "elex (Famous game developer and publisher in China)",
+      "company": "elex",
       "title": "Community Manager",
       "duration": "2020-05-01 ~ 2021-09-27",
       "description": "Built Mandarin community, hosted online and offline events."
     },
     "wargaming": {
-      "company": "Wargaming.net (Famous game developer and publisher in Belarus)",
+      "company": "Wargaming",
       "title": "Sales Optimization (Team Lead)",
       "duration": "2018-12-01 ~ 2020-03-01",
       "description": "Optimized sales process and increased sales efficiency."
@@ -93,24 +145,28 @@
   },
   "metadata": {
     "home": {
-      "title": "Andrea Fan | Frontend Developer Portfolio",
-      "description": "I'm Andrea Fan (Shan Le Fan), a Taiwan-based Frontend Developer with a marketing background. Explore my projects, work experience, and blog."
+      "title": "Shan Le Fan | My Personal space",
+      "description": "I'm Shan Le, you can call me Andrea, a Taiwan-based Frontend Developer with a marketing background. Explore my projects, work experience, and blog."
     },
     "blog": {
-      "title": "Blog | Andrea Fan",
-      "description": "Thoughts on frontend development, project management, and life by Andrea Fan."
+      "title": "Blog | Shan Le Fan",
+      "description": "Thoughts on frontend development, project management, and life by Shan Le Fan."
     },
     "tags": {
-      "title": "Tags | Andrea Fan's Blog",
+      "title": "Tags | Shan Le Fan's Blog",
       "description": "Browse the topics and tags I've written about."
     },
     "tag": {
-      "title": "{tag} | Andrea Fan's Blog",
-      "description": "Posts tagged {tag} on Andrea Fan's blog."
+      "title": "{tag} | Shan Le Fan's Blog",
+      "description": "Posts tagged {tag} on Shan Le Fan's blog."
     },
     "post": {
-      "title": "Blog | Andrea Fan",
+      "title": "Blog | Shan Le Fan",
       "description": "Thoughts on frontend development, project management, and life by Andrea Fan."
+    },
+    "resume": {
+      "title": "Resume | Shan Le Fan",
+      "description": "Andrea Fan's resume — a Taiwan-based frontend developer with experience in React, Next.js, and Nuxt. View work history, projects, and open-source contributions."
     }
   },
   "footer": {
