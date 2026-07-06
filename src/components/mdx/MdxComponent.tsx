@@ -27,27 +27,27 @@ const components = {
     />
   ),
   h2: ({ children }: { children: React.ReactNode }) => (
-    <h2 className="mt-5 m-0 font-black text-gray-700 dark:text-gray-300">
+    <h2 className="mt-7 m-0 font-black text-gray-700 dark:text-gray-300">
       {children}
     </h2>
   ),
   h3: ({ children }: { children: React.ReactNode }) => (
-    <h3 className="mt-5 mb-0 font-bold text-gray-700 dark:text-gray-300">
+    <h3 className="mt-7 mb-0 font-bold text-gray-700 dark:text-gray-300">
       {children}
     </h3>
   ),
   h4: ({ children }: { children: React.ReactNode }) => (
-    <h4 className="mt-4 mb-0 font-bold text-gray-700 dark:text-gray-300">
+    <h4 className="mt-7 mb-0 font-bold text-gray-700 dark:text-gray-300">
       {children}
     </h4>
   ),
   h5: ({ children }: { children: React.ReactNode }) => (
-    <h5 className="mt-4 mb-0 font-bold text-gray-700 dark:text-gray-300">
+    <h5 className="mt-7 mb-0 font-bold text-gray-700 dark:text-gray-300">
       {children}
     </h5>
   ),
   p: ({ children }: { children: React.ReactNode }) => (
-    <p className="my-0 text-gray-700 dark:text-gray-300">{children}</p>
+    <p className="my-2 text-gray-700 dark:text-gray-300">{children}</p>
   ),
   figure: ({ children }: { children: React.ReactNode }) => (
     <figure className="my-0 w-full text-gray-700 dark:text-gray-300">

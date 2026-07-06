@@ -40,7 +40,7 @@ export default async function TagPage({ params }: TagPageProps) {
   );
 
   return (
-    <section className="flex flex-col gap-4 my-4">
+    <section className="flex flex-col gap-4 my-4 w-full max-w-[1000px] mx-auto px-5 py-10">
       <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">
         ✨{resolvedParams.tag.toUpperCase()}✨ {t("relatedPosts")}
       </h2>

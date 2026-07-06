@@ -25,7 +25,7 @@ export default function Post({
       <div className="flex flex-col w-full md:w-[70%]">
         <Link
           href={href ? href : slug}
-          className="text-xl w-fit font-semibold pb-2 text-[#5350a6] dark:text-[#a19efc] hover:text-orange-500 transition-all duration-300"
+          className="text-xl w-fit font-semibold pb-2 text-[#5350a6] dark:text-[#adaaff] hover:text-orange-500 transition-all duration-300"
         >
           {title}
         </Link>
@@ -39,13 +39,13 @@ export default function Post({
           </time>
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">
           {description}
         </p>
 
         <Link
           href={href ? href : slug}
-          className="flex items-center bg-[#5350a6] text-white w-fit px-2 py-1 gap-2 mt-4 hover:text-orange-300 transition-all duration-300"
+          className="flex items-center bg-[#5350a6] text-white w-fit px-2 py-2 gap-2 mt-7 hover:text-orange-300 transition-all duration-300"
         >
           {t("readMore")}
           <ArrowRight className="w-4 h-4 hover:animate-bounce " />

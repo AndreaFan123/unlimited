@@ -21,6 +21,7 @@ export function useWorkProjects(): WorkProject[] {
       description: tProject(`${key}.description`),
       duration: tProject(`${key}.duration`),
       link: tProject(`${key}.link`),
+      type: tProject(`${key}.type`),
     }))
   );
 }
@@ -54,9 +55,9 @@ export default function ProjectContainer() {
 
   return (
     <div className="w-full max-w-[1000px] mx-auto py-20 px-5">
-      <article className="flex flex-col gap-6 lg:flex-row w-full lg:justify-between">
-        <h3 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">{tProject("title")}</h3>
-        <p className="font-mono lg:w-1/2 text-gray-600 dark:text-gray-300">{tProject("description")}</p>
+      <article className="flex flex-col items-center gap-6 lg:flex-row w-full lg:justify-between">
+        <h3 className="text-3xl font-bold text-gray-700 dark:text-gray-300">{tProject("title")}</h3>
+        <p className="font-mono lg:w-1/2 lg:text-right text-gray-600 dark:text-gray-300">{tProject("description")}</p>
       </article>
 
       <div
@@ -68,7 +69,7 @@ export default function ProjectContainer() {
             key={project.key}
             className={cn(
               "relative origin-center transition-transform duration-300 ease-out will-change-transform ",
-              index > 0 && "-mt-5",
+              index > 0 && "-mt-[17px]",
               getBarMotion(index, hoveredIndex)
             )}
             style={{ zIndex: getBarZIndex(index, hoveredIndex) }}

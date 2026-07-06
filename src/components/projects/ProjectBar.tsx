@@ -35,12 +35,12 @@ export default function ProjectBar({
       rel="noopener noreferrer"
       aria-label={`${visitLabel}: ${project.name}`}
       className={cn(
-        "relative block w-full -skew-x-12 border",
+        "relative block w-full -skew-x-12 border-2",
         "cursor-pointer transition-colors duration-300 ease-out",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7772ff] focus-visible:ring-offset-2 dark:focus-visible:ring-[#7772ff]",
         isActive
           ? "border-[var(--project-color)] bg-[var(--project-color)]"
-          : "border-gray-700 dark:bg-[#1a1a1a]  dark:border-gray-300"
+          : "border-gray-700 dark:bg-[#1a1a1a] bg-[#F6F3EB] dark:border-gray-300 "
       )}
       style={{ "--project-color": color } as React.CSSProperties}
     >
@@ -48,35 +48,50 @@ export default function ProjectBar({
         <div className="flex justify-between gap-5">
           <h4
             className={cn(
-              "text-base font-semibold transition-colors duration-300",
+              "text-lg font-semibold transition-colors duration-300",
               isActive
                 ? hoverTextLight
-                  ? "text-gray-900"
+                  ? "text-gray-800"
                   : "text-white"
-                : "text-gray-800 dark:text-gray-300"
+                : "text-gray-700 dark:text-gray-300"
             )}
           >
             {project.name}
           </h4>
 
-          <span
-            className={cn(
-              "shrink-0 rounded-full border px-2.5 py-1 text-xs font-mono transition-colors duration-300",
-              isActive
-                ? hoverTextLight
-                  ? "border-gray-900/30 bg-gray-900/10 text-gray-900"
-                  : "border-white/40 bg-white/15 text-white"
-                : "border-gray-700 text-gray-600 project-section-surface dark:border-gray-300 dark:text-gray-300"
-            )}
-          >
-            {project.duration}
-          </span>
+          <div className="flex shrink-0 items-center gap-2">
+            <span
+              className={cn(
+                "rounded-full border-2 px-2.5 py-1 text-xs font-mono transition-colors duration-300",
+                isActive
+                  ? hoverTextLight
+                    ? "border-gray-900/30 bg-gray-900/10 text-gray-900"
+                    : "border-white/40 bg-white/15 text-white"
+                  : "border-gray-700 text-gray-600 project-section-surface dark:border-gray-300 dark:text-gray-300"
+              )}
+            >
+              {project.type}
+            </span>
+
+            <span
+              className={cn(
+                "rounded-full border-2 px-2.5 py-1 text-xs font-mono transition-colors duration-300",
+                isActive
+                  ? hoverTextLight
+                    ? "border-gray-900/30 bg-gray-900/10 text-gray-900"
+                    : "border-white/40 bg-white/15 text-white"
+                  : "border-gray-700 text-gray-600 project-section-surface dark:border-gray-300 dark:text-gray-300"
+              )}
+            >
+              {project.duration}
+            </span>
+          </div>
         </div>
 
         {project.description ? (
           <p
             className={cn(
-              "mt-3 text-sm leading-relaxed transition-colors duration-300",
+              "text-sm leading-relaxed transition-colors duration-300",
               isActive
                 ? hoverTextLight
                   ? "text-gray-800"

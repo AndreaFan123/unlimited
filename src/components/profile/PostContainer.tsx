@@ -15,12 +15,11 @@ export default function PostContainer({ lang }: { lang: Locales }) {
 
   const latestPosts = sortedPosts.slice(0, 6);
   return (
-    <div className="flex flex-col sm:px-0">
+    <div className="sm:px-0 pb-20 lg:py-32 w-full max-w-[1000px] mx-auto px-5 flex flex-col gap-12">
       <h2 className="text-3xl relative w-fit font-bold text-gray-700 dark:text-gray-300">
         {tProfile("latestPosts")}
-        <span className="h-2 bg-yellow-400 dark:bg-orange-600 absolute top-6 left-0 -z-10 w-full"></span>
       </h2>
-      <ul className="py-4 grid lg:grid-cols-2 gap-3">
+      <ul className="py-4 grid lg:grid-cols-2 gap-5">
         {latestPosts.map((post) => (
           <Post key={post.slug} post={post} />
         ))}

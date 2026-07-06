@@ -17,6 +17,7 @@ import MdxContent from "@/src/components/mdx/MdxComponent";
 import "@/src/styles/mdx.css";
 import { Link } from "@/src/i18n/navigation";
 import { Locales } from "@/src/i18n/request";
+import { routing } from "@/src/i18n/routing";
 
 type PostPageProps = {
   params: Promise<{
@@ -62,13 +63,16 @@ export const generateStaticParams = async (): Promise<
 export default async function BlogPostPage({ params }: PostPageProps) {
   const resolvedParams = await params;
   const post = await getPostFromParams(resolvedParams);
-  const locale = resolvedParams.locale as Locales;
+  const locale = routing.locales.includes(resolvedParams.locale as Locales)
+    ? (resolvedParams.locale as Locales)
+    : routing.defaultLocale;
   if (!post || !post.published) {
     notFound();
   }
 
   const formattedDate = formatDate(post.date);
   const t = await getTranslations({ locale, namespace: "profile" });
+  const tBlog = await getTranslations({ locale, namespace: "blog" });
   const articleSchema = blogPostingSchema({
     title: post.title,
     description: post.description,
@@ -78,10 +82,10 @@ export default async function BlogPostPage({ params }: PostPageProps) {
     locale,
   });
   return (
-    <article className="w-full max-w-[1000px] mx-auto px-5 prose py-10">
+    <article className="w-full max-w-[1000px] mx-auto px-5 py-10">
       <JsonLd data={articleSchema} />
-      <div className="pb-5">
-        <h1 className="text-gray-700 relative w-fit dark:text-gray-300">
+      <div className="flex flex-col gap-3 pb-5">
+        <h1 className="text-4xl font-extrabold leading-tight text-gray-700 dark:text-gray-300">
           {post.title}
         </h1>
         {post.description && (
@@ -106,14 +110,15 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         </div>
       </div>
       <Separator />
-      <MdxContent code={post.body} />
-      <Link className="mt-4 " href={ROUTES.BLOG}>
-        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-          <ArrowLeft className="w-4 h-4  hoverEffect" />{" "}
-          <span className="">
-            {locale === "en" ? "Back to Blog" : "回到部落格"} 🏃🏽‍♀️
-          </span>
-        </div>
+      <div className="prose w-full max-w-[1000px] mx-auto">
+        <MdxContent code={post.body} />
+      </div>
+      <Link
+        href={ROUTES.BLOG}
+        className="mt-10 inline-flex w-fit items-center gap-2 rounded-sm font-semibold text-gray-700 no-underline transition-colors hover:text-orange-500 focus:outline-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[#7772ff] focus-visible:ring-offset-2 dark:text-gray-300"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        <span>{tBlog("backToBlog")} 🏃🏽‍♀️</span>
       </Link>
     </article>
   );

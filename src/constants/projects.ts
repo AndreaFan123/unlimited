@@ -1,9 +1,11 @@
 export const PROJECT_COLORS = [
-  "#292f57",
-  "#414669",
-  "#70748f",
-  "#a0a3b4",
-  "#cfd1da",
+  "#59B292",
+  "#FFC94D",
+  "#5A9CB5",
+  "#FA6781",
+  "#F48F68",
+  "#9CCFFF",
+  "#3F9AAE"
 ] as const;
 
 export const WORK_PROJECT_KEYS = [
@@ -12,6 +14,8 @@ export const WORK_PROJECT_KEYS = [
   "findHelp",
   "hubOcean",
   "unlimitedBlog",
+  "pyladies",
+  "missingSemester",
 ] as const;
 
 export type WorkProjectKey = (typeof WORK_PROJECT_KEYS)[number];
@@ -22,6 +26,7 @@ export type WorkProject = {
   description: string;
   duration: string;
   link: string;
+  type: string;
 };
 
 export function getProjectLatestYear(duration: string): number {

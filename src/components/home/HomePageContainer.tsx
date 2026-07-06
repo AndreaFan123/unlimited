@@ -10,13 +10,17 @@ import ProjectContainer from "../projects/ProjectContainer";
 export default function HomePageContainer({ locale }: { locale: Locales }) {
   return (
     <section>
-      <section className="pb-20 lg:py-32 w-full max-w-[1000px] mx-auto px-5 py-10 flex flex-col gap-28">
+      <div>
         <ProfileContainer />
-      </section>
-      <section className="project-section-surface">
+      </div>
+      <div className="dark:border-b-[1px] dark:border-gray-400 dark:border-dashed" />
+      <div className="project-section-surface">
         <ProjectContainer />
-      </section>
-
+      </div>
+      <div className="dark:border-b-[1px] dark:border-gray-400 dark:border-dashed" />
+      <div>
+        <PostContainer lang={locale}/>
+      </div>
     </section>
   );
 }

@@ -60,7 +60,7 @@
       "description": "Website maintainer and team leader.",
       "duration": "2020-Present",
       "link": "https://tw.pyladies.com/",
-      "type": "Side Project"
+      "type": "Volunteer"
     },
     "mdn": {
       "name": "MDN (Mozilla Developer Network)",
@@ -76,7 +76,7 @@
       "duration": "2026-Present",
       "link": "https://missing-semester-tw.github.io/",
       "repo": "https://github.com/missing-semester-tw",
-      "type": "Side Project"
+      "type": "Volunteer"
     }
   },
   "socials": {
@@ -137,7 +137,8 @@
     "description": "Rambling about web development, management, and other random stuff in my life",
     "feature": "Featured",
     "workingOnIt": "I am working on it",
-    "readMore": "Read More"
+    "readMore": "Read More",
+    "backToBlog": "Back to Blog"
   },
   "tag": {
     "relatedPosts": "related Posts",

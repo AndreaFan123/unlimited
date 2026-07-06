@@ -62,11 +62,11 @@ export default async function BlogPage({
           {t("blog")}
           <span className="h-2 bg-yellow-400 dark:bg-orange-500 absolute top-8 left-0 -z-10 w-full"></span>
         </h1>
-        <p>{t("description")} 🚀</p>
+        <p className="text-gray-700 dark:text-gray-300 font-mono">{t("description")} 🚀</p>
       </div>
       <div className="flex flex-col gap-4 ">
         {displayPosts?.length > 0 ? (
-          <ul className="flex flex-col gap-10">
+          <ul className="flex flex-col gap-20">
             {displayPosts.map((post) => (
               <Post key={post.slug} {...post} />
             ))}

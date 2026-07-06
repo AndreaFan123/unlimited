@@ -24,37 +24,43 @@
       "name": "Dezctop 官方網站",
       "description": "Dezctop 品牌官方電商網站",
       "link": "https://dezctop.com/tw",
-      "duration": "2025-現在"
+      "duration": "2025-現在",
+      "type": "工作"
     },
     "senryo": {
       "name": "千兩壽司訂購平台",
       "description": "日式料理訂餐／外送平台",
       "link": "https://order.sen-ryo.com.hk/tc",
-      "duration": "2023"
+      "duration": "2023",
+      "type": "工作"
     },
     "findHelp": {
       "name": "FindHelp（僅繁體中文）",
       "description": "蒐集台灣各縣市福利政策，方便讓使用者搜尋",
       "link": "https://find-help-andreafan123s-projects.vercel.app/",
-      "duration": "2026"
+      "duration": "2026",
+      "type": "興趣"
     },
     "hubOcean": {
       "name": "HUB Ocean 重新設計",
       "description": "HUB Ocean 平台視覺與介面重新設計概念",
       "link": "https://hub-ocean-odp-concept.netlify.app/",
-      "duration": "2026"
+      "duration": "2026",
+      "type": "興趣"
     },
     "unlimitedBlog": {
       "name": "Unlimited",
       "description": "個人網站",
       "link": "https://shanlefan.com/zh-TW",
-      "duration": "2025-2026"
+      "duration": "2025-2026",
+      "type": "興趣"
     },
     "pyladies": {
       "name": "PyLadies (國際 Python 社群)",
       "description": "PyLadies Taiwan 網站維護者及組長",
       "duration": "2020-01-01 ~ 現在",
-      "link": "https://tw.pyladies.com/"
+      "link": "https://tw.pyladies.com/",
+      "type": "志工"
     },
     "mdn": {
       "name": "MDN (Mozilla 開發者網路)",
@@ -69,7 +75,8 @@
       "description": "Missing Semester 繁體中文翻譯者",
       "duration": "2019-01-01 ~ 現在",
       "link": "https://missing-semester-tw.github.io/",
-      "repo": "https://github.com/missing-semester-tw"
+      "repo": "https://github.com/missing-semester-tw",
+      "type": "志工"
     }
   },
   "socials": {
@@ -130,7 +137,8 @@
     "description": "關於網頁開發、管理和生活中其他雜七雜八的事情",
     "feature": "精選",
     "workingOnIt": "我正在努力中",
-    "readMore": "閱讀更多"
+    "readMore": "閱讀更多",
+    "backToBlog": "回到部落格"
   },
   "tag": {
     "relatedPosts": "相關文章",
