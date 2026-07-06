@@ -15,7 +15,7 @@ export default function PostContainer({ lang }: { lang: Locales }) {
 
   const latestPosts = sortedPosts.slice(0, 6);
   return (
-    <div className="sm:px-0 pb-20 lg:py-32 w-full max-w-[1000px] mx-auto px-5 flex flex-col gap-12">
+    <div className="sm:px-0 pb-20 py-16  lg:py-32 w-full max-w-[1000px] mx-auto px-5 flex flex-col gap-12">
       <h2 className="text-3xl relative w-fit font-bold text-gray-700 dark:text-gray-300">
         {tProfile("latestPosts")}
       </h2>

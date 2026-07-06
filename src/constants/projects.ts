@@ -1,11 +1,11 @@
 export const PROJECT_COLORS = [
-  "#59B292",
-  "#FFC94D",
-  "#5A9CB5",
-  "#FA6781",
-  "#F48F68",
-  "#9CCFFF",
-  "#3F9AAE"
+  "#659287",
+  "#BA5A5A",
+  "#A98B76",
+  "#576A8F",
+  "#89986D",
+  "#E97F4A",
+  "#604652"
 ] as const;
 
 export const WORK_PROJECT_KEYS = [

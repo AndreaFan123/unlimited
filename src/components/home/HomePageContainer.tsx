@@ -2,8 +2,6 @@
 
 import ProfileContainer from "../../components/profile/ProfileContainer";
 import PostContainer from "@/src/components/profile/PostContainer";
-import WorkExperience from "@/src/components/work-experience/WorkExperience";
-import VolunteerProject from "@/src/components/work-experience/VolunteerProject";
 import { Locales } from "@/src/i18n/request";
 import ProjectContainer from "../projects/ProjectContainer";
 

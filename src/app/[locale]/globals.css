@@ -5,6 +5,12 @@
 :root {
   --background: hsl(0, 0%, 93%);
   --foreground: hsl(0, 0%, 9%);
+  --content-max-width: 1000px;
+  --content-padding: 1.25rem;
+  --content-inset: max(
+    var(--content-padding),
+    calc((100vw - var(--content-max-width)) / 2 + var(--content-padding))
+  );
 }
 
 @media (prefers-color-scheme: dark) {
@@ -116,5 +122,14 @@ body {
 
   .project-section-surface {
     @apply bg-[#F6F3EB] dark:bg-background;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

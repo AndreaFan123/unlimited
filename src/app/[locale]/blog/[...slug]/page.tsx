@@ -109,7 +109,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
           ))}
         </div>
       </div>
-      <Separator />
+      <Separator className="mb-5"/>
       <div className="prose w-full max-w-[1000px] mx-auto">
         <MdxContent code={post.body} />
       </div>
