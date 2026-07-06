@@ -7,6 +7,8 @@ const ROUTES = {
   MEETUTODAY: "https://meetu.today/en",
   BLOG: "/blog",
   BLOG_SLUG: "/blog/[slug]",
+  PROJECTS: "/projects",
+  PROJECT_SLUG: "/projects/[slug]",
   TAG_SLUG: "/blog/tags/",
   COSEEING: "https://a11yvillage.coseeing.org/en",
   PYLADIES: "https://tw.pyladies.com/",

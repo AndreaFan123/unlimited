@@ -26,8 +26,17 @@ export type WorkProject = {
   description: string;
   duration: string;
   link: string;
+  repo?: string;
   type: string;
 };
+
+export function isWorkProjectKey(value: string): value is WorkProjectKey {
+  return WORK_PROJECT_KEYS.includes(value as WorkProjectKey);
+}
+
+export function getProjectPath(key: WorkProjectKey): string {
+  return `/projects/${key}`;
+}
 
 export function getProjectLatestYear(duration: string): number {
   if (/present|現在/i.test(duration)) {

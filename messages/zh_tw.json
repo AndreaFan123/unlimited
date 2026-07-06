@@ -18,8 +18,11 @@
     "volunteerType": "志工",
     "actions": {
       "visitWebsite": "前往網站",
-      "visitRepo": "前往 Repo"
+      "visitRepo": "前往 Repo",
+      "viewProject": "查看專案"
     },
+    "backToHome": "回到首頁",
+    "workingOnIt": "專案介紹撰寫中",
     "dezctop": {
       "name": "Dezctop 官方網站",
       "description": "Dezctop 品牌官方電商網站",
@@ -168,6 +171,10 @@
     "resume": {
       "title": "履歷 | 范珊樂 Shan Le Fan",
       "description": "范珊樂 Andrea 的前端工程師履歷，涵蓋工作經歷、專案與開源貢獻。"
+    },
+    "project": {
+      "title": "專案介紹｜范珊樂 Shan Le Fan",
+      "description": "了解我在工作與 side project 中的開發經驗、遇到的挑戰與成果。"
     }
   },
   "footer": {

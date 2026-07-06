@@ -18,8 +18,11 @@
     "volunteerType": "Volunteer",
     "actions": {
       "visitWebsite": "Visit Website",
-      "visitRepo": "Visit Repo"
+      "visitRepo": "Visit Repo",
+      "viewProject": "View Project"
     },
+    "backToHome": "Back to Home",
+    "workingOnIt": "Project write-up in progress",
     "dezctop": {
       "name": "Dezctop Website",
       "description":"Taiwan top standup deskt and computer gears provider",
@@ -168,6 +171,10 @@
     "resume": {
       "title": "Resume | Shan Le Fan",
       "description": "Andrea Fan's resume — a Taiwan-based frontend developer with experience in React, Next.js, and Nuxt. View work history, projects, and open-source contributions."
+    },
+    "project": {
+      "title": "Projects | Shan Le Fan",
+      "description": "Learn about my work and side projects, the challenges I faced, and what I built."
     }
   },
   "footer": {
