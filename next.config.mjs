@@ -1,4 +1,3 @@
-/* eslint-disable import/no-anonymous-default-export */
 import { build } from "velite";
 import createNextIntlPlugin from 'next-intl/plugin';
 

@@ -15,7 +15,6 @@ type PersonInfoProps = {
 
 export default function PersonInfo({
   name,
-  title,
   description,
 }: PersonInfoProps) {
   const tSocials = useTranslations("socials");

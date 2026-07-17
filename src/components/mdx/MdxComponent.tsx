@@ -91,6 +91,9 @@ type MdxProps = {
 };
 
 export default function MdxContent({ code }: MdxProps) {
+  // Velite compiles MDX into a runtime function; the component type is
+  // produced per `code` string, which is the intended MDX pattern.
+  /* eslint-disable react-hooks/static-components -- MDX runtime component */
   const Component = useMdxComponent(code);
   return <Component components={components} />;
 }
