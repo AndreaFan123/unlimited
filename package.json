@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "dev:content": "velite --watch",
-    "build:content": "velite",
-    "build": "velite && next build",
+    "build:content": "velite && node scripts/write-post-locale-map.mjs",
+    "build": "velite && node scripts/write-post-locale-map.mjs && next build",
     "start": "next start",
     "lint": "next lint"
   },

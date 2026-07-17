@@ -16,7 +16,7 @@ import ROUTES from "@/src/constants/routes";
 import MdxContent from "@/src/components/mdx/MdxComponent";
 import "@/src/styles/mdx.css";
 import { Link } from "@/src/i18n/navigation";
-import { Locales } from "@/src/i18n/request";
+import { Locales, toContentLanguage } from "@/src/i18n/request";
 import { routing } from "@/src/i18n/routing";
 
 type PostPageProps = {
@@ -47,8 +47,14 @@ export async function generateMetadata({
 
 const getPostFromParams = async (params: Awaited<PostPageProps["params"]>) => {
   const slug = params?.slug?.join("/");
-  const post = posts.find((post) => post.slugAsParams === slug);
-  return post;
+  const locale = routing.locales.includes(params.locale as Locales)
+    ? (params.locale as Locales)
+    : routing.defaultLocale;
+  const language = toContentLanguage(locale);
+
+  return posts.find(
+    (post) => post.slugAsParams === slug && post.language === language,
+  );
 };
 
 export const generateStaticParams = async (): Promise<

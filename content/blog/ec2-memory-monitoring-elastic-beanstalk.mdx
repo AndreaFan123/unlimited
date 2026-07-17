@@ -1,0 +1,220 @@
+---
+title: "EC2 Memory Monitoring on Elastic Beanstalk"
+description: On a Nuxt SSR Elastic Beanstalk environment, we use CloudWatch Agent to observe memory and mem-guard to restart the app when memory stays high—replacing the old two-hour full instance churn.
+date: 2026-07-16
+tags: ["aws", "cloud", "elastic-beanstalk", "monitoring", "devops"]
+published: true
+language: "en"
+---
+
+Our frontend is Nuxt SSR on **Elastic Beanstalk (EB)** — Node.js 22 on Amazon Linux 2023. For a while, memory would creep up over time and eventually approach 90%+. The frustrating part: CloudWatch does not show EC2 memory by default. In other words, you can see CPU and network, but not the memory state.
+
+This post documents how we made memory visible with CloudWatch Agent, then replaced "terminate the whole instance on a schedule" with "restart only the Node app when memory is truly too high."
+
+## Background: What We Used to Do
+
+Long-running SSR processes tend to accumulate memory. Not always an immediate OOM, but enough to slow responses and add instability.
+
+The previous approach used **Auto Scaling Group (ASG) Scheduled Actions** every two hours:
+
+- `Terminate`: scale desired capacity down to 1
+- `Launch`: a few minutes later, scale back to 2
+
+That effectively replaced EC2 instances on a schedule to flush memory. It sounded effective, but in practice things could go wrong (not constantly, but occasionally):
+
+1. EB rolling deploys got blocked — when ASG was running scheduled churn, EB could not complete a rolling update smoothly.
+2. Full instance replacement is expensive — boot, health checks, agent reinstall — much slower than restarting one systemd service.
+3. It treated the symptom, not the cause — the underlying memory growth was still there; we only washed it away on a timer.
+
+After discussion, we decided on:
+
+| Layer | What to do |
+| --- | --- |
+| Observe | Make `mem_used_percent` visible in CloudWatch |
+| Respond | When memory stays **sustained** high, restart the `web` service and send a notification |
+
+---
+
+## Architecture
+
+EB already manages an ASG with two `m7a.medium` instances. On top of that, we stacked three layers:
+
+```markdown
+CloudFront
+    ↓
+Elastic Beanstalk (Node.js 22)
+    ↓
+Application Load Balancer
+    ↓
+EC2 × 2 (ASG-managed)
+    ├─ CloudWatch Agent → mem_used_percent metrics (observe)
+    ├─ SSM State Manager → auto-install agent on new instances (ops)
+    └─ mem-guard (systemd timer) → restart web on high memory (respond)
+```
+
+> Observation and response are independent paths. mem-guard reads local `free` and can still run without CloudWatch Agent.
+
+---
+## Step 1: Make Memory Visible in CloudWatch
+
+CloudWatch does not collect memory metrics out of the box. You need **CloudWatch Agent** on each EC2 instance, managed via **SSM (Systems Manager)**.
+
+### 1. Fix IAM permissions
+
+On the instance profile EB uses (`aws-elasticbeanstalk-ec2-role`), attach:
+
+- `AmazonSSMManagedInstanceCore` — so the instance can be managed by SSM
+- `CloudWatchAgentServerPolicy` — so the agent can push metrics to CloudWatch
+
+Set this on the **EB environment role**, not only on the two existing EC2 instances. That way new instances inherit it automatically after EB replaces machines.
+
+### 2. Store config in Parameter Store
+
+Create `AmazonCloudWatch-mem` in SSM Parameter Store. The content collects `mem_used_percent` under the `CWAgent` namespace:
+
+```json
+{
+  "agent": {
+    "metrics_collection_interval": 60
+  },
+  "metrics": {
+    "namespace": "CWAgent",
+    "append_dimensions": {
+      "InstanceId": "${aws:InstanceId}"
+    },
+    "aggregation_dimensions": [["InstanceId"]],
+    "metrics_collected": {
+      "mem": {
+        "measurement": ["mem_used_percent"]
+      }
+    }
+  }
+}
+```
+
+### 3. Manual install first — confirm you can see data
+
+Use SSM **Run Command** with the official AWS documents `AWS-ConfigureAWSPackage` and `AmazonCloudWatch-ManageAgent` to install and apply the config on existing instances.
+
+After install:
+
+```markdown
+CloudWatch
+  → Metrics
+    → CWAgent
+      → mem_used_percent
+        Pick the correct **InstanceId** and **region**
+```
+
+> Common mistake: install the agent in region A, then look for graphs in region B.
+
+### 4. Use State Manager so new instances catch up automatically
+
+Manual install only covers current machines. New instances from EB deploy or scale-out need automation:
+
+1. Tag the EB environment: `MemMonitor=true`
+2. Create two State Manager associations:
+   - `Install-CWAgent` — install CloudWatch Agent
+   - `Configure-CWAgent-mem` — read config from Parameter Store
+
+Tagged new instances should show up in CloudWatch charts within about 10–20 minutes.
+
+---
+
+## Step 2: mem-guard — Restart the App on High Memory
+
+We added `.ebextensions/mem-guard.config` in the app repo so it deploys with EB onto every instance:
+
+```bash
+# Runs every 5 minutes
+USED=$(free | awk '/^Mem:/ {printf "%.0f", (1 - $7/$2)*100}')
+
+# Only act after 2 consecutive breaches (~10 minutes) above 85%
+if [ "$USED" -gt 85 ] sustained; then
+  aws sns publish ...   # email notification
+  systemctl restart web # restart Node app only
+fi
+```
+
+A **systemd timer** fires every 5 minutes. Two consecutive breaches (~10 minutes) are required before restart, so short spikes do not trigger it.
+
+### Why `.ebextensions`?
+
+- If you hand-edit EB-generated launch template user data, every deploy overwrites it
+- If you terminate EB instances to "refresh" them, you conflict with health checks and the deploy flow
+- Keep the config in the app repo, version-controlled and deployed with the code
+
+### A deploy bug we hit 😅
+
+After the first deploy, Session Manager showed `mem-guard.timer` did not exist. Root cause: **the CI pipeline's EB deploy zip omitted the `.ebextensions` folder**.
+
+### SNS notifications
+
+Before restart, mem-guard publishes to an SNS topic, e.g. `EB memory: restarting app on i-xxxx`. The IAM role needs `sns:Publish`. An email does not mean the server died — usually just a Node process restart, back within seconds.
+
+---
+
+## Step 3: Build the Dashboard
+
+We created dashboard **`EB-memory`** so we can watch the trend on a line chart later:
+
+- Both instances' `mem_used_percent` on one chart
+- An **85% horizontal line** (monitoring threshold)
+- Y-axis fixed 0–100
+
+<Image
+  src="/static/eb_memory.webp"
+  alt="EB memory dashboard with 85% threshold line"
+  width={1000}
+  height={1000}
+/>
+
+
+## The First Days After Launch
+
+A few days after deploy, CloudWatch charts showed the familiar pattern: memory climbing slowly, then a **cliff drop**.
+
+<Image
+  src="/static/eb_memory_line.webp"
+  alt="EB memory line chart showing gradual rise and cliff drop"
+  width={1000}
+  height={1000}
+/>
+
+
+You can check with Session Manager via `journalctl -u mem-guard.service` (remember `sudo`; timestamps are UTC):
+
+
+## What We Removed vs. Kept
+
+
+| Approach | Decision |
+| --- | --- |
+| ASG Terminate/Launch every 2 hours | ❌ Removed; do not re-add before deploy |
+| CloudWatch Agent + State Manager | ✅ Keep — observe + automate new instances |
+| mem-guard restart `web` | ✅ Keep — respond to high memory |
+| Dashboard `EB-memory` | ✅ Keep — watch memory trends |
+| Fix SSR memory leak root cause | 🔄 In progress — mem-guard stops the bleeding, it is not a cure |
+
+
+---
+
+## Suggested Implementation Order
+
+If you're doing something similar on EB, this order works well:
+
+1. IAM + Parameter Store + Run Command — get `mem_used_percent` on existing instances first
+2. mem-guard `.ebextensions` — confirm CI zip includes it; verify `mem-guard.timer` after deploy
+3. State Manager — auto-install agent on new instances
+4. Dashboard — one stable entry point for non-engineers
+5. (Optional) CloudWatch Alarms — 70%/80% early warning, separate from mem-guard's 85%
+
+## Takeaways
+
+1. CloudWatch does not show memory by default — install the agent on purpose, and match the region.
+2. Design observation and response separately — agent draws graphs; mem-guard self-heals locally.
+3. On EB, restarting the app is much friendlier than replacing the whole machine — seconds, without disrupting ASG and deploy flow.
+4. Scheduled terminate is a double-edged sword — clears memory, but can block EB rolling updates.
+5. Check the deploy pipeline — if `.ebextensions` is written but never zipped, it never deployed.
+
+Finally, even with monitoring in place, you still need to gradually verify and eliminate whether the application itself is leaking memory.

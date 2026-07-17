@@ -2,10 +2,10 @@
 
 import { Link, usePathname } from "@/src/i18n/navigation";
 import { Locales } from "@/src/i18n/request";
+import { getLocalizedPathname } from "@/src/lib/post-locale";
 import { cn } from "@/src/lib/utils";
 
-const linkClass =
-  "transition-all hover:scale-110 duration-300";
+const linkClass = "transition-all hover:scale-110 duration-300";
 
 export default function LocaleToggle({ lang }: { lang: Locales }) {
   const pathname = usePathname();
@@ -13,22 +13,22 @@ export default function LocaleToggle({ lang }: { lang: Locales }) {
   return (
     <div className="flex gap-3 items-center">
       <Link
-        href={pathname}
+        href={getLocalizedPathname(pathname, "en")}
         locale="en"
         className={cn(
           linkClass,
-          lang === "en" && "font-bold text-orange-500 hover:text-orange-500"
+          lang === "en" && "font-bold text-orange-500 hover:text-orange-500",
         )}
       >
         EN
       </Link>
       <span className="text-gray-400">|</span>
       <Link
-        href={pathname}
+        href={getLocalizedPathname(pathname, "zh-TW")}
         locale="zh-TW"
         className={cn(
           linkClass,
-          lang === "zh-TW" && "font-bold text-orange-500 hover:text-orange-500"
+          lang === "zh-TW" && "font-bold text-orange-500 hover:text-orange-500",
         )}
       >
         ZH-TW

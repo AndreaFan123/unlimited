@@ -1,0 +1,222 @@
+---
+title: "Elastic Beanstalk 上的 EC2 記憶體監控"
+description: 在 Nuxt SSR 的 EB 環境中，用 CloudWatch Agent 觀測記憶體、用 mem-guard 在持續高記憶體時重啟 app，取代先前每兩小時整台換機的作法。
+date: 2026-07-16
+tags: ["aws", "cloud", "elastic-beanstalk", "monitoring", "devops"]
+published: true
+language: "zh_tw"
+---
+
+我們的前台是 Nuxt SSR，跑在 **Elastic Beanstalk（EB）** 的 Node.js 22 / Amazon Linux 2023 上。有一段時間，記憶體會慢慢爬升，最後逼近 90% 以上。更麻煩的是：CloudWatch 預設根本看不到 EC2 的記憶體，換句話說只能看到 CPU、網路，卻無法看到記憶體的狀態。
+
+這篇文章記錄如何透過 CloudWatch Agent 觀測記憶體，再把「定時整台換機」改成「記憶體真的太高時，只重啟 Node app」。
+
+## 背景：原本怎麼處理？
+
+SSR 應用跑久了，記憶體使用率會緩慢上升。這不一定是立刻記憶體滿，但會讓回應變慢、增加不穩定風險。
+
+先前的作法是用 **Auto Scaling Group（ASG）的 Scheduled Actions**，每兩小時一次：
+
+- `Terminate`：把 instance 數量降到 1
+- `Launch`：幾分鐘後再拉回 2
+
+等於定期把整台 EC2 換掉，強制清掉記憶體。聽起來有效，但實際上卻會發生(不是常態，但偶爾會)：
+
+1. EB rolling deploy 會被擋住——ASG 正在執行定時換機時，EB 無法順利做 rolling update。
+2. 整台換機成本高——啟動、健康檢查、agent 重裝，都比「重啟一個 systemd service」慢很多。
+3. 治標不治本——記憶體洩漏的根因還在，只是被定時洗掉。
+
+經過討論後決定：
+
+| 層次 | 要做什麼 |
+| --- | --- |
+| 觀測 | 讓 CloudWatch 看得到 `mem_used_percent` |
+| 回應 | 記憶體**持續**偏高時，重啟 `web` service，並發通知 |
+
+---
+
+## 架構
+
+EB 底下本來就有 ASG 管兩台 `m7a.medium`，在這之上疊了三層：
+
+```markdown
+CloudFront
+    ↓
+Elastic Beanstalk（Node.js 22）
+    ↓
+Application Load Balancer
+    ↓
+EC2 × 2（ASG 管理）
+    ├─ CloudWatch Agent → 指標 mem_used_percent（觀測）
+    ├─ SSM State Manager → 新機自動裝 agent（維運）
+    └─ mem-guard（systemd timer）→ 高記憶體時重啟 web（回應）
+```
+
+> 觀測和回應是兩條獨立的路線。mem-guard 直接讀本機 `free`，不依賴 CloudWatch Agent 也能動。
+
+---
+## 第一步：讓 CloudWatch 看得到記憶體
+
+CloudWatch 預設不收記憶體指標。要在 EC2 裡裝 **CloudWatch Agent**，並透過 **SSM（Systems Manager）** 管理。
+
+### 1. 補 IAM 權限
+
+在 EB 使用的 instance profile（我們是 `aws-elasticbeanstalk-ec2-role`）加上：
+
+- `AmazonSSMManagedInstanceCore` — 讓機器能被 SSM 管理
+- `CloudWatchAgentServerPolicy` — 讓 agent 能把指標推到 CloudWatch
+
+權限要設在 **EB 環境層的 role**，不能只改現有兩台 EC2。這樣 EB 換機後，新 instance 才會自動繼承。
+
+### 2. 把設定存進 Parameter Store
+
+在 SSM Parameter Store 建立 `AmazonCloudWatch-mem`，內容指定 `mem_used_percent`，namespace 用 `CWAgent`：
+
+```json
+{
+  "agent": {
+    "metrics_collection_interval": 60
+  },
+  "metrics": {
+    "namespace": "CWAgent",
+    "append_dimensions": {
+      "InstanceId": "${aws:InstanceId}"
+    },
+    "aggregation_dimensions": [["InstanceId"]],
+    "metrics_collected": {
+      "mem": {
+        "measurement": ["mem_used_percent"]
+      }
+    }
+  }
+}
+```
+
+### 3. 先手動裝一次，確認可以看到數據
+
+用 SSM **Run Command** 跑 AWS 官方的 `AWS-ConfigureAWSPackage` 和 `AmazonCloudWatch-ManageAgent`，在現有 instance 上安裝並套用設定。
+
+裝好後
+
+```markdown
+CloudWatch 
+  → Metrics 
+    → CWAgent 
+      → mem_used_percent
+        選對 **InstanceId** 和 **region**
+```
+
+> 常見錯誤：在 A region 裝 agent，卻到 B region 找圖。
+
+### 4. 用 State Manager 讓新機自動跟上
+
+手動裝只能管當下的機器。EB deploy 或 scale 出來的新 instance 需要自動化：
+
+1. 在 EB 環境加 tag：`MemMonitor=true`
+2. 建兩個 State Manager Association：
+   - `Install-CWAgent` — 安裝 CloudWatch Agent
+   - `Configure-CWAgent-mem` — 從 Parameter Store 讀設定
+
+之後帶這個 tag 的新機，大約 10～20 分鐘內數據就會出現在 CloudWatch 圖表上。
+
+---
+
+## 第二步：mem-guard——高記憶體時重啟 app
+
+在 app repo 加 `.ebextensions/mem-guard.config`，跟著 EB deploy 裝到每台 instance：
+
+```bash
+# 每 5 分鐘執行一次
+USED=$(free | awk '/^Mem:/ {printf "%.0f", (1 - $7/$2)*100}')
+
+# 連續 2 次（約 10 分鐘）超過 85% 才動作
+if [ "$USED" -gt 85 ] 連續達標; then
+  aws sns publish ...   # 寄信通知
+  systemctl restart web # 只重啟 Node app
+fi
+```
+
+用 **systemd timer** 每 5 分鐘觸發一次，連續 2 次超過門檻（約 10 分鐘）才重啟，避免短暫尖峰誤觸發。
+
+### 為什麼用 `.ebextensions`？
+
+- 如果手改 EB 自動產生的 launch template user data，每次 deploy 會被蓋掉
+- 如果對 EB instance 進行 terminate 換機，和 EB 健康檢查，這樣會和部署流程衝突
+- 需要把設定放在 app repo，跟程式碼一起 version control，一起 deploy
+
+
+### 部署時遇到的 Bug 😅
+
+第一次 deploy 後，Session Manager 進去發現 `mem-guard.timer` 不存在。後來發現：**CI 打包 EB deploy zip 時漏了 `.ebextensions` 目錄**。
+
+### SNS 通知
+
+重啟前會透過 SNS topic 寄信，標題類似 `EB memory: restarting app on i-xxxx`。IAM role 需要 `sns:Publish` 權限。收到信不代表機器掛掉，多半只是 Node 程序被重啟，幾秒內就恢復。
+
+---
+
+## 第三步：Dashboard 建立
+
+建立 Dashboard **`EB-memory`**，以便未來直接透過線圖來觀察數據：
+
+- 兩台 instance 的 `mem_used_percent` 在同一張圖
+- 加一條 **85% 水平線**（監控門檻）
+- Y 軸固定 0～100
+
+<Image
+  src="/static/eb_memory.webp"
+  alt="EB memory line chart"
+  width={1000}
+  height={1000}
+/>
+
+
+## 上線後的第一天
+
+部署完成後幾天，CloudWatch 圖表出現熟悉的型態：記憶體緩慢上升，然後**懸崖式下降**。
+
+<Image
+  src="/static/eb_memory_line.webp"
+  alt="EB memory line chart"
+  width={1000}
+  height={1000}
+/>
+
+
+可以用 session manager 查 `journalctl -u mem-guard.service`（記得加 `sudo`，時間用 UTC）：
+
+
+## 整個決策拿掉什麼、保留什麼
+
+
+| 做法 | 決定 |
+| --- | --- |
+| ASG 每 2 小時 Terminate/Launch | ❌ 已刪除，deploy 前不要再加回 |
+| CloudWatch Agent + State Manager | ✅ 保留，負責觀測與新機自動化 |
+| mem-guard 重啟 `web` | ✅ 保留，負責回應 |
+| Dashboard `EB-memory` | ✅ 保留，看記憶體走向 |
+| 查 SSR 記憶體洩漏根因 | 🔄 進行中——mem-guard 是止血，不是根治 |
+
+
+---
+
+## 實作順序建議
+
+若你也要在 EB 上做類似的事，建議順序：
+
+1. IAM + Parameter Store + Run Command — 先讓現有機器有 `mem_used_percent`
+2. mem-guard `.ebextensions` — 確認 CI zip 有包含，deploy 後驗證 `mem-guard.timer`
+3. State Manager — 新機自動裝 agent
+4. Dashboard — 給非技術同仁一個固定入口
+5. （可選）CloudWatch Alarm — 70%/80% 預警，和 mem-guard 的 85% 分開
+
+## 小結
+
+1. CloudWatch 預設看不到記憶體——要主動裝 agent，而且 region 要對。
+2. 觀測和回應分開設計——agent 負責畫圖，mem-guard 負責本機自救。
+3. 對 EB 環境，重啟 app 比重啟整台機器友善得多——幾秒完成，不影響 ASG 與 deploy 流程。
+4. 定時 terminate 整台換機是雙面刃——能清記憶體，但會擋 EB rolling update。
+5. deploy 管線要檢查——`.ebextensions` 寫了但沒被打進 zip，等於沒部署。
+
+最後，即使實作監控，仍要循序漸進地去確認並排除程式本身是否有造成記憶體洩漏的問題。
+
