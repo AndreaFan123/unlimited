@@ -2,14 +2,12 @@
 
 import { Binoculars } from "lucide-react";
 import type { WorkProject } from "@/src/constants/projects";
-import { getProjectPath } from "@/src/constants/projects";
-import { Link } from "@/src/i18n/navigation";
 import { cn } from "@/src/lib/utils";
 
 type ProjectCardProps = {
   project: WorkProject;
   color: string;
-  viewLabel: string;
+  visitLabel: string;
 };
 
 function isLightColor(hex: string): boolean {
@@ -24,7 +22,7 @@ function isLightColor(hex: string): boolean {
 export default function ProjectBar({
   project,
   color,
-  viewLabel,
+  visitLabel,
 }: ProjectCardProps) {
   const lightBackground = isLightColor(color);
   const textColor = lightBackground ? "text-gray-900" : "text-white";
@@ -33,9 +31,11 @@ export default function ProjectBar({
     : "bg-white/20 text-white";
 
   return (
-    <Link
-      href={getProjectPath(project.key)}
-      aria-label={`${viewLabel}: ${project.name}`}
+    <a
+      href={project.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${visitLabel}: ${project.name}`}
       style={{ backgroundColor: color }}
       className={cn(
         "relative flex h-full w-full flex-col justify-between rounded-3xl p-5",
@@ -66,7 +66,9 @@ export default function ProjectBar({
           <h4 className={cn("text-xl font-bold leading-snug", textColor)}>
             {project.name}
           </h4>
-          <p className={cn("text-base font-mono leading-snug", textColor)}>{project.description}</p>
+          <p className={cn("text-base font-mono leading-snug", textColor)}>
+            {project.description}
+          </p>
         </div>
       </div>
 
@@ -82,6 +84,6 @@ export default function ProjectBar({
           </span>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

@@ -57,7 +57,7 @@ export default function ProjectContainer() {
               <ProjectBar
                 project={project}
                 color={PROJECT_COLORS[index % PROJECT_COLORS.length]}
-                viewLabel={tProject("actions.viewProject")}
+                visitLabel={tProject("actions.visitWebsite")}
               />
             </li>
           ))}
