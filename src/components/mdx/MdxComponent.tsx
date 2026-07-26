@@ -1,5 +1,6 @@
 import * as runtime from "react/jsx-runtime";
 import ZoomableImage from "@/src/components/mdx/ZoomableImage";
+import { cn } from "@/src/lib/utils";
 
 type ImageProps = {
   src: string;
@@ -7,6 +8,8 @@ type ImageProps = {
   width?: number;
   height?: number;
   className?: string;
+  priority?: boolean;
+  loading?: "eager" | "lazy";
 };
 
 function useMdxComponent(code: string) {
@@ -17,32 +20,84 @@ function useMdxComponent(code: string) {
 }
 
 const components = {
-  Image: ({ src, alt, width = 300, height = 300, ...props }: ImageProps) => (
+  Image: ({
+    src,
+    alt,
+    width = 300,
+    height = 300,
+    priority,
+    loading,
+    ...props
+  }: ImageProps) => (
     <ZoomableImage
       src={src}
       alt={alt || ""}
       width={width}
       height={height}
+      priority={priority}
+      loading={loading}
       {...props}
     />
   ),
-  h2: ({ children }: { children: React.ReactNode }) => (
-    <h2 className="mt-7 m-0 font-black text-gray-700 dark:text-gray-300">
+  // Forward `id` from rehype-slug so hash links + TOC scrollspy work.
+  // scroll-mt-20 offsets the sticky header (h-20) when jumping to a heading.
+  h2: ({
+    children,
+    className,
+    ...props
+  }: React.ComponentPropsWithoutRef<"h2">) => (
+    <h2
+      className={cn(
+        "mt-7 mb-2 scroll-mt-20 font-black text-gray-700 dark:text-gray-300",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </h2>
   ),
-  h3: ({ children }: { children: React.ReactNode }) => (
-    <h3 className="mt-7 mb-0 font-bold text-gray-700 dark:text-gray-300">
+  h3: ({
+    children,
+    className,
+    ...props
+  }: React.ComponentPropsWithoutRef<"h3">) => (
+    <h3
+      className={cn(
+        "mt-7 mb-2 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </h3>
   ),
-  h4: ({ children }: { children: React.ReactNode }) => (
-    <h4 className="mt-7 mb-0 font-bold text-gray-700 dark:text-gray-300">
+  h4: ({
+    children,
+    className,
+    ...props
+  }: React.ComponentPropsWithoutRef<"h4">) => (
+    <h4
+      className={cn(
+        "mt-7 mb-2 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </h4>
   ),
-  h5: ({ children }: { children: React.ReactNode }) => (
-    <h5 className="mt-7 mb-0 font-bold text-gray-700 dark:text-gray-300">
+  h5: ({
+    children,
+    className,
+    ...props
+  }: React.ComponentPropsWithoutRef<"h5">) => (
+    <h5
+      className={cn(
+        "mt-7 mb-2 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </h5>
   ),

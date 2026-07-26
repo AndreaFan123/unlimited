@@ -1,0 +1,307 @@
+---
+title: "Integrating Meta Pixel + Conversions API"
+description: Implement Meta Pixel and Conversions API Purchase events, deduplicate with an order-number event_id, and handle ad cookie consent plus ECPay / Stripe webhook wiring.
+date: 2026-07-20
+tags: ["meta", "capi", "gtm", "nuxt", "ecommerce", "monitoring"]
+published: true
+language: "en"
+---
+
+This past month I’ve been working through marketing API integrations—mainly Google Ads, Google Merchant Center, Meta, and Facebook Marketplace. Google Ads and Meta are done; I’m writing this down so I can revisit the process later.
+
+Previously the site relied on the browser Pixel alone. Over time we still missed events—payment redirects to a gateway, ad blockers, cookie consent, closed tabs, and so on. Meta recommends running Pixel and the Conversions API (CAPI) together, then deduplicating with the same `event_id`, so conversion counts stay accurate.
+
+This post is based on an ecommerce integration I’ve been helping with: architecture, frontend/backend split, and what to watch before go-live. It fits a Nuxt / Vue storefront plus an order-backend webhook. Our Taiwan payment partner is ECPay; the US uses Stripe. The same pattern works for both.
+
+---
+
+## Two paths, one purchase
+
+| Path | Who sends | When | Tool |
+| --- | --- | --- | --- |
+| Browser (Pixel) | User’s browser | Thank-you page loads; GTM fires `purchase` | GTM Facebook Pixel Tag |
+| Server (CAPI) | Server | After payment-success webhook confirms | `POST graph.facebook.com/.../events` |
+
+```markdown
+User payment succeeds
+        │
+        ├─► Browser: GTM → Pixel Purchase (event_id = order number)
+        │
+        └─► Backend: CAPI Purchase (event_id = same order number)
+                    │
+                    ▼
+              Meta dedup → counts as 1 conversion
+```
+
+Both browser and server must send the same `event_id`:
+
+```markdown
+event_id = order_serial_number (order number)
+```
+
+That `event_id` must match GTM dataLayer `ecommerce.transaction_id` and the Pixel `eid`.
+
+---
+
+## Responsibility split (AI-suggested; review whether it fits your team)
+
+
+| Role | Does | Does not |
+| --- | --- | --- |
+| Frontend | Read `_fbp` / build `fbc`; attach attribution fields on order when ads are consented; fire Purchase via GTM on the thank-you page | Hold the CAPI token; call Graph API; hash email / phone for CAPI |
+| Marketing | Facebook Pixel Tag, Event ID mapped to `transaction_id`, Advanced Matching (if needed) | — |
+| Backend | Build CAPI payload on payment success, hash PII, pick the right market Pixel, strip test code in production | Reuse a stale sample `event_time` |
+
+The storefront is Nuxt. The browser does not call `fbq` directly—it uses the existing GTM setup. CAPI lives on the order backend (ECPay / Stripe webhook).
+
+---
+
+## Frontend: cookie consent + `ad_tracking_data`
+
+### Why consent gates what we send
+
+Legal / product decision: if the user has **not consented to advertising cookies**, do not send Meta attribution fields into the order API. The backend can also skip CAPI when attribution data is missing, so behavior stays aligned with consent.
+
+### Order API payload (example shaped like our backend)
+
+The backend accepts attribution as a nested object (same for Taiwan ECPay and US Stripe):
+
+```json
+{
+  "shipping": { "...": "..." },
+  "billing": null,
+  "shipping_choice": "Normal",
+  "shipping_floors": null,
+  "ad_tracking_data": {
+    "fbp": "fb.1.1700000000000.1234567890",
+    "fbc": "fb.1.1700000000000.AbCdEfGhIj"
+  }
+}
+```
+
+| Field | Notes |
+| --- | --- |
+| `fbp` | Cookie `_fbp` (browser ID). Usually present once Pixel is on and consent is granted |
+| `fbc` | Click ID. Mostly present when the user arrives from a FB / IG ad (URL has `fbclid`) |
+| (omit) `client_user_agent` | Backend can take this from the request header |
+| (omit) `event_source_url` | Thank-you URL is **built on the backend**; frontend does not send it on create-order |
+
+When ads are declined: omit the whole `ad_tracking_data` object—do not send `null`.
+
+Only `fbp`, no `fbc`: common when the visit did not come from an ad click.
+
+### When `fbc` exists
+
+1. Cookie already has `_fbc`, or
+2. URL has `fbclid=...`; the frontend builds `fb.{subdomainIndex}.{timestamp}.{fbclid}` per Meta’s format, and may store it in session for later checkout
+
+---
+
+## Backend: send CAPI only after payment succeeds
+
+### Endpoint
+
+```markdown
+POST https://graph.facebook.com/v25.0/{PIXEL_ID}/events?access_token={TOKEN}
+```
+
+Choose the Pixel by order market (example: one Dataset / Pixel for Taiwan, one for the US). Keep the token on the backend only.
+
+### Payload example
+
+```json
+{
+  "data": [
+    {
+      "event_name": "Purchase",
+      "event_time": 1752990000,
+      "event_id": "2607204856",
+      "event_source_url": "https://www.example.com/tw/payment-result/success?order_serial_num=2607204856",
+      "action_source": "website",
+      "user_data": {
+        "em": ["<sha256 of normalized email>"],
+        "ph": ["<sha256 of E.164 phone>"],
+        "fbp": "fb.1....",
+        "fbc": "fb.1....",
+        "client_ip_address": "203.0.113.42",
+        "client_user_agent": "Mozilla/5.0 ..."
+      },
+      "custom_data": {
+        "currency": "TWD",
+        "value": 2180,
+        "order_id": "2607204856",
+        "content_type": "product",
+        "content_ids": ["15"],
+        "contents": [
+          { "id": "15", "quantity": 1, "item_price": 1180 }
+        ],
+        "num_items": 1
+      }
+    }
+  ],
+  "test_event_code": "TESTxxxx"
+}
+```
+
+| Field | Watch out |
+| --- | --- |
+| `event_time` | Unix seconds at payment time; **must be within the past 7 days**. An old sample timestamp is rejected by Meta |
+| `event_id` / `order_id` | Real order number |
+| `em` / `ph` | Normalize on the backend, then SHA-256; array format |
+| `test_event_code` | **Test only**; remove entirely in production (test event codes expire within 24 hours—watch that) |
+| `content_ids` | Prefer real product / variant IDs; don’t ship doc placeholder strings |
+
+A successful response looks like:
+
+```markdown
+events_received": 1
+```
+
+### When to fire
+
+Send from the ECPay / Stripe payment-success webhook (or the same moment you confirm “paid”)—not when the user merely creates an unpaid order.
+
+---
+
+## GTM: Event ID for browser Purchase
+
+Map the Facebook Pixel Tag Event ID to the dataLayer transaction id, for example:
+
+```markdown
+{{ecommerce.transaction_id}}
+```
+
+The thank-you page `purchase` push should carry the same order number (put `event_id` in the dataLayer as well). In Network, the Facebook `tr` request should show:
+
+- `ev=Purchase`
+- `eid=<order number>`
+- `id=<Pixel ID for that market>`
+
+---
+
+## How do we verify?
+
+Test Events are useful, but staging Basic Auth can leave the Browser list empty even when the Pixel did fire. Verify in layers:
+
+### Browser
+
+| Tool | What to check |
+| --- | --- |
+| Chrome Network → `tr` or `facebook` | `ev`, `eid`, amount, Pixel ID |
+| Meta Pixel Helper | Purchase + Event ID on the thank-you page |
+| dataLayer / GTM Preview | `purchase` present; Tag Fired |
+
+### Server
+
+| Tool | What to check |
+| --- | --- |
+| CAPI with the correct `test_event_code` | Test Events shows Server · Purchase |
+| CloudWatch / backend logs | Calls to `graph.facebook.com`, `events_received` |
+| Graph API Explorer (manual) | Confirm token / payload shape / `event_time` first |
+
+### Cookie consent (must test)
+
+| Scenario | Create-order body | Server CAPI |
+| --- | --- | --- |
+| Accept ads | Has `ad_tracking_data` (often at least `fbp`) | Should send (if backend gates on this) |
+| Decline ads | No `ad_tracking_data` | Should not send an extra Server event for that order |
+
+To inspect the body: open DevTools Network **before** submitting the order, enable Preserve log, find `POST .../orders/ecpay` or `.../orders/stripe` → Payload.
+
+### Dedup
+
+Same order:
+
+- Browser: `eid=2607204856`
+- Server: `event_id=2607204856`
+
+Then Meta merges them into one conversion.
+
+---
+
+## How to test
+
+Make sure marketing (or whoever owns access) has granted permission to test in Events Manager. In Events Manager, pick the market under test. For our store we’re rolling out Taiwan and the US—different markets mean different Pixel IDs. In our experience the Access Token can be the same across markets; token creation often sits with marketing, so confirm ownership and ask them to provide it.
+
+Open the Test Events UI and choose `website`:
+
+<Image
+  src="/static/meta_test_event.png"
+  alt="Meta Test Events interface"
+  width={500}
+  height={500}
+/>
+
+You’ll see Server and Browser options. If the backend isn’t ready yet, start with the browser:
+
+<Image
+  src="/static/meta_test_event_type.png"
+  alt="Meta Test Events interface — choose server or browser"
+  width={500}
+  height={500}
+/>
+
+Enter the domain under test, click `Test Events`, and use the popup to run basic flows and confirm events:
+
+<Image
+  src="/static/meta_test_event_browser.png"
+  alt="Meta Test Events browser setup"
+  width={500}
+  height={500}
+/>
+
+When things work, events configured for the site show up in the list:
+
+<Image
+  src="/static/meta_test_event_received.png"
+  alt="Meta Test Events received in browser"
+  width={500}
+  height={500}
+/>
+
+After creating an order and paying, you should see a `Purchase` event:
+
+<Image
+  src="/static/meta_test_event_purchase.png"
+  alt="Meta Test Events browser Purchase"
+  width={500}
+  height={500}
+/>
+
+Once server integration is live, after the frontend completes a purchase you should see something like this on the Server side:
+
+<Image
+  src="/static/meta_test_event_server.png"
+  alt="Meta Test Events server Purchase"
+  width={500}
+  height={500}
+/>
+
+---
+
+## Things to watch during the project
+
+1. `event_time` too old → `OAuthException` / “event timestamp too far in the past”. Use `date +%s` or the real payment time.
+2. Staging GTM turned off → e.g. a debug loglevel flag also disables GTM, so the thank-you page never fires Pixel. Env vars should control “enable GTM” independently.
+3. Test Events missing PageView / Purchase → often the monitor isn’t attached; use Network / Pixel Helper / overview instead. For Server, rely on `test_event_code`.
+4. API moved to nested fields but frontend still sends a flat payload → if the backend skips CAPI without `ad_tracking_data`, it looks like Server is broken. Keep the frontend/backend contract in sync.
+5. Doc placeholders shipped to production → e.g. `content_ids: ["<product_variation_id>"]`; use real IDs in prod.
+6. `test_event_code` left on in production → remove it before go-live.
+
+---
+
+## Checklist
+
+- Staging: verified accept / decline cookie body and CAPI behavior
+- Staging: Browser + Server share the same `event_id`
+- Production: remove `test_event_code`
+- Production: Pixel (each market has its own Pixel ID)
+- Production: place a small test order; spot-check Network / Events Manager
+
+---
+
+## References
+
+- [Meta Conversions API](https://developers.facebook.com/docs/marketing-api/conversions-api)
+- [Deduplicate Pixel and server events](https://developers.facebook.com/docs/marketing-api/conversions-api/deduplicate-pixel-and-server-events)
+- [Customer Information Parameters (`user_data`)](https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/customer-information-parameters)

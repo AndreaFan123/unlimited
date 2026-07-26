@@ -1,0 +1,332 @@
+---
+title: "How We Implemented Google Enhanced Conversions in Nuxt"
+description: Implementing browser-side Google Enhanced Conversions with GTM + dataLayer on a Nuxt ecommerce storefront—spec decisions, hashing, a consent race bug, and production rollout.
+date: 2026-06-01
+tags: ["google-ads", "gtm", "nuxt", "ecommerce", "enhanced-conversions"]
+published: true
+language: "en"
+---
+
+# How We Implemented Google Enhanced Conversions in Nuxt
+
+| Item | Details |
+| --- | --- |
+| Type | Technical blog (internal experience share) |
+| Author | Andrea (frontend) |
+| Date | 2026-06 |
+| Project | `frontend-nuxt` (Nuxt 3 / Vue 3 / TypeScript) |
+
+---
+
+為什麼廣告轉換數字越來越難對得準？因為 cookie 被限制、Safari ITP、使用者拒絕追蹤……Google 的 **Enhanced Conversions（強化轉換）** 就是在這種情境下，用「使用者同意後提供的 first-party 資料」補強歸因。
+
+這篇文章記錄我們在 Dezctop 電商站，用 **GTM + dataLayer** 完成瀏覽器端 Enhanced Conversions 的過程：從規格定案、前端實作、踩到的 consent race bug，到 production 上線。
+
+---
+
+## 一、先搞清楚我們在做什麼
+
+### Enhanced Conversions 是什麼？
+
+簡單說：在轉換（例如購買成功）發生時，除了原本的 `purchase` 事件，再多送一包 **經過正規化與 SHA-256 雜湊** 的使用者資料（email、電話、姓名等）。Google Ads 用這些資料去提高「廣告點擊 ↔ 訂單」的匹配率。
+
+它**不是**把明文 email 丟到廣告後台；正確做法是：
+
+1. 先依 Google 規則正規化（trim、小寫、Gmail 規則、電話轉 E.164）
+2. 再做 SHA-256
+3. 用 `sha256_*` 鍵名放進 dataLayer
+
+### 我們選哪條路？
+
+Google 文件裡大致有兩種做法：
+
+| 方案 | 說明 |
+| --- | --- |
+| **A. 瀏覽器端（我們採用）** | 轉換當下，前端 push `user_data` → GTM → Ads Conversion tag |
+| B. Ads API 上傳 | 轉換後由後端上傳 `ConversionAdjustment` |
+
+我們專案本來就走 **GTM**，沒有直連 `gtag.js`，所以 Phase 1 定案為 **方案 A**：前端負責正規化與 hash，行銷在 GTM 用 User-Provided Data（Code）讀 `{{user_data}}` 整包轉傳。
+
+這也意味著：**前端做完 ≠ Ads 後台立刻有效**。還需要行銷在 Google Ads 啟用強化轉換、在 GTM 綁定變數並 Publish。
+
+---
+
+## 二、架構長什麼樣子
+
+### 資料流（簡化）
+
+```
+使用者結帳成功
+    → success.vue 取得訂單詳情
+    → 檢查「是否同意廣告 cookie」
+    → 有同意：組裝並 hash user_data → dataLayer.push({ user_data })
+    → 再送 purchase（transaction_id = 訂單序號）
+    → GTM 觸發 Ads Conversion tag（綁定 User-Provided Data）
+    → Google Ads 強化轉換比對
+```
+
+### 關鍵原則
+
+1. **同意優先**：`advertisement === false` 時，完全不送含 PII 的 `user_data`
+2. **時序正確**：一定是 `user_data` 先於 `purchase`
+3. **防重複**：同一訂單重整感謝頁，不重送 `purchase`
+4. **不引入 gtag.js**：繼續用既有 GTM 架構
+
+---
+
+## 三、前端怎麼拆任務
+
+我們把程式集中在少數幾個地方，避免每個頁面自己組 `user_data`。
+
+### 1. 正規化與雜湊：`utils/marketingUserData.ts`
+
+這是 Enhanced Conversions 的「規則中心」。重點包括：
+
+**Email（最容易漏）**
+
+1. trim + 全小寫
+2. 若是 `gmail.com` / `googlemail.com`：拿掉 `@` 前的 `.` 與 `+` 後綴  
+   （例：`Jane.Doe+Shop@gmail.com` → `janedoe@gmail.com`）
+3. SHA-256 → hex 小寫
+
+**電話**
+
+- 轉成 E.164（例如 `+886912345678`）
+- 移除所有空白
+- SHA-256
+
+**地址**
+
+- 姓名：trim、小寫後 hash
+- street / city / region / postal_code / country：**正規化明文，不 hash**（對齊 GTM 瀏覽器端 schema）
+
+> 注意：專案裡原本的通用 `sha256Hash()` **沒有**做正規化，不能直接拿來用。
+
+### 2. 統一出口：`gtmStore.pushUserDataForConversion()`
+
+```typescript
+// 概念示意
+if (!shouldSendAdvertisingData()) return
+
+await getUser() // 若已登入
+if (!shouldSendAdvertisingData()) return // async 後再檢查一次
+
+const userData = order
+  ? await buildUserDataFromOrder(order, customer)
+  : await buildUserDataFromCustomer(customer)
+
+if (!userData?.sha256_email_address) return
+if (!shouldSendAdvertisingData()) return
+
+gtm?.push({ user_data: userData })
+```
+
+為什麼要 **二次（甚至三次）gate**？因為 Stripe 結帳成功會整頁 redirect，consent 從 cookie 還原與 `await getUser()` 之間有 race——這是我們後來踩到的坑。
+
+### 3. 結帳成功頁：`payment-result/success.vue`
+
+To-Be 流程：
+
+1. `getAnOrderDetail(order_serial_num)` 成功
+2. 用 `sessionStorage` key `gtm_purchase_sent_{訂單號}` 防重複
+3. `await pushUserDataForConversion({ order })`
+4. `sendPurchaseEvent()`（`transaction_id` = `order_serial_number`）
+5. 寫入 sessionStorage 標記
+
+ATM / 失敗頁：**不送 purchase**（訂單尚未付款）。
+
+### 4. 登入態：`app.vue`
+
+啟動時若已登入，會走同一套 `pushUserDataForConversion()`（通常只有 email）。感謝頁還會再送一筆「完整」的 order `user_data`。Phase 1 可接受兩筆；轉換比對以感謝頁那筆為準。
+
+### 5. Unit test
+
+`tests/marketingUserData.test.ts` 覆蓋 Gmail 規則、E.164 等案例，確保正規化不會在重構時悄悄壞掉。
+
+---
+
+## 四、dataLayer 長什麼樣子
+
+### 同意廣告時（T-A01）
+
+```javascript
+// 1) 先
+{ user_data: {
+    sha256_email_address: "...",
+    sha256_phone_number: "...",
+    address: {
+      sha256_first_name: "...",
+      sha256_last_name: "...",
+      street: "...",
+      city: "...",
+      region: "...",
+      postal_code: "...",
+      country: "TW"
+    }
+}}
+
+// 2) 後
+{ event: "purchase", ecommerce: {
+    transaction_id: "2606110122",  // = 訂單序號
+    value, currency, items, ...
+}}
+```
+
+### 拒絕廣告時（T-A02）
+
+- `user_data`：**0 筆**
+- `purchase`：仍應送出（電商事件與廣告 PII 分開）
+- Consent Mode：`ad_storage` / `ad_user_data` = `denied`
+
+---
+
+## 五、我們踩到的坑（最值得看）
+
+### 坑 1：Consent race——關了廣告還漏送 email
+
+**現象**
+
+- Cookie：`advertisement: false`
+- Consent Mode：`denied`
+- 但 dataLayer 仍出現一筆 **只有 `sha256_email_address`** 的 `user_data`
+
+**原因**
+
+Stripe 付款成功是 **整頁 redirect**，Pinia 重置後：
+
+1. `app.vue` 用 `setTimeout(0)` 立刻 `pushUserDataForConversion()`
+2. consent 卻在 `setTimeout(100)` 才從 cookie 還原
+3. `await getUser()` 期間 consent 可能已變 `false`，但開頭 gate 已通過，仍 push
+
+感謝頁那條「完整 order user_data」通常會被擋住；漏送的是 **app.vue 的 email-only**。
+
+**修正**
+
+- `hydrateCookieConsent()`：在 `onBeforeMount` **同步**還原 consent
+- `gtmStore`：每個 `await` 之後、真正 `gtm.push` 之前，再檢查一次 `shouldSendAdvertisingData()`
+
+這直接對應成功指標 **S-03**：未同意廣告時，不送含 PII 的 `user_data`。
+
+### 坑 2：感謝頁 F5 後 `purchase` 變 0——以為壞了
+
+其實常常是 **正常**：
+
+1. 第一次進頁已送過 `purchase`，並寫入 `sessionStorage`
+2. F5 後 dataLayer 重建，filter 可能是 `[]`
+3. 但 `sessionStorage` 仍是 `'1'` → 代表 dedup 生效，沒有重送
+
+驗收 dedup（T-A03）時，重點看 **sessionStorage**，不要只看重整後的 dataLayer 長度。
+
+### 坑 3：staging 看不到 `purchase`，但 sessionStorage 是 `'1'`
+
+Staging CI 用 `VITE_LOGLEVEL=debug`，舊邏輯會 `gtm.enable(false)`，導致：
+
+- `settingConsentState`：直接 `dataLayer.push` → **看得到**
+- `purchase`：走 `gtm.trackEvent` → **看不到**
+- 但程式有跑過 → `sessionStorage = '1'`
+
+Production 用 `silent`，GTM 會開。這提醒我們：**驗證環境設定本身，也是測試計畫的一部分**。
+
+### 坑 4：測試操作問題
+
+- 關掉 Advertisement 後，一定要按 **Save Setting**，不是關掉視窗就算數
+- 必須全程同一網域（例如全程 staging）；localhost 登入 + staging 感謝頁會因 JWT 跨域失敗
+
+---
+
+## 六、怎麼驗收（前端可自測）
+
+在感謝頁 Console：
+
+```javascript
+// consent
+JSON.parse(decodeURIComponent(
+  document.cookie.match(/(?:^|;\s*)consent=([^;]*)/)?.[1]
+))
+
+// user_data / purchase
+window.dataLayer.filter(e => e.user_data)
+window.dataLayer.filter(e => e.event === 'purchase')
+
+// dedup
+sessionStorage.getItem('gtm_purchase_sent_訂單號')
+```
+
+| 測試 | 預期 |
+|------|------|
+| 同意廣告 | 有完整 `user_data` + `purchase`；`transaction_id` = 訂單號 |
+| 拒絕廣告 | `user_data` 為 `[]`；仍有 `purchase`（或 sessionStorage 為 `'1'`） |
+| F5 同一訂單 | 不重送 `purchase` |
+
+---
+
+## 七、行銷端還要做什麼（前端無法單方面完成）
+
+前端 production 上線後，球在 GTM / Ads：
+
+1. Google Ads 啟用 **強化轉換 for Web** + 接受顧客數位資料條款
+2. 方法建議選 **Google Tag Manager**（不是純「Google 代碼」，若架構是 GTM）
+3. GTM 建立：
+   - Data Layer 變數：`user_data`
+   - User-Provided Data：Type **Code**，來源 `{{user_data}}`，**Format Value 全不勾選**
+4. 綁到 **Google Ads 轉換追蹤**代碼的 User-provided data
+5. 觸發條件對齊 `purchase`
+6. 各語系第二容器 + 全站容器皆套用
+7. Preview 通過後 Publish
+8. 上線後 7～14 天看轉換診斷 match rate
+
+我們前端已定案的規格：
+
+- pre-hash `sha256_*`
+- `transaction_id` = `order_serial_number`
+- 無欄位 mapping（整包 object）
+
+---
+
+## 八、時間線（濃縮）
+
+| 時間 | 里程碑 |
+|------|--------|
+| 2026-05-28 | Phase 1 分析書、Action Plan |
+| 2026-06-05 | Q-01 定案；EC 核心程式與 Schema P0；T-A01 通過 |
+| 2026-06-11 | T-A02 race 修正並驗證通過；T-A03 dedup 通過；production deploy |
+| 之後 | 行銷 GTM Preview / Publish / match rate 觀察 |
+
+---
+
+## 九、給接下來做類似串接的人
+
+1. **先定 dataLayer 契約**，再寫程式——鍵名（明文 vs `sha256_*`）、誰做 hash、GTM 變數類型，會決定整條路徑。
+2. **同意與追蹤要成對想**：redirect、async、cookie hydrate，任何一環都可能讓「關廣告仍送 PII」。
+3. **驗收要有正向與負向**：有同意要有資料；沒同意要「完全沒有」。
+4. **環境差異寫進文件**：staging 關 GTM、跨域 JWT、ECPay 無 `order_serial_num`，都會讓測試結果「看起來像壞了」。
+5. **前端與行銷是同一條關鍵路徑**：程式上線只是一半；GTM Publish 與 Ads 診斷才是另一半。
+
+---
+
+## 十、相關檔案速查
+
+| 主題 | 路徑 |
+|------|------|
+| 正規化 / hash | `utils/marketingUserData.ts` |
+| 同意 gate / push | `composables/gtmStore.ts` |
+| Cookie / Consent Mode | `composables/appStore.ts` |
+| 感謝頁 | `pages/[[lang]]/payment-result/success.vue` |
+| Consent hydrate | `app.vue` |
+| Unit test | `tests/marketingUserData.test.ts` |
+| GTM 容器 | `plugins/vue-gtm.client.ts` |
+| 技術分析全文 | `docs/marketing-api-phase1-implementation_2026-05-28_v1.0.md` |
+
+---
+
+## 結語
+
+Enhanced Conversions 看起來像「多 push 一個 object」，真正的難度在於：**規格對齊、合規時序、跨頁 redirect 的狀態還原，以及前端與 GTM / Ads 的聯調**。
+
+我們 Phase 1 前端已完成程式、同意 gate、dedup，並部署到 production。接下來只要行銷把 GTM 變數綁定與 Publish 做完，轉換診斷裡的 match rate，才會開始反映這段投資。
+
+若你也在 Nuxt + GTM 架構下接強化轉換，希望這篇能幫你少踩幾個我們踩過的坑。
+
+---
+
+*本文為內部技術經驗分享，實作細節以 Phase 1 分析書為準。程式變更請依專案規則取得明確同意後再修改 codebase。*

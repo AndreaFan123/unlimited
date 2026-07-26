@@ -14,6 +14,7 @@ import { Badge } from "@/src/components/ui/badge";
 import ROUTES from "@/src/constants/routes";
 
 import MdxContent from "@/src/components/mdx/MdxComponent";
+import TableOfContents from "@/src/components/blog/TableOfContents";
 import "@/src/styles/mdx.css";
 import { Link } from "@/src/i18n/navigation";
 import { Locales, toContentLanguage } from "@/src/i18n/request";
@@ -88,7 +89,8 @@ export default async function BlogPostPage({ params }: PostPageProps) {
     locale,
   });
   return (
-    <article className="w-full max-w-[1000px] mx-auto px-5 py-10">
+    // relative: TOC sits in the right gutter on xl+ screens
+    <article className="relative w-full max-w-[1000px] mx-auto px-5 py-20">
       <JsonLd data={articleSchema} />
       <div className="flex flex-col gap-3 pb-5">
         <h1 className="text-4xl font-extrabold leading-tight text-gray-700 dark:text-gray-300">
@@ -101,9 +103,13 @@ export default async function BlogPostPage({ params }: PostPageProps) {
           <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-300" />
           {formattedDate}
         </span>
-        <div className="flex gap-2 mt-6">
+        <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto overscroll-x-contain">
           {post.tags?.map((tag, index) => (
-            <Badge key={`${tag}-${index}`} variant="secondary">
+            <Badge
+              key={`${tag}-${index}`}
+              variant="secondary"
+              className="shrink-0"
+            >
               <Link
                 className="text-gray-600 dark:text-gray-300 no-underline"
                 href={`${ROUTES.TAG_SLUG}${slug(tag)}`}
@@ -115,10 +121,11 @@ export default async function BlogPostPage({ params }: PostPageProps) {
           ))}
         </div>
       </div>
-      <Separator className="mb-5"/>
-      <div className="prose w-full max-w-[1000px] mx-auto">
+      <Separator className="mb-5" />
+      <div data-mdx-content className="prose w-full max-w-[1000px] mx-auto">
         <MdxContent code={post.body} />
       </div>
+      <TableOfContents />
       <Link
         href={ROUTES.BLOG}
         className="mt-10 inline-flex w-fit items-center gap-2 rounded-sm font-semibold text-gray-700 no-underline transition-colors hover:text-orange-500 focus:outline-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[#7772ff] focus-visible:ring-offset-2 dark:text-gray-300"

@@ -54,7 +54,8 @@ export default function ZoomableImage({
           width={width}
           height={height}
           {...props}
-          className={cn("object-contain", className)}
+          className={cn("h-auto w-auto max-w-full object-contain", className)}
+          style={{ width: "auto", height: "auto" }}
         />
       </button>
 
@@ -84,7 +85,11 @@ export default function ZoomableImage({
               width={width}
               height={height}
               {...props}
-              className={cn("h-auto max-h-[90vh] w-full object-contain", className)}
+              className={cn(
+                "h-auto max-h-[90vh] w-full object-contain",
+                className,
+              )}
+              style={{ width: "100%", height: "auto" }}
               priority
             />
           </div>

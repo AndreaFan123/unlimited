@@ -23,6 +23,13 @@
     },
     "backToHome": "回到首頁",
     "workingOnIt": "專案介紹撰寫中",
+    "khunSin": {
+      "name": "Khun-Sin",
+      "description": "Khun-Sin 台灣鯨豚數據與通報",
+      "link": "https://khun-sin.com",
+      "duration": "2026-現在",
+      "type": "興趣"
+    },
     "dezctop": {
       "name": "Dezctop 官方網站",
       "description": "Dezctop 品牌官方電商網站",
@@ -141,7 +148,8 @@
     "feature": "精選",
     "workingOnIt": "我正在努力中",
     "readMore": "閱讀更多",
-    "backToBlog": "回到部落格"
+    "backToBlog": "回到部落格",
+    "tableOfContents": "目錄"
   },
   "tag": {
     "relatedPosts": "相關文章",

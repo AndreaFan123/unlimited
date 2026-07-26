@@ -1,0 +1,306 @@
+---
+title: "串接 Meta Pixel + Conversions API"
+description: 實作 Meta Pixel 與 Conversions API 的 Purchase 事件，用訂單號 event_id 去重複，並處理廣告 Cookie 同意與 ECPay／Stripe Webhook 串接。
+date: 2026-07-20
+tags: ["meta", "capi", "gtm", "nuxt", "ecommerce", "monitoring"]
+published: true
+language: "zh_tw"
+---
+
+這一個月都在處理串接 API 的部分，主要有 Google Ads, Google Merchant Center, Meta, Facebook Marketplace 這四個，其中已經完成 Google Ads 和 Meta 的部分，為了方便未來複習用，因此將過程記錄下來。
+
+先前網站只靠瀏覽器 Pixel，但長期下來發現有些事件仍會漏掉，例如：付款會跳轉金流、廣告攔截、Cookie 同意、關閉分頁……等。查了一下資料，Meta 是建議 Pixel + Conversions API（CAPI）同時並行，再用同一個 `event_id` 去重複，轉換才準。
+
+這篇文章以我目前協助的電商網站串接經驗，從架構、前後端分工及上線要注意什麼。適用 Nuxt／Vue 前台 + 訂單後端 Webhook。目前我們台灣合作的金流是 ECPay，美國則是 Stripe，此實作兩者都符合。
+
+---
+
+## 兩個方向、同一筆購買
+
+| 路徑 | 誰送 | 什麼時候 | 工具 |
+| --- | --- | --- | --- |
+| Browser（Pixel） | 使用者瀏覽器 | 感謝頁載入、GTM 觸發 `purchase` | GTM Facebook Pixel Tag |
+| Server（CAPI） | 伺服器 | 付款成功 Webhook 確認後 | `POST graph.facebook.com/.../events` |
+
+```markdown
+使用者付款成功
+        │
+        ├─► 瀏覽器：GTM → Pixel Purchase（event_id = 訂單號）
+        │
+        └─► 後端：CAPI Purchase（event_id = 同一個訂單號）
+                    │
+                    ▼
+              Meta 去重 → 只算 1 次轉換
+```
+
+不論是瀏覽器或是伺服器，都必須送同一個 `event_id`：
+
+```markdown
+event_id = order_serial_number（訂單號）
+```
+
+這個 `event_id` 需要跟 GTM dataLayer 的 `ecommerce.transaction_id` 和 Pixel 的 `eid` 一致。
+
+---
+
+## 職責切分(AI 建議，人為審核是否適切 )
+
+
+| 角色 | 做什麼 | 不做什麼 |
+| --- | --- | --- |
+| 前端 | 讀 `_fbp`／組 `fbc`；同意廣告時下單帶歸因欄位；感謝頁透過 GTM 送 Purchase | 不持有 CAPI Token；不呼叫 Graph API；不負責 CAPI 的 email／phone hash |
+| 行銷 | Facebook Pixel Tag、Event ID 對應 `transaction_id`、Advanced Matching（若需要） | — |
+| 後端 | 付款成功組 CAPI payload、hash PII、選對市場 Pixel、正式環境拿掉 test code | 不要用過期的範例 `event_time` |
+
+前台是 Nuxt，瀏覽器端不直接寫 `fbq`，走既有 GTM；CAPI 放在訂單後端（ECPay／Stripe Webhook）。
+
+---
+
+## 前端：Cookie 同意 + `ad_tracking_data`
+
+### 為什麼要同意才傳
+
+法務／產品定案：使用者**未同意廣告 Cookie** 時，不把 Meta 歸因欄位送進訂單 API。後端也可以做成「沒有歸因資料就不送 CAPI」，與同意一致。
+
+### 下單 API payload (以我們後端給的 API 格式為例)
+
+後端把歸因收成巢狀物件（台灣 ECPay／美國 Stripe 皆同）：
+
+```json
+{
+  "shipping": { "...": "..." },
+  "billing": null,
+  "shipping_choice": "Normal",
+  "shipping_floors": null,
+  "ad_tracking_data": {
+    "fbp": "fb.1.1700000000000.1234567890",
+    "fbc": "fb.1.1700000000000.AbCdEfGhIj"
+  }
+}
+```
+
+| 欄位 | 說明 |
+| --- | --- |
+| `fbp` | Cookie `_fbp`（Browser ID）。有 Pixel、同意後通常會有 |
+| `fbc` | Click ID。多半在從 FB／IG 廣告點進來（URL 有 `fbclid`）才有 |
+| （不放）`client_user_agent` | 可改由後端從 request header 取 |
+| （不放）`event_source_url` | 感謝頁 URL 由**後端組**，前端不下單傳 |
+
+拒絕廣告時：整段 `ad_tracking_data` 不出現，也不傳 `null`。
+
+只有 `fbp`、沒有 `fbc`：沒走廣告進站時很常見。
+
+### `fbc` 什麼時候會有
+
+1. Cookie 已有 `_fbc`，或
+2. URL 帶 `fbclid=...`，前端依 Meta 規格組成 `fb.{subdomainIndex}.{timestamp}.{fbclid}`，必要時存 session 供之後結帳使用
+
+---
+
+## 後端：付款成功才打 CAPI
+
+### 端點
+
+```markdown
+POST https://graph.facebook.com/v25.0/{PIXEL_ID}/events?access_token={TOKEN}
+```
+
+依訂單市場選 Pixel（範例：台灣與美國各一顆 Dataset／Pixel）。Token 只放後端。
+
+### Payload 範例
+
+```json
+{
+  "data": [
+    {
+      "event_name": "Purchase",
+      "event_time": 1752990000,
+      "event_id": "2607204856",
+      "event_source_url": "https://www.example.com/tw/payment-result/success?order_serial_num=2607204856",
+      "action_source": "website",
+      "user_data": {
+        "em": ["<sha256 of normalized email>"],
+        "ph": ["<sha256 of E.164 phone>"],
+        "fbp": "fb.1....",
+        "fbc": "fb.1....",
+        "client_ip_address": "203.0.113.42",
+        "client_user_agent": "Mozilla/5.0 ..."
+      },
+      "custom_data": {
+        "currency": "TWD",
+        "value": 2180,
+        "order_id": "2607204856",
+        "content_type": "product",
+        "content_ids": ["15"],
+        "contents": [
+          { "id": "15", "quantity": 1, "item_price": 1180 }
+        ],
+        "num_items": 1
+      }
+    }
+  ],
+  "test_event_code": "TESTxxxx"
+}
+```
+
+| 欄位 | 注意 |
+| --- | --- |
+| `event_time` | Unix 秒，付款當下；**必須在過去 7 天內**。範例裡的舊時間戳會直接被 Meta 拒絕 |
+| `event_id`／`order_id` | 真實訂單號 |
+| `em`／`ph` | 後端正規化後 SHA-256；陣列格式 |
+| `test_event_code` | **僅測試**；正式環境整段刪掉 (test event code 24 小時內有效，要注意) |
+| `content_ids` | 建議商品／變體 ID，不要留文件佔位字串 |
+
+成功回應會看到： 
+
+```markdown
+events_received": 1
+```
+
+### 觸發時機
+
+在 ECPay／Stripe 付款成功 Webhook（或確認「已付款」的同一點）送出，不是「使用者剛建立訂單、還沒付款」時送 Purchase。
+
+---
+
+## GTM：Browser Purchase 的 Event ID
+
+Facebook Pixel Tag 的 Event ID 對到 dataLayer 的交易號，例如：
+
+```markdown
+{{ecommerce.transaction_id}}
+```
+
+感謝頁前端 push 的 `purchase` 應帶相同訂單號（ dataLayer 也需要放 `event_id`）。Network 裡 Facebook `tr` 請求應看到：
+
+- `ev=Purchase`
+- `eid=<訂單號>`
+- `id=<該市場 Pixel ID>`
+
+---
+
+## 如何驗收？
+
+Test Events 很好用，但 staging 有 Basic Auth 導致 Browser 列表可能空白，不代表 Pixel 沒送。建議分層驗：
+
+### Browser
+
+| 工具 | 看什麼 |
+| --- | --- |
+| Chrome Network → `tr` 或 `facebook` | `ev`、`eid`、金額、Pixel ID |
+| Meta Pixel Helper | 感謝頁是否出現 Purchase + Event ID |
+| dataLayer／GTM Preview | 是否有 `purchase`，Tag 是否 Fired |
+
+### Server
+
+| 工具 | 看什麼 |
+| --- | --- |
+| 帶正確 `test_event_code` 的 CAPI | Test Events 出現 Server · Purchase |
+| CloudWatch／後端 log | 是否打 `graph.facebook.com`、`events_received` |
+| Graph API Explorer（手動） | 先確認 Token／格式／`event_time` |
+
+### 同意 Cookie（一定要測）
+
+| 情境 | 建立訂單 body | Server CAPI |
+| --- | --- | --- |
+| 接受廣告 | 有 `ad_tracking_data`（至少常有 `fbp`） | 應送出（若後端依此閘門） |
+| 拒絕廣告 | 沒有 `ad_tracking_data` | 不應多一筆該單的 Server |
+
+看 body：DevTools 要在按下送出訂單之前就開好 Network，勾 Preserve log，找 `POST .../orders/ecpay` 或 `.../orders/stripe` → Payload。
+
+### 去重複 Dedup
+
+同一訂單：
+
+- Browser：`eid=2607204856`
+- Server：`event_id=2607204856`
+
+Meta 才會合成一筆轉換。
+
+---
+
+## 如何測試
+
+確認行銷等單位有將給予權限到 Event Manager 的測試活動進行測試，到 Event Manager 後，要選擇測試的市場，以我們電商來說目前要導入的是台灣跟美國，市場不同 Pixel ID 也不一樣，但 Access Token 以目前實作經驗來看，即使市場不同，Access token 會相同；產 Token 的權限可能落在行銷端，因此這部分要確認好，並請對方提供。
+
+以下是進入到 Test Event 的介面，選擇 `website`
+<Image
+  src="/static/meta_test_event.png"
+  alt="Meta test event interface"
+  width={500}
+  height={500}
+/>
+
+接著會出現 Server 跟 Broswer 的選項，如果後端還沒完成，可以先從瀏覽器測試
+
+<Image
+  src="/static/meta_test_event_type.png"
+  alt="Meta test event interface, choose server or browser"
+  width={500}
+  height={500}
+/>
+
+輸入測試的網域後，點擊 `Test Events`，接下來會彈出視窗，就可以進行一些基本操作，來確認事件是否正常
+
+<Image
+  src="/static/meta_test_event_browser.png"
+  alt="Meta test event browser"
+  width={500}
+  height={500}
+/>
+
+正常的話會看到為網頁設定的的事件出現在畫面
+
+<Image
+  src="/static/meta_test_event_received.png"
+  alt="Meta test event browser"
+  width={500}
+  height={500}
+/>
+
+建立一筆訂單並付款後，會看到 `Purchase` 事件
+
+<Image
+  src="/static/meta_test_event_purchase.png"
+  alt="Meta test event browser purchase"
+  width={500}
+  height={500}
+/>
+
+Server 端串接完成的話，測試時，當前端送出購買後，Server 應該要收到類似下面的
+
+<Image
+  src="/static/meta_test_event_server.png"
+  alt="Meta test event server purchase"
+  width={500}
+  height={500}
+/>
+
+---
+
+## 期間需要注意的事項
+
+1. `event_time` 太舊 → `OAuthException`／「事件時間戳記太久遠」。用 `date +%s` 或真實付款時間。
+2. Staging GTM 被關掉 → 例如 debug loglevel 連帶關掉 GTM，感謝頁沒有 Pixel。環境變數要能獨立控制「是否啟用 GTM」。
+3. Test Events 沒有 PageView／Purchase → 常是監看沒掛上；改看 Network／Pixel Helper／概覽。Server 則靠 `test_event_code`。
+4. API 欄位改巢狀後前端仍平鋪 → 後端若寫成「沒有 `ad_tracking_data` 就不送 CAPI」，會看起來像 Server 壞掉。前後端契約要一致。
+5. 文件佔位字被送上線 → 例如 `content_ids: ["<product_variation_id>"]`；正式要用真實 ID。
+6. 正式帶 `test_event_code` → 上正式前務必拿掉。
+
+---
+
+## 檢查清單
+
+- Staging：同意／拒絕 Cookie 的 body 與 CAPI 行為都驗過
+- Staging：Browser + Server 同 `event_id`
+- 正式：移除 `test_event_code`
+- 正式：Pixel (不同市場有不同的 Pixel ID)
+- 正式：建立一筆小額單，Network／Events Manager 抽查
+
+---
+
+## 參考
+
+- [Meta Conversions API](https://developers.facebook.com/docs/marketing-api/conversions-api)
+- [Pixel 與 CAPI 去重](https://developers.facebook.com/docs/marketing-api/conversions-api/deduplicate-pixel-and-server-events)
+- [Customer Information Parameters（user_data）](https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/customer-information-parameters)

@@ -27,6 +27,10 @@
     "zh_tw": "create-design-system-zh_tw",
     "en": "create-design-system"
   },
+  "de-zoomcamp-notes-part-1-docker-for-data-engineer": {
+    "zh_tw": "de-zoomcamp-notes-part-1-docker-for-data-engineer-zh_tw",
+    "en": "de-zoomcamp-notes-part-1-docker-for-data-engineer"
+  },
   "design-system-naming": {
     "zh_tw": "design-system-naming-zh_tw",
     "en": "design-system-naming"
@@ -98,6 +102,13 @@
   "learn-to-build-auth": {
     "en": "learn-to-build-auth-en",
     "zh_tw": "learn-to-build-auth-zh_tw"
+  },
+  "meta-capi-purchase-integration": {
+    "zh_tw": "meta-capi-purchase-integration-zh_tw"
+  },
+  "implement-google-enhanced-conversions": {
+    "en": "implement-google-enhanced-conversions",
+    "zh_tw": "implement-google-enhanced-conversions-zh_tw"
   },
   "reflection-on-work": {
     "zh_tw": "reflection-on-work-zh_tw",

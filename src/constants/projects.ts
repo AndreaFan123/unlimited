@@ -9,6 +9,7 @@ export const PROJECT_COLORS = [
 ] as const;
 
 export const WORK_PROJECT_KEYS = [
+  "khunSin",
   "dezctop",
   "senryo",
   "findHelp",
