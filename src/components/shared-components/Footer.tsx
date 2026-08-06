@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="w-full py-7 mx-auto px-4 border-t-[1px] border-dashed border-gray-400 bg-white dark:bg-background">
       <div className="flex flex-col items-center">
-        <h3 className="text-xl font-extrabold">Unlimited</h3>
+        <h3 className="text-xl font-extrabold text-gray-700">Unlimited</h3>
         <p className="text-sm text-gray-500 dark:text-gray-300">
           &copy; {new Date().getFullYear()} Unlimited. {t("allRightsReserved")}
         </p>

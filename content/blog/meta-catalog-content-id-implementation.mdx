@@ -1,0 +1,214 @@
+---
+title: "Integrating Meta Catalog API"
+description: Wire up Meta Catalog API so the backend can automatically update and push product data.
+date: 2026-07-30
+tags: ["meta", "capi", "gtm", "catalog"]
+published: true
+language: "en"
+---
+
+The previous post covered [Integrating Meta Pixel + Conversions API](/blog/meta-capi-purchase-integration). The goal there was to run Pixel and Conversions API (CAPI) in parallel, then deduplicate with the same `event_id` so conversion counts stay accurate.
+
+We can already send purchase events to Meta (browser Pixel + server CAPI), and conversion deduplication lines up via the order number. But to run Catalog dynamic ads / retargeting, Meta also needs to know which catalog SKU the user viewed, added to cart, or bought.
+
+---
+
+## Content IDs must match before retargeting works
+
+At acceptance, the catalogs already had products (Taiwan / USA both had feeds loaded).  
+But in Meta Test Events, Purchase `contents` looked like this:
+
+<Image
+  src="/static/meta_catalog_api_capi_conteint_id.png"
+  alt="Meta Test Events interface"
+  width={500}
+  height={500}
+/>
+
+
+For the same product, the Catalog Content ID was:
+
+<Image
+  src="/static/meta_catalog_api_capi_correct_content_id.png"
+  alt="Meta Test Events interface"
+  width={500}
+  height={500}
+/>
+
+
+The storefront product API’s `variations[].model` was also `AC-MPNQ35-BK1`.
+
+Comparing the sources made it obvious:
+
+| Source | Product identity in use |
+|------|----------------------|
+| Meta events | Chinese product name ❌ |
+| Catalog Content ID | `variation.model` ✅ |
+| Product / order API | `model` ✅ |
+
+When the event id does not equal the Catalog Content ID, dynamic ads cannot correctly associate to catalog products.
+
+---
+
+## Deciding which field to use as the id
+
+There are several candidate ids: numeric `variation.id`, EAN, Chinese name, `model`…  
+From the table above, `model` is a reasonable choice:
+
+```markdown
+Catalog Content ID
+  === Pixel / CAPI contents.id and content_ids
+  === storefront dataLayer item_id
+  === variations[].model (e.g. AC-MPNQ35-BK1, CR-ARCMEG-BK2)
+```
+
+Why `model`:
+
+1. The existing feed already uses it.  
+2. It’s easy for CS, warehouse, and ad creative reconciliation.  
+3. Different colors / specs of the same product are different SKUs and should be tracked separately.
+
+Also: never use the product name as the Content ID. If there is no `model`, omit `item_id` and keep only `item_name` for GA / display.
+
+---
+
+## Changes across the stack
+
+Once we agreed to use `model` as the id, we had to confirm frontend, backend, and GTM were all consistent:
+
+```markdown
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│ Meta Catalog │◄───│ Backend Feed／ │     │ Order CAPI  │
+│ Content ID   │    │ Batch sync    │     │ content_ids │
+│   = model    │    └──────────────┘     │   = model   │
+└──────▲───────┘                         └──────▲──────┘
+       │                                        │
+       │         ┌──────────────────┐           │
+       └─────────│ Storefront       │───────────┘
+                 │ dataLayer        │
+                 │ item_id = model  │
+                 └────────▲─────────┘
+                          │
+                 ┌────────┴─────────┐
+                 │ GTM Facebook Tag │
+                 │ reads item_id,   │
+                 │ not item_name    │
+                 └──────────────────┘
+```
+
+### Meta Catalog (backend and marketing)
+
+- Feed uses `model` as the retailer / Content ID.  
+- Backend: update price, promotions, and inventory via Feed + Batch / scheduled jobs; ensure CAPI `content_ids` and `contents` also use the model id.  
+- Marketing: turn off the old Google Sheet “full-table replace” schedule and treat the new Feed as the source of truth.
+
+---
+
+### Storefront (frontend)
+
+Ensure `item_id` is filled in, with the mapper always:
+
+```markdown 
+item_id ← itemIdFromModel(model)   // only when model is non-empty
+item_name ← product display name   // for humans and GA
+```
+
+Cover the rest of the purchase funnel (adapt to your company’s rules):
+
+| Event | Focus |
+|------|------|
+| `view_item` | Product-page variation `model` |
+| `add_to_cart` | Include `model` when building the cart (including add-ons) |
+| `view_cart` / `begin_checkout` | `model` returned by the cart API |
+| `purchase` | `model` on order line items |
+
+We verified: the order detail API already has `model`; Purchase dataLayer correctly shows `item_id: "AC-DMPHOH-BK1"`.  
+Product-page add-ons carry `model`, so `add_to_cart` also sends the SKU.
+
+---
+
+### GTM → Facebook Pixel (marketing’s turf? 🧐)
+
+We use the community template Custom Version of Facebook Pixel, with Enhanced Ecommerce dataLayer Integration enabled.
+
+The template auto-builds `contents` from `ecommerce`, but in practice it often treats the product name as the id.
+
+Steps to add the override variables:
+
+1. Open Tags and find `Facebook Pixel`
+   - Under Object Properties, add variables for `content_ids` and `contents`.
+      - Add CJS variables that pull `item_id` from the existing `{{ecommerce.items}}`.  
+2. Override Object Properties on the Tag:
+   - Property Name: `contents` → Value: `{{CJS - Meta Contents}}`
+   - Property Name: `content_ids` → Value: `{{CJS - Meta Content IDs}}`  
+     (Note: **`content_ids` plural**, not `content_id`.)  
+3. If you have separate Pixel Tags per market, update each one the same way.  
+4. Pass Preview, then publish the container.
+
+<Image
+  src="/static/meta_catalog_api_gtm.png"
+  alt="GTM Facebook Pixel object properties"
+  width={500}
+  height={500}
+/>
+
+Acceptance: open Preview and actually click through:
+
+```markdown
+# dataLayer
+
+dataLayer.push({
+  event: "add_to_cart",
+  target: null,
+  action: null,
+  target-properties: null,
+  value: null,
+  interaction-type: false,
+  ecommerce: {
+    currency: "TWD",
+    value: 480,
+    items: [
+      {
+        item_name: "XXX",
+        item_id: "AC-UDHOOK-BK1", # override succeeded here
+        item_brand: "XXX",
+        price: 480,
+        item_category: "XXX",
+        item_variant: "XXX",
+        quantity: 1
+      }
+    ]
+  },
+  gtm.uniqueEventId: 270
+})
+```
+
+---
+
+## 🐞 Bug: old SKUs still showing up
+
+After Content IDs matched everywhere, the data still looked odd, so I’m noting it here. Roughly:
+
+1. Add products A and B separately — each time Meta only has 1 id (expected).  
+2. Empty the cart completely.  
+3. Add product C — Meta / GTM variables become C + already-deleted B.
+
+The dataLayer API call often only has C, but Preview’s `CJS - Meta Contents` still has two rows.
+
+Debugging showed it wasn’t “the clear-cart API failed to wipe state,” but:
+
+- The site cart and GTM’s internal ecommerce state are two separate memories.  
+- Clearing the cart only clears the former; if the latter isn’t explicitly wiped, the next merge can bring old items back.
+
+
+Fix:
+
+```markdown
+Before every ecommerce event:
+  dataLayer.push({ ecommerce: null })
+then trackEvent(the real add_to_cart / purchase / …)
+```
+
+---
+
+That’s the write-up for this Meta Catalog integration. It looks simple on the surface, but with three teams involved—even though I owned the frontend—having to write the docs (and working through them with AI) forced a clear split of responsibilities. That made cross-team coordination much clearer. A valuable experience!

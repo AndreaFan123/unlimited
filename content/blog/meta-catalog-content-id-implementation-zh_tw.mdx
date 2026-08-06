@@ -1,0 +1,213 @@
+---
+title: "串接 Meta Catalog API"
+description: 實作串接 Meta Catalog API 讓後端可以自動化更新/推送商品數據。
+date: 2026-07-30
+tags: ["meta", "capi", "gtm", "catalog"]
+published: true
+language: "zh_tw"
+---
+
+上一篇紀錄了[串接 Meta Pixel + Conversions API](/zh-TW/blog/meta-capi-purchase-integration-zh_tw)，主要目的在於 Pixel + Conversions API（CAPI）同時並行，再用同一個 `event_id` 去重複，轉換才準。
+
+目前已經能把購買事件送到 Meta（瀏覽器 Pixel + 伺服器 CAPI），轉換去重複也透過訂單號核對。但如果要跑 Catalog 動態廣告／再行銷，就必須讓 Meta 知道使用者看／加購／買的，是目錄裡的哪一個 SKU。
+
+---
+
+## Content ID 一致才能進一步再行銷
+
+驗收時目錄是有商品的（Taiwan／USA 都有 Feed 灌過）。  
+但打開 Meta Test Events，Purchase 的 `contents` 長這樣：
+
+<Image
+  src="/static/meta_catalog_api_capi_conteint_id.png"
+  alt="Meta Test Events interface"
+  width={500}
+  height={500}
+/>
+
+
+同一顆商品在 Catalog 裡的 Content ID 卻是：
+
+<Image
+  src="/static/meta_catalog_api_capi_correct_content_id.png"
+  alt="Meta Test Events interface"
+  width={500}
+  height={500}
+/>
+
+
+查詢官網商品 API 的 `variations[].model` 也是 `AC-MPNQ35-BK1`。
+
+把資料來源比對後就很清楚：
+
+| 來源 | 實際用的「商品身分」 |
+|------|----------------------|
+| Meta 事件 | 中文商品名 ❌ |
+| Catalog Content ID | `variation.model` ✅ |
+| 商品／訂單 API | `model` ✅ |
+
+由於事件 id 不等於 Catalog Content ID，會導致動態廣告無法正確關聯目錄商品。
+
+---
+
+## 決定要用哪個作為 id
+
+可選的 id 其實有好幾個：數字 `variation.id`、EAN、中文名、`model`…  
+但由上面的表格來看，`model` 是一個合理的選擇：
+
+```markdown
+Catalog Content ID
+  === Pixel / CAPI 的 contents.id、content_ids
+  === 官網 dataLayer 的 item_id
+  === variations[].model（例：AC-MPNQ35-BK1、CR-ARCMEG-BK2）
+```
+
+為什麼選 `model`：
+
+1. 既有 Feed 已經在用。  
+2. 客服、倉儲、廣告素材對帳都方便。  
+3. 同一商品不同顏色／規格是不同 SKU，本來就該分開追蹤。
+
+同時不拿商品名稱作為 Content ID；沒有 `model` 就省略 `item_id`，只保留 `item_name` 給 GA／顯示。
+
+---
+
+## 同步修改
+
+既然約定好使用 `model` 作為 id，那就要確認前端、後端以及 GTM 內是否都一致
+
+```markdown
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│ Meta Catalog │◄───│ 後端 Feed／   │     │ 訂單 CAPI    │
+│ Content ID   │    │ Batch 同步    │     │ content_ids │
+│   = model    │    └──────────────┘     │   = model   │
+└──────▲───────┘                         └──────▲──────┘
+       │                                        │
+       │         ┌──────────────────┐           │
+       └─────────│ 官網 dataLayer    │─────────── ┘
+                 │ item_id = model  │
+                 └────────▲─────────┘
+                          │
+                 ┌────────┴─────────┐
+                 │ GTM Facebook Tag │
+                 │ 讀 item_id，不是   │
+                 │ item_name        │
+                 └──────────────────┘
+```
+
+### Meta 目錄（後端和行銷範疇）
+
+- Feed 以 `model` 為 retailer／Content ID。  
+- 後端：針對價格、促銷、庫存用 Feed + Batch／排程更新；確保 CAPI 內的 `content_ids` 以及 `contents` 內容也要採用 model id。  
+- 行銷：則將舊的 Google Sheet「整表取代」排程關掉，以 新 Feed 為主。
+
+---
+
+### 官網（前端範疇）
+
+確保 補上 `item_id`，mapper 一律：
+
+```markdown 
+item_id ← itemIdFromModel(model)   // 有非空 model 才帶
+item_name ← 商品顯示名稱           // 給人看、給 GA
+```
+
+涵蓋其他購買的流程(可依照自己公司的規範設計)：
+
+| 事件 | 重點 |
+|------|------|
+| `view_item` | 商品頁 variation 的 `model` |
+| `add_to_cart` | 商品頁組時要帶上 `model`（含加購） |
+| `view_cart`／`begin_checkout` | 購物車 API 回傳的 `model` |
+| `purchase` | 訂單明細的 `model` |
+
+實測過：訂單 detail API 已有 `model`；Purchase 的 dataLayer 可正確出現 `item_id: "AC-DMPHOH-BK1"`。  
+商品頁加購帶 `model`，`add_to_cart` 也會帶 SKU。
+
+---
+
+### GTM → Facebook Pixel (應該是行銷？🧐)
+
+這裡用的是社群範本 Custom Version of Facebook Pixel，且開了 Enhanced Ecommerce dataLayer Integration。  
+
+因此範本會自動從 `ecommerce` 組 `contents`，實務上卻常把商品名當成 id。
+
+以下是增加變數的步驟：
+
+1. 點擊 Tags 找 `Facebook Pixel`
+   - 點擊 Object Properties，新增變數 `content_ids` 和 `contents`。
+      - 新增 CJS 變數，從既有的 `{{ecommerce.items}}` 抽出 `item_id`。  
+2. 在 Tag 的 Object Properties 覆寫：
+   - Property Name：`contents` → Value：`{{CJS - Meta Contents}}`
+   - Property Name：`content_ids` → Value：`{{CJS - Meta Content IDs}}`  
+     （注意是 **`content_ids` 複數**，不是 `content_id`。）  
+3. 若為多國且各有 Pixel Tag，每一個都要依照上面的步驟改。  
+4. Preview 通過後再發佈容器。
+
+<Image
+  src="/static/meta_catalog_api_gtm.png"
+  alt="Meta Test Events interface"
+  width={500}
+  height={500}
+/>
+
+驗收標準，開啟 Preview 實際操作：
+
+```markdown
+# dataLayer
+
+dataLayer.push({
+  event: "add_to_cart",
+  target: null,
+  action: null,
+  target-properties: null,
+  value: null,
+  interaction-type: false,
+  ecommerce: {
+    currency: "TWD",
+    value: 480,
+    items: [
+      {
+        item_name: "XXX",
+        item_id: "AC-UDHOOK-BK1", # 這邊就是複寫成功
+        item_brand: "XXX",
+        price: 480,
+        item_category: "XXX",
+        item_variant: "XXX",
+        quantity: 1
+      }
+    ]
+  },
+  gtm.uniqueEventId: 270
+})
+```
+
+---
+
+## 🐞 Bug: 舊 SKU 還在
+
+在 Content ID 都一致之後，資料卻有些怪怪的，因此特別紀錄下來，情形大致是：
+
+1. 分別加購商品 A、B，每次 Meta 都只有 1 個 id（正常）。  
+2. 把購物車刪光。  
+3. 再加商品 C——Meta／GTM 變數卻變成 C + 已刪的 B。
+
+dataLayer 的 API Call 往往只有 C，但 Preview 的 `CJS - Meta Contents` 卻有兩筆。
+
+Debug 後發現不是「刪購物車 API 沒清乾淨」，而是：
+
+- 網站購物車 和 GTM 內部的 ecommerce 狀態 是兩份記憶。  
+- 刪除購物車的 API 只清前者；後者如果沒有明確去除，就會在下一次合併時把舊 items 併回來。
+
+
+修法：
+
+```markdown
+每次送 ecommerce 事件前：
+  dataLayer.push({ ecommerce: null })
+再 trackEvent(真正的 add_to_cart / purchase / …)
+```
+
+---
+
+以上就是這次串接 Meta API 的紀錄，看似簡單，但要三方協作的狀況下，雖然我負責前端，但也因為需要寫文件的關係，得以透過文件和 AI 一起把整個任務劃分清楚，讓我更理解如何與不同部門的協調與溝通，是很寶貴的經驗！
