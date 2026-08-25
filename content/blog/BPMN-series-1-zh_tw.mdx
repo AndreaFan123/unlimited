@@ -1,10 +1,181 @@
 ---
-title: "BPMN Series 1"
-description: Learn BPMN
+title: "BPMN 系列 1：商業流程模型基礎入門：4 大核心"
+description: 學習 BPMN 的基礎圖示與運用概念，用 BPMN 釐清需求。
 date: 2026-08-03
 tags: ["BPMN", "ProcessModeling", "ProcessImprovement", "ProcessMapping", "ProductManagement"]
-published: false
+published: true
 language: "zh_tw"
 ---
 
-哈囉
+一直以來我就很喜歡用視覺呈現的方式幫助自己釐清需求或是作為開會時更好的溝通工具。視覺化的流程讓人一目瞭然，當然不同的視角看同一份流程圖會有不同的見解，
+但比起單純用文字或是口說來解釋清楚。
+
+BPMN —— Business Process Model and Notation，商業流程模型與標註，是一套全球通用的流程圖標準語言，雖然不是每一間公司的流程規劃都是採用這套，
+基於或許在職場上會跟產品經理或是系統分析師一起討論需求，抑或未來若是轉職成為產品端的人，這項技能都是值得投資的 (但即使不是因為轉職，滿足自己的好奇心也是一件很棒的事情)，
+因此決定投入一點時間去學習。以下紀錄學習的一些重點，還有練習案例分享。
+
+---
+
+## BPMN 基礎：四大要件
+
+- 泳道 (Swimlanes)
+- 流程對象 (Flow Objects) - 事件 (Events) 和 活動 (Activities)
+- 閘道 (Gateways)
+- 連接物件 (Connecting Objects)
+
+### 泳道 (Swimlanes)
+流程圖中的舞台，明確劃分責任歸屬，區分水池 (Pool)、泳道 (Lanes)，而泳池又區分白箱水池 (White-box pool) 和黑箱水池 (Black-box pool)
+
+#### 水池 (Pool) vs. 泳道 (Lanes)
+
+水池是獨立的組織，參與者或第三方，而泳道是指組織內部的系統或者角色。
+
+<Image
+  src="/static/BPMN-pool-lanes.png"
+  alt="BPMN events - start event, intermidiate event and end event"
+  width={500}
+  height={500}
+/>
+
+以上面的圖來表示，XXX Company 就是水池(白箱水池)，而 Sales, Financ 是泳道，代表 XXX Company 內部的組織。
+
+#### 白箱水池 (White-box pool) vs. 黑箱水池 (Black-box pool)
+
+上面提到 XXX Company 是白箱水池，會顯示內部組織的相關流程——我們公司內部的系統/組織運作流程；相反地，黑箱水池就是指與我們組織合作的外部組織，
+而外部組織內的運作流程不會畫出來，僅以一個白色框框表示。
+
+以下圖為例：VIP 和 XXX Payment 都是外部組織，也就是黑箱水池。
+
+<Image
+  src="/static/BPMN-white-pool-black-pool.png"
+  alt="BPMN events - start event, intermidiate event and end event"
+  width={500}
+  height={500}
+/>
+
+### 流程對象 (Flow Objects)  - 事件 (Events) 和 活動 (Activities)
+
+#### 事件 (Events)
+事件起始區分三種：開始事件 (Start Event)、中間事件 (Intermidiate Event)、結束事件 (End Event)，每一個事件都有代表的符號如下：
+
+<Image
+  src="/static/BPMN-events.png"
+  alt="BPMN events - start event, intermidiate event and end event"
+  width={500}
+  height={500}
+/>
+
+- 開始事件 (Start Event)：細線圓圈，代表流程的開始
+- 中間事件 (Intermidiate Event)：雙細線圓圈，代表流程執行中的等待或者發生的狀態
+- 結束事件 (End Event)：粗圓圈，代表流程的結束
+
+雖然起始只有三種，但種類繁多如下圖，這邊不一一贅述，未來用案例直接做介紹印象會深刻一些。
+
+<Image
+  src="/static/BPMN-event-categories.png"
+  alt="BPMN events categories"
+  width={500}
+  height={500}
+/>
+
+---
+
+#### 活動 (Activities)
+
+活動是總稱，具體細分三大類：原子任務 (Tasks)、子流程 (Sub-Processes) 與 調用活動 (Call Activities)
+
+  <Image
+    src="/static/BPMN-tasks-8-categories.png"
+    alt="BPMN events categories"
+    width={500}
+    height={500}
+  />
+
+- 原子任務 (Tasks)：代表不可再拆分的單一工作步驟，根據官方規範定義了八種原子任務。
+  - 用戶任務 (User Task)
+  - 手動任務 (Manual Task)
+  - 服務任務 (Service Task)
+  - 腳本任務 (Script Task)
+  - 發送任務 (Send Task)
+  - 接收任務 (Receive Task)
+  - 業務規則任務 (Business Rule Task)
+  - 抽象/通用任務 (Abstract Task) 
+- 子流程 (Sub-Processes)：將複雜流程結構化的重要工具，圓角矩形，底部中央會有一個「+」號。
+- 調用活動 (Call Activity)：引用一個已經獨立存在、可重複使用的流程或任務（類似程式語言中的 Call Function）
+
+---
+
+### 閘道 (Gateways)
+通常用菱形表示，負責處理流程的分流（Diverging/Split）、合流（Converging/Merge）、分支判斷與同步化。
+
+
+<Image
+    src="/static/BPMN-Gateways.png"
+    alt="BPMN gateways categories"
+    width={500}
+    height={500}
+  />
+
+#### 排他性閘道 (Exclusive / XOR)
+
+「單選」，評估所有條件後，僅能選擇一個符合條件的路徑執行；例如購物超過 1000 元則免運，否則需要運費 30 元。
+
+#### 平行閘道  (Parallel / AND)
+
+「全選 / 同步」，分流時會觸發所有條件，合流時會等候所有條件完成才繼續；例如新進員工，需要同時建立系統帳號以及發送歡迎信。
+
+#### 包容性閘道  (Inclusive / OR)
+
+「單選 / 多選」，評估所有的條件，符合一條或多條的條件被執行；例如購買機票，可以加選位子，接送等，或者兩個都選。
+
+#### 事件驅動性閘道  (Event-Based)
+
+被動等待事件發生，當某個條件「先」發生，就會觸發；例如：發送報價單後，看是「收到客戶簽核」還是「超過 3 天逾時」。
+
+#### 複雜閘道 (Complex) 
+
+自訂複雜邏輯，當上述閘道無法滿足時使用。
+
+---
+
+### 連接物件 (Connecting Objects)
+
+BPMN 的連接物件要三大類別如下，且必須要嚴格遵守嚴謹的跨界規則。
+
+<Image
+    src="/static/BPMN-connecting-object.png"
+    alt="BPMN gateways categories"
+    width={500}
+    height={500}
+  />
+
+- 順序流 (Sequence Flow)
+- 訊息流 (Message Flow)
+- 關聯 (Association)
+
+
+
+#### 順序流 (Sequence Flow)
+
+控制同一個水池內活動的執行順序。不可跨越黑箱/白箱水池邊界！只能在同一個 Pool 內穿梭。
+
+#### 訊息流 (Message Flow)
+
+表示不同水池（組織/系統）之間的通訊或訊息交換，只能跨水池連接，絕不可用於同一個 Pool 內的活動串聯。
+
+#### 關聯 (Association)
+
+將資料物件 (Data Object)、文字註解 (Annotation) 連結到流程對象上。不影響流程控制執行順序，僅補充資訊。
+
+---
+
+## 範例
+
+<Image
+    src="/static/BPMN-1-review.png"
+    alt="BPMN gateways categories"
+    width={500}
+    height={500}
+  />
+
+圖示表示一個公司的行銷業務活動，公司作為「白箱水池 (White-box pool)」
