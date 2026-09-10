@@ -178,4 +178,25 @@ BPMN 的連接物件要三大類別如下，且必須要嚴格遵守嚴謹的跨
     height={500}
   />
 
-圖示表示一個公司的行銷業務活動，公司作為「白箱水池 (White-box pool)」
+圖示表示一個公司的行銷業務活動，公司作為「白箱水池 (White-box pool)」，其中 Sales & marketing 部門作為「泳道 (Lanes)」，這個範例主要是行銷活動，活動會發送訊息給 VIP 客戶，
+由客戶選擇禮物，圖中可以看到 Customer 作為「黑箱水池 (Black-box pool)」，我們不會知道 Customer 端的流程細節。
+
+這個範例從訊息事件作為流程起點，用一個細圓圈加上一個信封，從 Customer 到訊息起點可以看到虛線呈現的「訊息流 (Message flow)」，這裡表示 Customer 註冊了這個活動，活動本身可能要求 Customer 提供電子信箱或是電話號碼等，訊息流是由外部到內部。
+
+接著可以看到往右延伸出去到第一個任務「Send VIP welcome message」(Task)，而連接事件跟任務的，用得是實線「順序流 (Sequence flow)」，任務底下用一個空白文件圖示代表「資料物件 (Data Object)」，以這個範例來說這個物件可以是 Customer 相關資料，
+該圖示用虛線(Association)往上連結任務；第一個任務再往右用順序流連接下一個事件「Welcome Message has been sent」，這裡用的是粗線圈加上信封，通常粗線圈代表著事件結束，這裡意味著公司已經發送 Customer 的歡迎訊息，用虛線訊息流往上連結 Customer，表示這個訊息是由內部到外部。
+
+---
+
+## 結論
+
+BPMN 四大元素：
+- 泳道 (Swimlanes)
+- 流程對象 (Flow Objects) - 事件 (Events) 和 活動 (Activities)
+- 閘道 (Gateways)
+- 連接物件 (Connecting Objects)
+
+「白箱水池」 (White-box pool) 代表內部，內部流程可被檢視；「黑箱水池」 (Black-box pool) 代表外部，流程不會被檢視。
+- 「泳道」 (Lanes)，通常代表一個白箱水池/組織內部的不同部門。
+
+「順序流」 (Sequence flow) 只能穿梭在白箱水池內，不可跨越到黑箱水池；反之，「訊息流」 (Message flow) 可穿梭在不同水池，代表通訊或訊息交換，只能跨水池連接，絕不可用於同一個水池內的活動串聯。
