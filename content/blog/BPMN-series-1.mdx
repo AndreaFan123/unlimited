@@ -1,10 +1,196 @@
 ---
-title: "BPMN 系列一：為什麼要學 BPMN"
-description: Learn
+title: "BPMN Series 1: The 4 Core Building Blocks of Business Process Modeling"
+description: Learn the basic BPMN symbols and concepts, and use BPMN to clarify requirements.
 date: 2026-08-03
 tags: ["BPMN", "ProcessModeling", "ProcessImprovement", "ProcessMapping", "ProductManagement"]
-published: false
-language: "zh_tw"
+published: true
+language: "en"
 ---
 
-哈囉
+I've always liked using visuals to help me clarify requirements, or as a better communication tool in meetings. A visualized process is easy to grasp at a glance. Of course, different people looking at the same diagram will read it differently — but it still beats trying to explain everything in plain text or by talking.
+
+BPMN — Business Process Model and Notation — is a globally recognized standard language for process diagrams. Not every company plans its processes this way, but if you end up discussing requirements with product managers or systems analysts, or if you move into a product role later on, it's a skill worth investing in (and even if a career switch isn't on the table, satisfying your own curiosity is a great reason too). So I decided to spend some time learning it. Below are my notes on the key points, plus a practice example.
+
+---
+
+## BPMN Basics: The Four Building Blocks
+
+- Swimlanes
+- Flow Objects — Events and Activities
+- Gateways
+- Connecting Objects
+
+### Swimlanes
+The stage of the diagram. They make responsibility clear, and are split into Pools and Lanes — and pools are further split into white-box pools and black-box pools.
+
+#### Pool vs. Lanes
+
+A pool is an independent organization, participant, or third party. A lane is a system or role inside that organization.
+
+<Image
+  src="/static/BPMN-pool-lanes.png"
+  alt="BPMN events - start event, intermidiate event and end event"
+  width={500}
+  height={500}
+/>
+
+In the diagram above, XXX Company is the pool (a white-box pool), and Sales and Finance are the lanes — the teams inside XXX Company.
+
+#### White-box pool vs. Black-box pool
+
+As mentioned, XXX Company is a white-box pool: it shows the internal processes — how our own systems and teams actually work. A black-box pool, on the other hand, is an external organization we work with. We don't draw what happens inside it; it's just an empty box.
+
+In the diagram below, VIP and XXX Payment are both external organizations, so they're black-box pools.
+
+<Image
+  src="/static/BPMN-white-pool-black-pool.png"
+  alt="BPMN events - start event, intermidiate event and end event"
+  width={500}
+  height={500}
+/>
+
+### Flow Objects — Events and Activities
+
+#### Events
+There are three basic kinds of events: Start Event, Intermediate Event, and End Event. Each has its own symbol:
+
+<Image
+  src="/static/BPMN-events.png"
+  alt="BPMN events - start event, intermidiate event and end event"
+  width={500}
+  height={500}
+/>
+
+- Start Event: a thin circle — the process begins here
+- Intermediate Event: a double thin circle — something happens or the process waits, mid-flow
+- End Event: a thick circle — the process ends here
+
+There are only three basic types, but plenty of variations, as shown below. I won't go through them one by one here — walking through real examples later will make them stick better anyway.
+
+<Image
+  src="/static/BPMN-event-categories.png"
+  alt="BPMN events categories"
+  width={500}
+  height={500}
+/>
+
+---
+
+#### Activities
+
+"Activity" is the umbrella term. It breaks down into three types: Tasks, Sub-Processes, and Call Activities.
+
+  <Image
+    src="/static/BPMN-tasks-8-categories.png"
+    alt="BPMN events categories"
+    width={500}
+    height={500}
+  />
+
+- Tasks: a single unit of work that can't be broken down any further. The official spec defines eight types:
+  - User Task
+  - Manual Task
+  - Service Task
+  - Script Task
+  - Send Task
+  - Receive Task
+  - Business Rule Task
+  - Abstract Task
+- Sub-Processes: the main tool for giving structure to a complex process. Drawn as a rounded rectangle with a "+" sign at the bottom center.
+- Call Activity: references a reusable process or task that already exists on its own (think of calling a function in code).
+
+---
+
+### Gateways
+Usually drawn as a diamond. Gateways handle splitting (diverging), merging (converging), branching decisions, and synchronization.
+
+
+<Image
+    src="/static/BPMN-Gateways.png"
+    alt="BPMN gateways categories"
+    width={500}
+    height={500}
+  />
+
+#### Exclusive Gateway (XOR)
+
+"Pick one." It checks all the conditions, but only one matching path runs. For example: orders over $1000 ship free, otherwise there's a $30 shipping fee.
+
+#### Parallel Gateway (AND)
+
+"Pick all / sync up." On a split, every path runs; on a merge, it waits for all of them to finish before moving on. For example: when a new employee joins, you create their system account and send the welcome email at the same time.
+
+#### Inclusive Gateway (OR)
+
+"Pick one or more." It checks all the conditions, and every matching path runs. For example: when booking a flight, you can add seat selection, airport pickup, or both.
+
+#### Event-Based Gateway
+
+Waits passively for something to happen — whichever event comes *first* triggers the path. For example: after sending a quote, does the signed approval come back, or does it time out after 3 days?
+
+#### Complex Gateway
+
+Custom, complicated logic — for when none of the gateways above will do.
+
+---
+
+### Connecting Objects
+
+BPMN has three kinds of connecting objects, and there are strict rules about which boundaries they can cross.
+
+<Image
+    src="/static/BPMN-connecting-object.png"
+    alt="BPMN gateways categories"
+    width={500}
+    height={500}
+  />
+
+- Sequence Flow
+- Message Flow
+- Association
+
+
+
+#### Sequence Flow
+
+Controls the order of activities within a single pool. It can never cross a pool boundary, black-box or white-box — it only moves around inside one pool.
+
+#### Message Flow
+
+Represents communication or message exchange between different pools (organizations/systems). It can only connect across pools, and must never be used to chain activities inside the same pool.
+
+#### Association
+
+Links a Data Object or a text Annotation to a flow object. It doesn't affect the flow of control — it just adds extra information.
+
+---
+
+## Example
+
+<Image
+    src="/static/BPMN-1-review.png"
+    alt="BPMN gateways categories"
+    width={500}
+    height={500}
+  />
+
+This diagram shows a company's marketing activity. The company is the white-box pool, with the Sales & Marketing department as a lane. The campaign sends a message to VIP customers and lets them pick a gift. Customer appears as a black-box pool — we have no idea what happens on the customer's side.
+
+The process starts with a message event: a thin circle with an envelope. The dashed line from Customer into that start event is a message flow — this is the customer signing up for the campaign, which probably asks for their email or phone number. The message flow goes from outside in.
+
+From there, the flow extends right to the first task, "Send VIP welcome message." The event and the task are connected by a solid line — a sequence flow. Below the task, the blank document icon is a Data Object, which here could be the customer's information; it connects up to the task with a dashed association line. The first task then connects right, again by sequence flow, to the event "Welcome Message has been sent" — a thick circle with an envelope. A thick circle usually means the process ends here, and in this case it means the company has sent the customer their welcome message. A dashed message flow goes up to Customer, showing the message travels from inside out.
+
+---
+
+## Wrap-up
+
+The four building blocks of BPMN:
+- Swimlanes
+- Flow Objects — Events and Activities
+- Gateways
+- Connecting Objects
+
+A white-box pool is internal: its process is visible. A black-box pool is external: its process stays hidden.
+- Lanes usually represent the different departments inside one white-box pool/organization.
+
+Sequence flow stays inside a white-box pool and can never cross into a black-box pool. Message flow, on the other hand, moves between pools — it represents communication or message exchange, only connects across pools, and must never be used to chain activities within the same pool.
