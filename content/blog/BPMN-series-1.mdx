@@ -62,7 +62,7 @@ There are three basic kinds of events: Start Event, Intermediate Event, and End 
 />
 
 - Start Event: a thin circle — the process begins here
-- Intermediate Event: a double thin circle — something happens or the process waits, mid-flow
+- Intermediate Event: a double circle — something happens or the process waits, mid-flow. There's an easy-to-miss detail here too: a **solid** border means it's *interrupting* (it cuts the original flow off), while a **dashed** border means it's *non-interrupting* (the original flow keeps running). That distinction matters a lot once you start modeling exceptions, so I'll come back to it in a later post.
 - End Event: a thick circle — the process ends here
 
 There are only three basic types, but plenty of variations, as shown below. I won't go through them one by one here — walking through real examples later will make them stick better anyway.
@@ -178,7 +178,14 @@ This diagram shows a company's marketing activity. The company is the white-box 
 
 The process starts with a message event: a thin circle with an envelope. The dashed line from Customer into that start event is a message flow — this is the customer signing up for the campaign, which probably asks for their email or phone number. The message flow goes from outside in.
 
-From there, the flow extends right to the first task, "Send VIP welcome message." The event and the task are connected by a solid line — a sequence flow. Below the task, the blank document icon is a Data Object, which here could be the customer's information; it connects up to the task with a dashed association line. The first task then connects right, again by sequence flow, to the event "Welcome Message has been sent" — a thick circle with an envelope. A thick circle usually means the process ends here, and in this case it means the company has sent the customer their welcome message. A dashed message flow goes up to Customer, showing the message travels from inside out.
+From there, the flow extends right to the first task, "Send VIP welcome message." The event and the task are connected by a solid line — a sequence flow. Below the task, the blank document icon is a Data Object, which here could be the customer's information; it connects up to the task with a dashed association line. The first task then connects right, again by sequence flow, to the event "Welcome Message has been sent" — a thick circle with an envelope. The thick circle means the process ends here, and in this case it means the company has sent the customer their welcome message. A dashed message flow goes up to Customer, showing the message travels from inside out.
+
+The real detail to notice here isn't how thick the circle is, though — it's **whether the envelope is hollow or filled in**:
+
+- **Hollow envelope = catching**: passively waiting to receive a message. The envelope at the start of the process is hollow, because the company is waiting for the customer to sign up.
+- **Filled envelope = throwing**: actively sending a message out. The envelope on the end event is filled in, because the company is the one pushing the welcome message to the customer.
+
+Same envelope symbol — hollow vs. filled is what tells you which direction the message goes. This catching/throwing distinction applies to every event type (message, signal, timer, and so on), it matters more than circle thickness, and it's the thing beginners get wrong most often.
 
 ---
 
