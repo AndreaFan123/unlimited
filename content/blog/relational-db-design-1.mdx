@@ -1,0 +1,109 @@
+---
+title: "Relational Database Design 1"
+description: Learning relational database design
+date: 2026-8-20
+tags: ["database", "RDBMS", "relational database",]
+published: true
+language: "en"
+---
+
+For most of my time as a frontend engineer, working with the backend has mainly meant hooking up APIs. I never dug very deep into how the backend designs a database or picks the columns for a table — I only knew that database design has a lot to do with performance.
+This series probably won't go into very deep or complicated database design. It's mostly a written record to help me sort out the questions I run into while learning, and to review what I've learned.
+
+Course: Udemy - [Relational Database Design Bootcamp](https://www.udemy.com/course/relational-database-design-bootcamp/)
+
+
+---
+
+## Different types of databases
+
+In the first part, Introduction of Database Design, the instructor uses slides to walk through the basic ideas and principles of databases and database design.
+
+### Flat File DB
+
+A simple database where all the data is kept in a single table or spreadsheet. It works for smaller data sets. Common examples are CSV and TXT files.
+
+### NoSQL DB
+
+Built for unstructured or semi-structured data. It suits large-scale or fast-changing data. Common options on the market are MongoDB and Cassandra.
+
+### Relational Database (RDB)
+
+A database that organizes data into tables (also called "relations") made up of rows and columns.
+- Each table represents a different entity (such as artists, customers, and so on)
+- Each row is a record, and each column is a field or attribute
+- You can build relationships between tables to link related data
+- It improves the reliability and integrity of the data
+
+---
+
+### A good table vs. a bad table
+
+A table has a fixed structure. The basic rules are:
+- Columns and rows: the basic grid that makes up a table, representing attributes and records.
+- Primary key: makes sure every record in the table can be identified uniquely.
+- Data types: limit a column to one kind of value, which keeps the data consistent.
+- Atomicity: makes sure every cell (column value) holds a single value that can't be split apart. This is exactly what's wrong with the playlists column in the earlier example, which packs several values into one cell.
+
+
+#### Example
+
+A table that doesn't follow good database design
+
+| first_name | last_name | date_of_birth    | state         | country | playlists                      |
+| ---------- | --------- | ---------------- | ------------- | ------- | ------------------------------ |
+| Andrew     | Smith     | 1998-03-11       | Wisconsin     | USA     | Easy Listening                 |
+| Michael    | Portman   | **Dec 3rd 1995** | New Hampshire | USA     | **best of 2024, best of 2025** |
+| Joseph     | Samuel    | 2003-07-20       | New York      | USA     | 90's classics                  |
+
+
+A table that does follow good database design
+| sb_id | first_name | last_name | date_of_birth | state         | country |
+| ----- | ---------- | --------- | ------------- | ------------- | ------- |
+| 1     | Andrew     | Smith     | 1998-03-11    | Wisconsin     | USA     |
+| 2     | Michael    | Portman   | 2000-09-15    | New Hampshire | USA     |
+| 3     | Joseph     | Samuel    | 2003-07-20    | New York      | USA     |
+
+Looking at the badly designed table, here's what it breaks:
+- It isn't atomic:
+  - The `playlists` column stores several comma-separated values (for example: best of 2024, best of 2025). Under 1NF, every column has to hold a single value that can't be split (an atomic value); you can't stuff several pieces of data into one column.
+  - The `date_of_birth` column uses inconsistent formats (for example, Dec 3rd 1995 doesn't match the standard YYYY-MM-DD format). That leads to inconsistent data types and makes querying and sorting harder later on.
+- No primary key
+
+---
+
+## Goals of database design
+
+This part is conceptual. I think it's worth remembering, so you can check a database against these design principles and then think about how to improve it.
+
+### Support data integrity and reliability
+
+This is about how accurate, consistent, and reliable the stored data is.
+- Make sure data stays correct and valid at all times (during inserts, updates, and deletes).
+- Enforce this through rules, constraints, and common practices.
+- Make sure every record in a table can be uniquely identified, and prevent duplicate records.
+- Make sure related data in the database can be referenced correctly.
+- Prevent logical errors, so users can trust the data when making decisions.
+
+### Minimize data redundancy
+- Avoid storing the same data in several places in the database
+- Save storage space and lower the risk of inconsistent data
+
+### Maintainability and scalability
+
+- Make the database easier to update, change, and extend without breaking what already works
+- Design for future growth in data volume and user load
+
+### Efficient data access and query performance
+
+- Plan the structure of tables and indexes so data can be retrieved quickly and efficiently
+
+### Security and access control
+
+- Define roles and permissions to control who can view or change data
+- Use views to limit access to sensitive data
+
+### Business and logic considerations
+
+- Capture and enforce the rules and logic of the business domain in the database design
+- Design the database so it can handle future changes without a major redesign
