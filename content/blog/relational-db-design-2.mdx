@@ -1,0 +1,260 @@
+---
+title: "Relational Database Design 2: Design Steps, Conceptual Data Modeling, and ERDs"
+description: Learning the steps of relational database design, conceptual data modeling, and entity relationship diagrams
+date: 2026-8-28
+tags: ["database", "RDBMS", "relational database",]
+published: true
+language: "en"
+---
+
+The previous post, [Relational Database Design 1](/blog/relational-db-design-1), went over the principles and goals of relational database design. This post covers the design steps, conceptual data modeling, and entity relationship diagrams.
+
+---
+
+## Steps of database design
+
+Whether you work on the frontend, the backend, or the cloud, the starting point for planning a business service or business logic is always the same: you need to know the business and user requirements. Database design works the same way.
+
+### Step 1: Business or user requirements
+
+- Confirm the data the business or the users need
+- Understand how the data will be used
+- Define business constraints, such as security, terms, and performance requirements
+
+### Step 2: Conceptual data model
+
+- Sketch the "big picture" of the database without going into detail
+- Create an Entity Relationship Diagram (ERD)
+- Define the entities, plus the relationships and attributes between them
+
+### Step 3: Logical design
+
+- Turn the ERD into table definitions with primary keys
+- Define foreign keys to express the relationships between tables and data
+- Normalize the database by applying normal forms
+
+### Step 4: Physical design
+
+- Pick a suitable data type for every attribute
+- Define any indexes you need for performance
+
+### Step 5: Implement the physical design
+
+- Choose an RDBMS and build the database schema with SQL
+- Set up the keys and constraints you need
+- Test it by inserting sample data
+
+### Step 6: Testing and rollout
+
+- Test specific user scenarios with real data
+- Find performance bottlenecks
+- Keep tuning constraints, indexes, and the schema when needed
+
+### Step 7: Maintenance and documentation
+
+- Write documentation for the schema
+- Plan for later changes and growth
+- Review and evaluate from time to time, so the design keeps up with changing business needs
+
+---
+
+## Conceptual data modeling
+
+You can think of conceptual data modeling as looking at all the information in the business requirements from a bird's-eye view. Like a blueprint, it helps everyone involved use the same agreed-upon definitions.
+The data defined at this stage represents the business processes, and how that data supports the business rules and requirements.
+
+### Elements of a conceptual data model
+
+A basic conceptual data model has:
+
+- Entity: the database object that stores the data you need (that is, a table)
+- Attribute: a property or characteristic of an entity (that is, a column in the table)
+- Relationship: shows how entities connect to each other
+- Cardinality: describes the type of connection between entities (one-to-one, one-to-many, many-to-many, and so on)
+
+---
+
+## Entity Relationship Diagram (ERD)
+
+An ERD is used to model the structure of a database. The main points:
+
+- It is more detailed than a conceptual model
+- Like the conceptual model, it maps out entities, relationships, and cardinality
+- It also includes the attributes of each entity (the columns in the table)
+- It includes extra table information, such as primary keys, foreign keys, and indexes
+
+---
+
+## Cardinality
+
+Cardinality defines the upper limit on how rows in two tables map to each other.
+
+| Relationship type    | Notation | Description       | Example
+| -------- | ------- | ------- | ------- |
+| One-to-One | 1:1    | One row in table A can only match one row in table B | A user and their ID number |
+| One-to-Many | 1:N / 1:M    | One row in table A can match many rows in table B, but one row in B can only match one row in A. | Customers and orders (one customer can have many orders) |
+| Many-to-Many | N:M    | One row in table A can match many rows in table B, and the other way around. Usually needs a junction table to break it apart. | Students and courses (a student takes many courses, a course has many students) |
+
+### Cardinality / participation
+
+<Image
+  src="/static/db-design-cardinalities.png"
+  alt="4 types of cardilities"
+  width={500}
+  height={500}
+/>
+
+There are four types (top to bottom):
+
+1. Zero or one
+2. Zero or more
+3. One or more
+4. Exactly one
+
+From these four, three main categories follow:
+
+- One-to-One
+- One-to-Many
+- Many-to-Many
+
+---
+
+### One-to-One / 1:1
+
+<Image
+  src="/static/db-design-one-to-one.png"
+  alt="One to One relationship"
+  width={500}
+  height={500}
+/>
+
+Compared with one-to-many or many-to-many, one-to-one shows up less often in everyday business systems. Its main traits:
+
+- Each row in one entity can only match one row in the other entity
+- The relationship can be `1...1`, or `0...1` / `1...0` (as shown in the diagram)
+- When you implement it, the foreign key goes on the dependent table and points to the primary key of the main entity
+- To really limit it to one-to-one, the foreign key usually needs a `UNIQUE` constraint, or it doubles as the primary key (PK + FK)
+- When designing a one-to-one, ask first: do these two entities really need to be split into two tables?
+- Common reasons to split:
+  - The data is optional
+  - The two have different lifecycles
+  - You need to isolate permissions or sensitive data
+  - They belong to different areas of responsibility
+  - They are accessed differently
+
+---
+
+### One-to-Many / 1:M
+
+<Image
+  src="/static/db-design-one-to-many.png"
+  alt="One to Many relationship"
+  width={500}
+  height={500}
+/>
+
+- One row in an entity can match many rows in another entity, but each row on the many side usually matches only one row on the one side
+- The relationship can be optional `0..N` or required `1..N`, depending on the business rules
+- When you implement it, the foreign key usually goes on the `M` side and points to the primary key of the `1` side
+- Whether the foreign key allows `NULL` depends on whether the relationship is optional. If every child row must belong to a parent row, it is usually set to `NOT NULL`
+- One-to-many is one of the most common relationships in a relational database
+- When designing a one-to-many, pay attention to the minimum cardinality: is it `0..N` or `1..N`?
+
+---
+
+### Many-to-Many / M:N
+
+<Image
+  src="/static/db-design-many-to-many.png"
+  alt="Many to Many relationship"
+  width={500}
+  height={500}
+/>
+
+- One row in an entity can match many rows in another entity, and one row in that other entity can also match many rows back
+- Both sides may be `0..N` or `1..N`; the actual minimum cardinality depends on the business rules
+- In a relational database, you usually don't implement an `M:N` relationship directly. Instead you create a junction table (also called an associative entity) to connect the two
+- The junction table normally holds the foreign keys of both entities, which splits the original M:N into two 1:N relationships
+- If the relationship itself carries data — quantity, price, role, join date, status — those attributes usually live in the junction table
+- The junction table can use the two foreign keys as a composite primary key, or it can have its own separate primary key. Which one you pick depends on your actual needs
+- While designing, check whether the same pair is allowed to repeat. If not, then even with a separate primary key you should usually put a `UNIQUE` constraint on the combination of the two foreign keys
+
+---
+
+## Putting it into practice
+
+### Exercise: a simple online bookstore (provided by Gemini)
+
+We need to build a database for a small online bookstore. The scope covers:
+- Customers: keep basic contact details.
+- Books: keep the title, price, and stock.
+- Orders: a customer can place orders, one order can include several books, and we need to record the quantity ordered.
+
+Based on the scenario above, draw the conceptual model.
+
+1. List the entities you can think of
+2. Work out the relationships and cardinality between them
+
+<details>
+<summary>Answer</summary>
+
+#### 1. List the entities
+
+The main entities in this scenario are:
+- Customer
+- Book
+- Order
+- Order Item: the junction table between books and orders
+
+> Entities are usually named in the singular
+
+---
+
+#### 2. Work out the relationships and cardinality
+
+##### Customer and Book
+The relationship between customer and book looks like a simple one-to-many: a customer can own zero or many books. The zero case happens right after a user record has been created.
+
+<details style={{ marginLeft: '20px', marginTop: '10px' }}>
+    <summary style={{color: '#903933'}}>Wait, there may be a problem here</summary>
+
+    <p style={{color: '#903933'}}>Does this scenario need a customer-to-book table as well as a customer-to-order table? My first instinct was that customer-to-book and customer-to-order are two different pieces of data, but I was looking at the relationship from a user's point of view. In terms of business logic, how many books a customer owns comes from buying them (placing an order), and the junction table "Order Item" already shows how many books a customer bought. So there is no need for a separate customer-to-book table.</p>
+
+  </details>
+
+##### Customer and Order
+
+As mentioned above, we can get the customer-to-book link through the relationship between customer and order. One customer can have many orders — but can one order have many customers? In practice, no. So the relationship between customer and order is settled: one-to-many.
+
+When drawing a conceptual data model, you can add a verb to express the business relationship between the data.
+
+<Image
+  src="/static/db-design-customer-order.png"
+  alt="Customer and Order relationship"
+  width={500}
+  height={500}
+/>
+
+##### Book and Order
+
+Here it helps to sort out the possible relationships. Both of these can be true:
+- One book appears in many orders
+- Many books appear in many orders
+
+As mentioned earlier, with a many-to-many we don't build an `M:N` table directly — we use another junction table to connect the two sides. In this scenario that table is "Order Item". If we use "Order Item" as the junction table between books and orders, the relationships look like this:
+
+- One order creates many order items
+- One book creates zero or many order items (a book that was just listed and has never been ordered has no order items)
+
+<Image
+  src="/static/db-design-all.png"
+  alt="Full conceptual model"
+  width={500}
+  height={500}
+/>
+
+</details>
+
+---
+
+An ERD still needs the full set of primary keys, foreign keys, and attributes, but this post is already running a bit long — so let's save that for the next one!
