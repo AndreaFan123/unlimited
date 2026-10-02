@@ -118,5 +118,17 @@
   "reflection-on-work": {
     "zh_tw": "reflection-on-work-zh_tw",
     "en": "reflection-on-work"
+  },
+  "relational-db-design-1": {
+    "zh_tw": "relational-db-design-1-zh_tw",
+    "en": "relational-db-design-1"
+  },
+  "relational-db-design-2": {
+    "zh_tw": "relational-db-design-2-zh_tw",
+    "en": "relational-db-design-2"
+  },
+  "relational-db-design-3": {
+    "zh_tw": "relational-db-design-3-zh_tw",
+    "en": "relational-db-design-3"
   }
 }

@@ -1,0 +1,81 @@
+---
+title: "Relational Database Design 3: Relational Integrity Constraints"
+description: Learn about five types of constraints in relational database design
+date: 2026-8-28
+tags: ["database", "RDBMS", "relational database"]
+published: true
+language: "en"
+---
+
+The previous post, [Relational Database Design 2: Design Steps, Conceptual Data Modeling, and ERDs](/blog/relational-db-design-2), explained the steps of database design, conceptual data models, and Entity Relationship Diagrams (ERDs). Before we begin, let's do a quick review.
+
+Steps of database design:
+
+1. Confirm the requirements: identify the data the business or users need and understand how the data will be used
+2. Conceptual data model: show the "big picture" of the database without the details, and create an Entity Relationship Diagram (ERD)
+3. Logical design: turn the ERD into tables with primary keys and foreign keys to define the relationships between tables
+4. Physical design: define the data type of each attribute and the indexes needed for performance
+5. Implement the physical design: choose an RDBMS and use SQL to create the database schema
+6. Testing and implementation
+7. Maintenance and documentation
+
+Elements of a conceptual data model:
+
+- Entity: a database object that stores the required data (that is, a table)
+- Attribute: a property or characteristic of an entity (that is, a column in a table)
+- Relationship: shows how entities are connected to each other
+- Cardinality: describes the type of connection between entities, such as one-to-one, one-to-many, or many-to-many
+
+But the points above do not explain what makes a database design "good." This post introduces relational integrity constraints, which help keep data correct, consistent, and logically valid.
+
+---
+
+## Relational Integrity Constraints
+
+### Domain Constraint
+
+A domain constraint allows a column (attribute) to contain only values that follow its data type and rules. For example, if a column uses the `VARCHAR` data type, it should only store text values.
+
+- ✅ Set `age` as an integer and add `CHECK (age >= 0)`
+
+- ❌ Set `age` as an `INTEGER` but do not add the right rules, so the column accepts values such as `-5` or `15 years old`
+
+---
+
+### Key Constraint
+
+A key constraint defines the keys in a table, such as a super key, candidate key, primary key, alternate key, or foreign key. It makes sure each record can be uniquely identified and that tables are connected correctly.
+
+- ✅ Set `customer_id` as the primary key, so the database prevents records from having the same ID
+
+- ❌ Do not set a primary key, so multiple records can use the same `customer_id`
+
+---
+
+### Entity Integrity Constraint
+
+A primary key can never be `NULL`. If a primary key allows `NULL`, the database no longer has a reliable way to identify a specific record.
+
+- ✅ Set `order_id` as the primary key. If someone tries to insert a record with `order_id` set to `NULL`, the database returns an error
+
+- ❌ Add an order without an `order_id`, leaving it as `NULL` and making the order difficult to find or update
+
+---
+
+### Referential Integrity Constraint
+
+Referential integrity prevents "orphaned records." When a foreign key has a value, it must match an existing primary key in another table.
+
+- ✅ Create a foreign key for `customer_id` in the orders table. If someone tries to insert a record with a nonexistent value such as `customer_id = 9999`, the database returns an error
+
+- ❌ An order has `customer_id = 9999`, but that customer has already been deleted while the order remains. This may cause errors in the application
+
+---
+
+### Semantic Integrity Constraint
+
+Some projects need extra rules based on their specific business logic. These rules can be enforced with `CHECK` constraints or application logic.
+
+- ✅ Add a database check such as `CHECK (discount_rate >= 0 AND discount_rate <= 1)` to keep the discount rate between 0 and 1, or `CHECK (shipping_date >= order_date)`
+
+- ❌ Set the promotion's `discount_rate` to 1.5, which means a 150% discount and causes the company to lose money, or set an order's shipping date earlier than its order date
