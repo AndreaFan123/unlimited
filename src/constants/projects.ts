@@ -5,11 +5,12 @@ export const PROJECT_COLORS = [
   "#576A8F",
   "#89986D",
   "#E97F4A",
-  "#604652"
+  "#604652",
 ] as const;
 
 export const WORK_PROJECT_KEYS = [
   "khunSin",
+  "lifeBonder",
   "dezctop",
   "senryo",
   "findHelp",
@@ -51,9 +52,10 @@ export function getProjectLatestYear(duration: string): number {
 }
 
 export function sortProjectsByDuration<T extends { duration: string }>(
-  projects: T[]
+  projects: T[],
 ): T[] {
   return [...projects].sort(
-    (a, b) => getProjectLatestYear(b.duration) - getProjectLatestYear(a.duration)
+    (a, b) =>
+      getProjectLatestYear(b.duration) - getProjectLatestYear(a.duration),
   );
 }

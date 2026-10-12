@@ -1,0 +1,86 @@
+---
+title: "Relational Database Design 4-1: Why Tables Need Primary and Foreign Keys"
+description: Learn about keys in relational databases
+date: 2026-9-07
+tags: ["database", "RDBMS", "relational database"]
+published: true
+language: "en"
+---
+
+The previous post, [Relational Database Design 3: Relational Integrity Constraints](/blog/relational-db-design-3), introduced relational integrity constraints in database design. Before we begin, let's do a quick review:
+
+Relational integrity constraints:
+
+1. Domain Constraint
+2. Key Constraint
+3. Entity Integrity Constraint
+4. Semantic Integrity Constraint
+
+---
+
+## Why Does a Table Need a Key?
+
+Imagine that we have two user records with the same name and email addresses that differ by only one letter. A person can quickly see the difference, but these records create several problems in a database:
+
+```markdown
+name | email
+Amy | amy@example.com
+Amy | amY@example.com
+```
+
+1. Are these two Amy records for the same person?
+2. If one user updates their information, how can we find the correct record?
+3. How can other data refer to a specific user?
+
+We could create this table with the following SQL:
+
+```js
+CREATE TABLE users (
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+```
+
+To identify each record correctly, we need to add a key: the primary key, as shown below:
+
+```js
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+```
+
+### Primary Key
+
+A primary key answers the question, "Which record is this?" It must be unique and cannot be `NULL`. A table can define only one primary key.
+
+A primary key uniquely identifies a record in a table, but real databases usually contain more than one table. For example, a user may have several orders. How can we connect the user to those orders?
+
+### Foreign Key
+
+A foreign key tells us who a record belongs to or what it is related to. Here is a simple `orders` table:
+
+```js
+CREATE TABLE orders (
+  id BIGINT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  total_amount DECIMAL(10, 2) NOT NULL,
+
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+The `users` and `orders` tables have a one-to-many relationship.
+
+---
+
+## Primary Key (PK) vs. Foreign Key (FK)
+
+| Question                           | Primary Key              | Foreign Key                |
+| ---------------------------------- | ------------------------ | -------------------------- |
+| Main purpose                       | Identifies a record      | Refers to another record   |
+| Must it be unique?                 | Yes                      | No                         |
+| Can it be `NULL`?                  | No                       | It depends on the design   |
+| How many can a table have?         | One                      | More than one              |
+| How does it create a relationship? | Other tables refer to it | It refers to another table |

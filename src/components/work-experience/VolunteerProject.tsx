@@ -20,6 +20,16 @@ export default function VolunteerProject() {
       ],
     },
     {
+      organization: t("lifeBonder.name"),
+      roles: [
+        {
+          duration: t("lifeBonder.duration"),
+          title: t("lifeBonder.description"),
+          type: t("volunteerType"),
+        },
+      ],
+    },
+    {
       organization: t("missingSemester.name"),
       roles: [
         {

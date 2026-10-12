@@ -2,7 +2,9 @@ const ROUTES = {
   HOME: "/",
   GITHUB: "https://github.com/AndreaFan123",
   LINKEDIN: "https://www.linkedin.com/in/andrea-fan/",
-  RESUME:"/resume",
+  RESUME: "/resume",
+  GOOGLE_RESUME:
+    "https://docs.google.com/document/d/1q4GMRqhGhdz2CI0vuxamcU3muJoxQsEp/edit?usp=sharing&ouid=114330232698485236942&rtpof=true&sd=true",
   SENRYO: "https://order.sen-ryo.com.hk/en",
   MEETUTODAY: "https://meetu.today/en",
   BLOG: "/blog",
@@ -13,7 +15,7 @@ const ROUTES = {
   COSEEING: "https://a11yvillage.coseeing.org/en",
   PYLADIES: "https://tw.pyladies.com/",
   MDN: "https://developer.mozilla.org/zh-TW/",
-  FINDHELP:"https://find-help-andreafan123s-projects.vercel.app/"
+  FINDHELP: "https://find-help-andreafan123s-projects.vercel.app/",
 };
 
 export default ROUTES;

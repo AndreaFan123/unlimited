@@ -48,7 +48,7 @@ const components = {
   }: React.ComponentPropsWithoutRef<"h2">) => (
     <h2
       className={cn(
-        "mt-7 mb-2 scroll-mt-20 font-black text-gray-700 dark:text-gray-300",
+        "mb-2 mt-7 scroll-mt-20 font-black text-gray-700 dark:text-gray-300",
         className,
       )}
       {...props}
@@ -63,7 +63,7 @@ const components = {
   }: React.ComponentPropsWithoutRef<"h3">) => (
     <h3
       className={cn(
-        "mt-7 mb-2 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
+        "mb-2 mt-7 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
         className,
       )}
       {...props}
@@ -78,7 +78,7 @@ const components = {
   }: React.ComponentPropsWithoutRef<"h4">) => (
     <h4
       className={cn(
-        "mt-7 mb-2 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
+        "mb-2 mt-7 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
         className,
       )}
       {...props}
@@ -93,7 +93,7 @@ const components = {
   }: React.ComponentPropsWithoutRef<"h5">) => (
     <h5
       className={cn(
-        "mt-7 mb-2 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
+        "mb-2 mt-7 scroll-mt-20 font-bold text-gray-700 dark:text-gray-300",
         className,
       )}
       {...props}
@@ -121,15 +121,15 @@ const components = {
     </blockquote>
   ),
   strong: ({ children }: { children: React.ReactNode }) => (
-    <strong className="rounded bg-[#c3c2ed] px-1 ">{children}</strong>
+    <strong className="rounded bg-[#c3c2ed] px-1">{children}</strong>
   ),
   a: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href} className="text-orange-600 hoverEffect">
+    <a href={href} className="hoverEffect text-orange-600">
       {children}
     </a>
   ),
   code: ({ children }: { children: React.ReactNode; href: string }) => (
-    <code className="text-pink-800 dark:text-orange-600 before:content-[''] after:content-['']">
+    <code className="text-pink-500 before:content-[''] after:content-[''] dark:text-orange-600">
       {children}
     </code>
   ),

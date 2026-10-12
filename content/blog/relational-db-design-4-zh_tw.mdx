@@ -1,0 +1,88 @@
+---
+title: "關聯式資料庫設計 4-1：為什麼資料庫需要鍵以及主鍵和外鍵的作用是什麼？"
+description: 學習關聯式資料庫中的關聯鍵
+date: 2026-9-07
+tags: ["database", "RDBMS", "relational database",]
+published: true
+language: "zh_tw"
+---
+
+上一篇[關聯式資料庫設計 3：資料庫關聯完整性限制](/zh-TW/blog/relational-db-design-3-zh_tw)，介紹了資料庫設計中的關聯完整性限制，在開始本篇之前，先做簡單的複習：
+
+關聯完整性限制（Relational Integrity Constraints）
+1. 定義域限制 (Domain Constraint)
+2. 關聯鍵限制 (Key Constraint)
+3. 實體完整限制 (Entity Integrity Constraint)
+4. 語意完整限制 (Semantic Integrity Constraint)
+
+---
+
+## 為什麼資料表需要鍵(Key)?
+
+想像一個情境，假設有兩筆使用者資料，名字都一樣，信箱有一個字母不同，肉眼可以馬上辨識，可是在資料庫中，這兩筆資料會產生幾個問題：
+
+```markdown
+name | email
+Amy  | amy@example.com
+Amy  | amY@example.com
+```
+
+1. 這兩個 Amy 是同一個人嗎？
+2. 如果其中一個使用者修改了資料，要如何精確找到正確的那筆？
+3. 其他資料要如何引用某位使用者？
+
+上述建立的 SQL 語法如下：
+
+```js
+CREATE TABKE users (
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+```
+
+為了能夠正確判斷資料，必須增加一個可以識別的鍵——主鍵 (Primary Key)，如下面所示：
+
+```js
+CREATE TABKE users (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+```
+
+### 主鍵 (Primary Key)
+
+主鍵存在的目的是為了回答「某筆資料是誰？」，它是「唯一」的，不可為 `NULL`，一張表只能定義一個主鍵。
+
+主鍵是資料表唯一的識別，但實務上不可能只有一張資料表，以上述為例，一個使用者可能會有訂單，那要如何關聯該使用者與訂單呢？
+
+### 外鍵 (Foreign Key)
+
+外鍵回答我們這筆資料「屬於誰？」或「與誰有關？」，以下是簡易的 order 資料表：
+
+```js
+CREATE TABLE orders (
+  id BIGINT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  total_amount DECIMAL(10, 2) NOT NULL,
+
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+而 `users` 和 `orders` 是屬於一對多 (One to Many) 的關係。
+
+---
+
+## 主鍵 (PK) vs 外鍵 (FK)
+
+| 問題    | 主鍵 | 外鍵 |
+| -------- | ------- | ------- |
+| 主要用途  | 識別本資料    | 參照其他資料 |
+| 是否唯一 | 是     | 否 |
+|  是否可以是 `NULL`   | 否    | 是設計而定 |
+| 一張表可有幾個 | 一個 |  多個 |
+| 是否建立關聯 | 被其他表引用 | 引用另外一張表 |
+
+
+

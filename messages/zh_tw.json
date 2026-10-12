@@ -5,7 +5,7 @@
     "title": "前端工程師",
     "description": "這是我的小小空間，用來紀錄生活觀察、分享興趣，以及那些正在發生的大小事。",
     "contactText": "歡迎來信聊聊。",
-    "contactEmailLabel": "寄信給范珊樂",
+    "contactEmailLabel": "寄信給 Andrea",
     "latestPosts": "最新文章"
   },
   "techStack": {
@@ -34,7 +34,7 @@
       "name": "Dezctop 官方網站",
       "description": "Dezctop 品牌官方電商網站",
       "link": "https://dezctop.com/tw",
-      "duration": "2025-現在",
+      "duration": "2026",
       "type": "工作"
     },
     "senryo": {
@@ -65,6 +65,13 @@
       "duration": "2025-2026",
       "type": "興趣"
     },
+    "lifeBonder": {
+      "name": "lifeBonder 行銷網站",
+      "description": "網站協作開發",
+      "duration": "2026-07-01 ~ 現在",
+      "link": "https://lifebonder.com/",
+      "type": "志工"
+    },
     "pyladies": {
       "name": "PyLadies (國際 Python 社群)",
       "description": "PyLadies Taiwan 網站維護者及組長",
@@ -86,7 +93,7 @@
       "duration": "2019-01-01 ~ 現在",
       "link": "https://missing-semester-tw.github.io/",
       "repo": "https://github.com/missing-semester-tw",
-      "type": "志工"
+      "type": "興趣"
     }
   },
   "socials": {
@@ -157,31 +164,31 @@
   },
   "metadata": {
     "home": {
-      "title": "范珊樂 Shan Le Fan｜ 我的個人小小空間",
-      "description": "范珊樂，或者你也可以叫我 Andrea。來自台灣、具行銷背景的前端工程師。這裡有我的作品、專案、工作經歷與技術部落格。"
+      "title": "Shan Le (Andrea) Fan｜ 我的個人小小空間",
+      "description": "Andrea，或者你也可以叫我 Andrea。來自台灣、具行銷背景的前端工程師。這裡有我的作品、專案、工作經歷與技術部落格。"
     },
     "blog": {
-      "title": "部落格｜范珊樂 Shan Le Fan",
-      "description": "范珊樂的部落格，分享前端開發、專案管理與生活的想法。"
+      "title": "部落格｜Shan Le (Andrea) Fan",
+      "description": "Shan Le (Andrea) Fan 的部落格，分享前端開發、專案管理與生活的想法。"
     },
     "tags": {
-      "title": "文章標籤｜范珊樂的部落格",
+      "title": "文章標籤｜Shan Le (Andrea) Fan 的部落格",
       "description": "瀏覽我寫過的文章主題與標籤。"
     },
     "tag": {
-      "title": "{tag}｜范珊樂的部落格",
-      "description": "范珊樂部落格中，標籤為 {tag} 的所有文章。"
+      "title": "{tag}｜Shan Le (Andrea) Fan 的部落格",
+      "description": "Shan Le (Andrea) Fan 部落格中，標籤為 {tag} 的所有文章。"
     },
     "post": {
-      "title": "部落格｜范珊樂 Andrea Fan",
-      "description": "范珊樂的部落格，分享前端開發、專案管理與生活的想法。"
+      "title": "部落格｜Shan Le (Andrea) Fan",
+      "description": "Shan Le (Andrea) Fan 的部落格，分享前端開發、專案管理與生活的想法。"
     },
     "resume": {
-      "title": "履歷 | 范珊樂 Shan Le Fan",
-      "description": "范珊樂 Andrea 的前端工程師履歷，涵蓋工作經歷、專案與開源貢獻。"
+      "title": "履歷 | Shan Le (Andrea) Fan",
+      "description": "Shan Le (Andrea) Fan 的前端工程師履歷，涵蓋工作經歷、專案與開源貢獻。"
     },
     "project": {
-      "title": "專案介紹｜范珊樂 Shan Le Fan",
+      "title": "專案介紹｜Shan Le (Andrea) Fan",
       "description": "了解我在工作與 side project 中的開發經驗、遇到的挑戰與成果。"
     }
   },
