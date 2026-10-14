@@ -24,6 +24,7 @@ export function blogPostingSchema(opts: {
   title: string;
   description?: string;
   date: string;
+  updated?: string;
   url: string;
   authorName: string;
   locale: string;
@@ -34,7 +35,7 @@ export function blogPostingSchema(opts: {
     headline: opts.title,
     ...(opts.description ? { description: opts.description } : {}),
     datePublished: opts.date,
-    dateModified: opts.date,
+    dateModified: opts.updated ?? opts.date,
     inLanguage: opts.locale,
     url: opts.url,
     mainEntityOfPage: { "@type": "WebPage", "@id": opts.url },
