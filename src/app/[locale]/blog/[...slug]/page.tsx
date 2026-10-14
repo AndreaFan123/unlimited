@@ -84,6 +84,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
     title: post.title,
     description: post.description,
     date: post.date,
+    updated: post.updated,
     url: `${SITE_URL}/${locale}/blog/${resolvedParams.slug.join("/")}`,
     authorName: t("name"),
     locale,
