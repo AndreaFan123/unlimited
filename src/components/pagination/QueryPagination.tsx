@@ -31,8 +31,13 @@ export default function QueryPagination({
 
   const createPageUrl = (pageNumber: number | string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("page", pageNumber.toString());
-    return `${pathname}?${params.toString()}`;
+    if (Number(pageNumber) === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", pageNumber.toString());
+    }
+    const query = params.toString();
+    return query ? `${pathname}?${query}` : pathname;
   };
 
   return (

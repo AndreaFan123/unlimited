@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { SITE_URL, contentLanguageToLocale } from "@/src/config/site";
+import { getPostAlternates } from "@/src/lib/blog-seo";
 import { blogPostingSchema } from "@/src/lib/structured-data";
 import { JsonLd } from "@/src/components/seo/JsonLd";
 import { posts } from "#site/content";
@@ -32,6 +33,7 @@ export async function generateMetadata({
 }: PostPageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const post = await getPostFromParams(resolvedParams);
+  if (!post || !post.published) notFound();
   const t = await getTranslations({
     locale: resolvedParams.locale,
     namespace: "metadata.post",
@@ -40,9 +42,7 @@ export async function generateMetadata({
   return {
     title: post?.title ? `${post.title}｜${fallbackTitle}` : fallbackTitle,
     description: post?.description ?? t("description"),
-    alternates: {
-      canonical: `${SITE_URL}/${resolvedParams.locale}/blog/${resolvedParams.slug.join("/")}`,
-    },
+    alternates: getPostAlternates(SITE_URL, post, posts),
   };
 }
 
@@ -90,7 +90,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
   });
   return (
     // relative: TOC sits in the right gutter on xl+ screens
-    <article className="relative w-full max-w-[1000px] mx-auto px-5 py-20">
+    <article className="relative mx-auto w-full max-w-[1000px] px-5 py-20">
       <JsonLd data={articleSchema} />
       <div className="flex flex-col gap-3 pb-5">
         <h1 className="text-4xl font-extrabold leading-tight text-gray-700 dark:text-gray-300">
@@ -100,7 +100,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
           <p className="text-gray-700 dark:text-gray-300">{post.description}</p>
         )}
         <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-300">
-          <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+          <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-300" />
           {formattedDate}
         </span>
         <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto overscroll-x-contain">
@@ -111,7 +111,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
               className="shrink-0"
             >
               <Link
-                className="text-gray-600 dark:text-gray-300 no-underline"
+                className="text-gray-600 no-underline dark:text-gray-300"
                 href={`${ROUTES.TAG_SLUG}${slug(tag)}`}
               >
                 {" "}
@@ -122,7 +122,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         </div>
       </div>
       <Separator className="mb-5" />
-      <div data-mdx-content className="prose w-full max-w-[1000px] mx-auto">
+      <div data-mdx-content className="prose mx-auto w-full max-w-[1000px]">
         <MdxContent code={post.body} />
       </div>
       <TableOfContents />
