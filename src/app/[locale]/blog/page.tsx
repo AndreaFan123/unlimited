@@ -1,7 +1,9 @@
 import Post from "@/src/components/post-list/Post";
 import QueryPagination from "@/src/components/pagination/QueryPagination";
 import { Metadata } from "next";
-import { getAlternates } from "@/src/config/site";
+import { SITE_URL } from "@/src/config/site";
+import { getBlogAlternates, getBlogPage } from "@/src/lib/blog-seo";
+import { notFound } from "next/navigation";
 import { posts } from "#site/content";
 import { sortPosts } from "@/src/lib/utils";
 import { getTranslations } from "next-intl/server";
@@ -10,7 +12,7 @@ import { routing } from "@/src/i18n/routing";
 
 type BlogPageProps = {
   searchParams: Promise<{
-    page?: string;
+    page?: string | string[];
   }>;
   params: Promise<{
     locale: string;
@@ -19,16 +21,32 @@ type BlogPageProps = {
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+  searchParams,
+}: BlogPageProps): Promise<Metadata> {
   const { locale } = await params;
+  const { currentPage } = getBlogPageData(locale, (await searchParams).page);
   const t = await getTranslations({ locale, namespace: "metadata.blog" });
   return {
     title: t("title"),
     description: t("description"),
-    alternates: getAlternates(locale, "/blog"),
+    alternates: getBlogAlternates(SITE_URL, locale, currentPage),
   };
+}
+
+const postsPerPage = 5;
+
+function getBlogPageData(locale: string, page: string | string[] | undefined) {
+  const sortedPosts = sortPosts(
+    posts.filter(
+      (post) =>
+        post.published &&
+        post.language === toContentLanguage(locale as Locales),
+    ),
+  );
+  const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
+  const currentPage = getBlogPage(page, totalPages);
+  if (currentPage === null) notFound();
+  return { sortedPosts, totalPages, currentPage };
 }
 
 export default async function BlogPage({
@@ -42,29 +60,27 @@ export default async function BlogPage({
     : routing.defaultLocale;
   const t = await getTranslations("blog");
 
-  const postsPerPage = 5;
-  const currentPage = Number(resolvedSearchParams?.page) || 1;
-  const sortedPosts = sortPosts(
-    posts.filter(
-      (post) => post.published && post.language === toContentLanguage(locale),
-    ),
+  const { sortedPosts, totalPages, currentPage } = getBlogPageData(
+    locale,
+    resolvedSearchParams.page,
   );
-  const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
   const displayPosts = sortedPosts.slice(
     postsPerPage * (currentPage - 1),
     postsPerPage * currentPage,
   );
 
   return (
-    <section className="w-full max-w-[1000px] mx-auto px-5">
+    <section className="mx-auto w-full max-w-[1000px] px-5">
       <div className="flex flex-col gap-4 py-10">
-        <h1 className="text-4xl relative w-fit font-extrabold text-gray-700 dark:text-gray-300">
+        <h1 className="relative w-fit text-4xl font-extrabold text-gray-700 dark:text-gray-300">
           {t("blog")}
-          <span className="h-2 bg-yellow-400 dark:bg-orange-500 absolute top-8 left-0 -z-10 w-full"></span>
+          <span className="absolute left-0 top-8 -z-10 h-2 w-full bg-yellow-400 dark:bg-orange-500"></span>
         </h1>
-        <p className="text-gray-700 dark:text-gray-300 font-mono">{t("description")} 🚀</p>
+        <p className="font-mono text-gray-700 dark:text-gray-300">
+          {t("description")} 🚀
+        </p>
       </div>
-      <div className="flex flex-col gap-4 ">
+      <div className="flex flex-col gap-4">
         {displayPosts?.length > 0 ? (
           <ul className="flex flex-col gap-20">
             {displayPosts.map((post) => (

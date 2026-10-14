@@ -6,8 +6,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Avoid indexing paginated list variants as duplicate content.
-      disallow: "/*?page=",
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
