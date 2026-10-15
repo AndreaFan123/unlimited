@@ -66,3 +66,20 @@ Run `node --test tests/sitemap.test.mjs` to check locale coverage, date handling
 stable output across build dates, and published article alternates.
 Run `node --test tests/content-dates.test.mjs` to check strict update-date
 validation, leap years, and agreement between article JSON-LD and sitemap dates.
+
+## Tag page checks
+
+Tag lists and counts include only published articles in the current locale.
+Tag detail URLs use the same slug normalization as tag links; unknown tags,
+draft-only tags, and tags without published articles in the requested locale
+return 404. Tag detail hreflang only advertises available published locales.
+Tags with the same slug share one list entry, retain the first display label, and
+count distinct articles once even if an article repeats aliases of that tag.
+The server sends published tag slugs for each locale to the language toggle.
+Switching to a locale without that tag goes to its tag index; available tags keep
+their detail page.
+
+Run `node --test tests/tag-pages.test.mjs` for route and metadata regression tests.
+With the production server running as described above, run
+`node --test tests/tag-pages-http.test.mjs` to check actual responses, draft-only
+404s, tag counts, and every published tag page's article links and hreflang.
