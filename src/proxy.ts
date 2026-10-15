@@ -21,7 +21,9 @@ export default function proxy(request: NextRequest) {
   // Automatic Link headers use different defaults and cannot pair article slugs.
   const isArticle = /^\/(en|zh-TW)\/blog\/(?!tags(?:\/|$)).+/.test(pathname);
   const isBlogIndex = /^\/(en|zh-TW)\/blog\/?$/.test(pathname);
-  return isArticle || isBlogIndex
+  // A tag can have published articles in only one locale.
+  const isTagDetail = /^\/(en|zh-TW)\/blog\/tags\/[^/]+\/?$/.test(pathname);
+  return isArticle || isBlogIndex || isTagDetail
     ? handleBlogRouting(request)
     : handleI18nRouting(request);
 }

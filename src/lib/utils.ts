@@ -25,15 +25,21 @@ export function sortPosts(posts: Array<Post>) {
 }
 
 export function getAllTags(posts: Array<Post>) {
-  const tags: Record<string, number> = {};
-  posts.forEach((post) => {
-    if (post.published) {
-      post.tags?.forEach((tag) => {
-        tags[tag] = (tags[tag] ?? 0) + 1;
-      });
+  const groups = new Map<string, { label: string; articles: Set<string> }>();
+  for (const post of posts) {
+    if (!post.published) continue;
+    for (const tag of post.tags ?? []) {
+      const key = slug(tag);
+      if (!key) continue;
+      if (!groups.has(key))
+        groups.set(key, { label: tag, articles: new Set() });
+      groups.get(key)!.articles.add(post.slug);
     }
-  });
-  return tags;
+  }
+  // Keep the first display label for each URL; count article identities, not aliases.
+  return Object.fromEntries(
+    [...groups.values()].map(({ label, articles }) => [label, articles.size]),
+  );
 }
 
 export function sortTagByCount(tags: Record<string, number>) {
