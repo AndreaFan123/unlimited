@@ -2,6 +2,13 @@ import { defineConfig, defineCollection, s } from "velite";
 import rehypeSlug from "rehype-slug";
 import rehypePrettyCode from "rehype-pretty-code";
 
+// Validate the calendar date before normalizing; Date.parse can roll invalid days forward.
+const updatedDate = s
+  .string()
+  .date()
+  .transform((date) => `${date}T00:00:00.000Z`)
+  .optional();
+
 const computedFields = <T extends { slug: string }>(data: T) => ({
   ...data,
   slugAsParams: data.slug.split("/").slice(1).join("/"),
@@ -16,6 +23,7 @@ const posts = defineCollection({
       title: s.string().max(99),
       description: s.string().max(999).optional(),
       date: s.isodate(),
+      updated: updatedDate,
       published: s.boolean().default(true),
       tags: s.array(s.string()).optional(),
       language: s.string().default("en"),
@@ -31,6 +39,7 @@ const projectPages = defineCollection({
     .object({
       slug: s.path(),
       projectKey: s.string(),
+      updated: updatedDate,
       title: s.string().max(99),
       description: s.string().max(999).optional(),
       published: s.boolean().default(true),
