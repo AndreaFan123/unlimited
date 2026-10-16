@@ -3,11 +3,11 @@ import rehypeSlug from "rehype-slug";
 import rehypePrettyCode from "rehype-pretty-code";
 
 // Validate the calendar date before normalizing; Date.parse can roll invalid days forward.
-const updatedDate = s
+const calendarDate = s
   .string()
   .date()
-  .transform((date) => `${date}T00:00:00.000Z`)
-  .optional();
+  .transform((date) => `${date}T00:00:00.000Z`);
+const updatedDate = calendarDate.optional();
 
 const computedFields = <T extends { slug: string }>(data: T) => ({
   ...data,
@@ -22,7 +22,7 @@ const posts = defineCollection({
       slug: s.path(),
       title: s.string().max(99),
       description: s.string().max(999).optional(),
-      date: s.isodate(),
+      date: calendarDate,
       updated: updatedDate,
       published: s.boolean().default(true),
       tags: s.array(s.string()).optional(),

@@ -11,12 +11,19 @@ type ProjectCardProps = {
 };
 
 function isLightColor(hex: string): boolean {
-  const r = Number.parseInt(hex.slice(1, 3), 16);
-  const g = Number.parseInt(hex.slice(3, 5), 16);
-  const b = Number.parseInt(hex.slice(5, 7), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-  return luminance > 0.6;
+  const luminance = (value: string) => {
+    const channels = [1, 3, 5].map((offset) => {
+      const channel =
+        Number.parseInt(value.slice(offset, offset + 2), 16) / 255;
+      return channel <= 0.04045
+        ? channel / 12.92
+        : ((channel + 0.055) / 1.055) ** 2.4;
+    });
+    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+  };
+  const background = luminance(hex);
+  // Pick the stronger WCAG contrast, rather than a perceived-brightness cutoff.
+  return (background + 0.05) / 0.05 >= 1.05 / (background + 0.05);
 }
 
 export default function ProjectBar({
@@ -25,10 +32,10 @@ export default function ProjectBar({
   visitLabel,
 }: ProjectCardProps) {
   const lightBackground = isLightColor(color);
-  const textColor = lightBackground ? "text-gray-900" : "text-white";
+  const textColor = lightBackground ? "text-black" : "text-white";
   const badgeClass = lightBackground
-    ? "bg-gray-900/10 text-gray-900"
-    : "bg-white/20 text-white";
+    ? "bg-white/20 text-black"
+    : "bg-gray-900/10 text-white";
 
   return (
     <a
@@ -55,10 +62,7 @@ export default function ProjectBar({
             {project.duration}
           </span>
 
-          <span
-            aria-hidden
-            className={cn("rounded-full p-2", badgeClass)}
-          >
+          <span aria-hidden className={cn("rounded-full p-2", badgeClass)}>
             <Binoculars className="size-4" />
           </span>
         </div>
@@ -66,7 +70,7 @@ export default function ProjectBar({
           <h4 className={cn("text-xl font-bold leading-snug", textColor)}>
             {project.name}
           </h4>
-          <p className={cn("text-base font-mono leading-snug", textColor)}>
+          <p className={cn("font-mono text-base leading-snug", textColor)}>
             {project.description}
           </p>
         </div>
