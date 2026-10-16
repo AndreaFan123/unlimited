@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Noto_Sans_TC } from "next/font/google";
+import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/src/components/shared-components/theme-provider";
@@ -20,12 +20,6 @@ export const metadata: Metadata = {
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-});
-
-const notoSansTC = Noto_Sans_TC({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export default async function RootLayout({
@@ -51,9 +45,7 @@ export default async function RootLayout({
   return (
     <html lang={resolvedLocale} suppressHydrationWarning>
       <body
-        className={`${
-          resolvedLocale === "en" ? inter.className : notoSansTC.className
-        }`}
+        className={`${resolvedLocale === "en" ? inter.className : "font-zh"}`}
       >
         <ThemeProvider
           attribute="class"

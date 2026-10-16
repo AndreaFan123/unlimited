@@ -26,7 +26,8 @@ export default function LocaleToggle({
         locale="en"
         className={cn(
           linkClass,
-          lang === "en" && "font-bold text-orange-500 hover:text-orange-500",
+          lang === "en" &&
+            "font-bold text-orange-700 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-400",
         )}
       >
         EN
@@ -41,7 +42,8 @@ export default function LocaleToggle({
         locale="zh-TW"
         className={cn(
           linkClass,
-          lang === "zh-TW" && "font-bold text-orange-500 hover:text-orange-500",
+          lang === "zh-TW" &&
+            "font-bold text-orange-700 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-400",
         )}
       >
         ZH-TW

@@ -1,11 +1,7 @@
-"use client";
-
 import { Eye, Github, Linkedin, NotebookText } from "lucide-react";
 import ExternalLink from "@/src/components/profile/ExternalLink";
 import ROUTES from "@/src/constants/routes";
 import { useTranslations } from "next-intl";
-import LineReveal from "../animation/LineReveal";
-import StaggerIn from "../animation/StaggerIn";
 
 type PersonInfoProps = {
   name: string;
@@ -13,10 +9,7 @@ type PersonInfoProps = {
   description: string;
 };
 
-export default function PersonInfo({
-  name,
-  description,
-}: PersonInfoProps) {
+export default function PersonInfo({ name, description }: PersonInfoProps) {
   const tSocials = useTranslations("socials");
   const SOCIALS = [
     {
@@ -53,17 +46,13 @@ export default function PersonInfo({
     },
   ];
   return (
-    <div className="flex flex-col items-start gap-20 mb-20">
-      <LineReveal animateOnScroll={false} delay={1}>
-        <h1 className="text-4xl md:text-5xl font-semibold lg:leading-snug text-balance block text-left">
-          {name}
-        </h1>
-      </LineReveal>
-      <div className="flex gap-10 items-start flex-col lg:flex-row lg:justify-between">
-        <LineReveal animateOnScroll={false} delay={1.5}>
-          <h2 className="text-xl block font-mono lg:w-[70%]">{description}</h2>
-        </LineReveal>
-        <StaggerIn delay={2} stagger={0.15} className="flex gap-7">
+    <div className="mb-20 flex flex-col items-start gap-20">
+      <h1 className="block text-balance text-left text-4xl font-semibold md:text-5xl lg:leading-snug">
+        {name}
+      </h1>
+      <div className="flex flex-col items-start gap-10 lg:flex-row lg:justify-between">
+        <h2 className="block font-mono text-xl lg:w-[70%]">{description}</h2>
+        <div className="flex gap-7">
           {SOCIALS.map((socialItem) => (
             <ExternalLink
               key={socialItem.name}
@@ -74,7 +63,7 @@ export default function PersonInfo({
               bgClassName={socialItem.bgClassName}
             />
           ))}
-        </StaggerIn>
+        </div>
       </div>
     </div>
   );

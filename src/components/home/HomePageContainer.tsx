@@ -1,5 +1,3 @@
-"use client";
-
 import ProfileContainer from "../../components/profile/ProfileContainer";
 import PostContainer from "@/src/components/profile/PostContainer";
 import { Locales } from "@/src/i18n/request";
@@ -11,13 +9,13 @@ export default function HomePageContainer({ locale }: { locale: Locales }) {
       <div>
         <ProfileContainer />
       </div>
-      <div className="dark:border-b-[1px] dark:border-gray-400 dark:border-dashed" />
+      <div className="dark:border-b-[1px] dark:border-dashed dark:border-gray-400" />
       <div className="project-section-surface">
         <ProjectContainer />
       </div>
-      <div className="dark:border-b-[1px] dark:border-gray-400 dark:border-dashed" />
+      <div className="dark:border-b-[1px] dark:border-dashed dark:border-gray-400" />
       <div>
-        <PostContainer lang={locale}/>
+        <PostContainer lang={locale} />
       </div>
     </section>
   );

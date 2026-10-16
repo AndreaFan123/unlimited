@@ -1,0 +1,21 @@
+# Unlimited — Andrea Fan
+
+> Andrea Fan's bilingual personal website, with software engineering articles, projects, and a resume in English and Traditional Chinese.
+
+## English
+
+- [Home](https://shanlefan.com/en): Introduction and recent work.
+- [Blog](https://shanlefan.com/en/blog): Published software engineering articles.
+- [Topics](https://shanlefan.com/en/blog/tags): Articles grouped by tag.
+- [Resume](https://shanlefan.com/en/resume): Professional experience.
+
+## Traditional Chinese
+
+- [首頁](https://shanlefan.com/zh-TW): 個人介紹與近期作品。
+- [部落格](https://shanlefan.com/zh-TW/blog): 已發布的軟體工程文章。
+- [文章標籤](https://shanlefan.com/zh-TW/blog/tags): 依標籤瀏覽文章。
+- [履歷](https://shanlefan.com/zh-TW/resume): 工作經歷。
+
+## Site resources
+
+- [Sitemap](https://shanlefan.com/sitemap.xml): Canonical URLs and available language variants.

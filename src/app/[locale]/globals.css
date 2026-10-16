@@ -37,6 +37,10 @@ body {
 }
 
 @layer base {
+  .font-zh {
+    font-family: "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -101,7 +105,7 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground min-h-screen flex flex-col justify-between;
+    @apply flex min-h-screen flex-col justify-between bg-background text-foreground;
   }
 
   /* focus */
@@ -117,7 +121,7 @@ body {
 
 @layer utilities {
   .hoverEffect {
-    @apply hover:text-orange-500 transition-all duration-300 hover:scale-110;
+    @apply transition-all duration-300 hover:scale-110 hover:text-orange-500;
   }
 
   .project-section-surface {
