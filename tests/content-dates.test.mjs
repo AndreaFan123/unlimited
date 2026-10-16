@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { test } from "node:test";
 import { runInNewContext } from "node:vm";
 import * as velite from "velite";
@@ -58,9 +59,67 @@ for (const collection of ["posts", "projectPages"]) {
   });
 }
 
-test("legacy publication-date parsing remains supported", () => {
+test("publication dates reject ambiguous formats and invalid calendar dates", () => {
   const date = config.collections.posts.schema.innerType().shape.date;
-  assert.equal(date.safeParse("2026-9-02").success, true);
+  for (const value of [
+    "2026-9-02",
+    "2024-10-9",
+    "2026-02-30",
+    "2025-02-29",
+    "1900-02-29",
+    "2026-04-31",
+    "2026-13-01",
+    "2026-00-10",
+    "2026-01-00",
+    "1",
+    "",
+    " 2026-10-14 ",
+    "2026-10-14T00:00:00Z",
+    undefined,
+  ]) {
+    assert.equal(date.safeParse(value).success, false, String(value));
+  }
+});
+
+test("publication dates normalize valid calendar days to UTC midnight", () => {
+  const date = config.collections.posts.schema.innerType().shape.date;
+  for (const value of ["2024-10-09", "2026-09-02", "2024-02-29", "2000-02-29"])
+    assert.equal(date.parse(value), `${value}T00:00:00.000Z`);
+});
+
+test("all article source dates and JSON-LD fallbacks are identical in UTC and Asia/Taipei", () => {
+  const snapshot = (timezone) =>
+    JSON.parse(
+      execFileSync(
+        process.execPath,
+        [
+          new URL("./helpers/publication-date-snapshot.mjs", import.meta.url)
+            .pathname,
+        ],
+        {
+          env: { ...process.env, TZ: timezone },
+          encoding: "utf8",
+        },
+      ),
+    );
+  const utc = snapshot("UTC");
+  const taipei = snapshot("Asia/Taipei");
+  assert(utc.length > 0);
+  assert.deepEqual(taipei, utc);
+  for (const article of utc) {
+    assert.match(article.sourceDate, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(
+      article.date,
+      `${article.sourceDate}T00:00:00.000Z`,
+      article.slug,
+    );
+    assert.equal(article.datePublished, article.date, article.slug);
+    assert.equal(
+      article.dateModified,
+      article.updated ?? article.date,
+      article.slug,
+    );
+  }
 });
 
 const site = {

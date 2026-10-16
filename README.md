@@ -67,6 +67,15 @@ stable output across build dates, and published article alternates.
 Run `node --test tests/content-dates.test.mjs` to check strict update-date
 validation, leap years, and agreement between article JSON-LD and sitemap dates.
 
+Article `date` and optional `updated` frontmatter must use a valid `YYYY-MM-DD`
+calendar date. Both normalize explicitly to UTC midnight; non-padded dates and
+timestamps are rejected. Publication dates do not create sitemap `lastmod` values.
+The date suite also parses all article sources in separate `UTC` and
+`Asia/Taipei` processes to guard against timezone-dependent publication dates.
+With the production server running, run
+`node --test tests/publication-dates-http.test.mjs` to check every published
+article's displayed day, JSON-LD dates, and sitemap modification date behavior.
+
 ## Tag page checks
 
 Tag lists and counts include only published articles in the current locale.
@@ -83,3 +92,18 @@ Run `node --test tests/tag-pages.test.mjs` for route and metadata regression tes
 With the production server running as described above, run
 `node --test tests/tag-pages-http.test.mjs` to check actual responses, draft-only
 404s, tag counts, and every published tag page's article links and hreflang.
+
+## Homepage PageSpeed checks
+
+Run `node --test tests/homepage-contrast.test.mjs` to verify project-card text,
+translucent badges, and active locale links meet 4.5:1 contrast in both themes.
+With a production server running on port 4317, run
+`node --test tests/homepage-http.test.mjs` to verify the bilingual server-rendered
+homepage, six published local articles, project links, and the public `llms.txt`.
+The same suite caps initial gzip CSS at 64 KiB and JavaScript at 220 KiB to guard
+against duplicated font declarations and article content entering client bundles.
+
+Measure Lighthouse against a production build, using the same device preset and
+throttling for before/after comparisons. Localhost scores are not production
+PageSpeed results; the production canonical URL causes the localhost canonical
+audit to fail even when the canonical is correct for deployment.
